@@ -1,38 +1,39 @@
 #!/usr/bin/env bash
 set -euo pipefail
 export LC_ALL=C.UTF-8
-IFS=$'\n\t'
 
-# ===================================================================
-# 🏆 Script universel : Import FIFA TXT → MySQL
-# ===================================================================
-
+# 📁 Dossier racine
 ROOT="/mnt/c/Users/PC/Documents/FM_temp"
 
-echo "📂 Dossiers FIFA disponibles dans $ROOT :"
+echo "📂 Dossiers disponibles dans $ROOT :"
 select SUBDIR in "$ROOT"/*/; do
   [ -n "$SUBDIR" ] && break
 done
 
-DB_NAME=$(basename "$SUBDIR")
+# 🔧 Préparation des chemins
 SOURCE="$SUBDIR"
+BASENAME=$(basename "$SUBDIR")
+DB_NAME="$BASENAME"
+
 echo "📁 Dossier sélectionné : $SOURCE"
-echo "🗄️  Base MySQL : $DB_NAME"
+echo "🗄️ Base MySQL : $DB_NAME"
 
-# --- Config MySQL ---
-read -s -p "Mot de passe MySQL root : " MYSQL_PASS
-echo
-MYSQL_USER="root"
-MYSQL_CMD="mysql --local-infile=1 -u${MYSQL_USER} -p${MYSQL_PASS}"
+# ⚙️ Paramètres MySQL (Docker)
+MYSQL_USER='root'
+MYSQL_PASS='root'
+MYSQL_HOST='127.0.0.1'
+MYSQL_PORT='5000'
 
-# --- Création de la base ---
-echo "🔧 Création de la base \`$DB_NAME\` si elle n'existe pas..."
-$MYSQL_CMD -e "CREATE DATABASE IF NOT EXISTS \`$DB_NAME\` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
+MYSQL_CMD="mysql --local-infile=1 -u${MYSQL_USER} -p${MYSQL_PASS} -h${MYSQL_HOST} -P${MYSQL_PORT}"
 
+# 🛠️ Création base
+echo "🧱 Création de la base \`${DB_NAME}\` si elle n'existe pas..."
+$MYSQL_CMD -e "CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
+
+# 🔧 Temp dir
 TMPDIR="$(mktemp -d)"
 trap "rm -rf \"$TMPDIR\"" EXIT
 
-# --- Fonction de nettoyage des noms de colonnes ---
 sanitize_colname() {
   local col="$1"
   col="$(echo "$col" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
@@ -41,37 +42,25 @@ sanitize_colname() {
   echo "${col,,}"
 }
 
-# ===================================================================
-# 🔁 Boucle sur les fichiers TXT du dossier
-# ===================================================================
 shopt -s nullglob
-for file in "$SOURCE"/*.txt; do
+for file in "$SOURCE"*.txt; do
   echo "----------------------------------------"
-  echo "📄 Traitement : $file"
-  basefile=$(basename "$file" .txt)
-  tablename=$(echo "$basefile" | sed -E 's/[^a-zA-Z0-9_]+/_/g' | tr '[:upper:]' '[:lower:]')
+  echo "📄 Traitement du fichier : $file"
 
-  tmp_utf8="$TMPDIR/${basefile}.utf8"
-  # Conversion UTF-16 → UTF-8 (DB Master exporte souvent en UTF-16LE)
-  iconv -f UTF-16 -t UTF-8 "$file" -o "$tmp_utf8" 2>/dev/null || cp "$file" "$tmp_utf8"
+  tablename="$(basename "$file" .txt | sed -E 's/[^a-zA-Z0-9_]+/_/g' | tr '[:upper:]' '[:lower:]')"
+  clean="$TMPDIR/${tablename}.utf8"
 
-  # Nettoyage (CRLF → LF, suppression NUL)
-  tr -d '\000' < "$tmp_utf8" | sed 's/\r$//' > "${tmp_utf8}.clean"
+  # Convert UTF-16 → UTF-8 si besoin
+  iconv -f UTF-16 -t UTF-8 "$file" -o "$clean" 2>/dev/null || cp "$file" "$clean"
+  tr -d '\000' < "$clean" | sed 's/\r$//' > "${clean}.tmp"
+  mv "${clean}.tmp" "$clean"
 
-  # Vérifie que le fichier n'est pas vide
-  if [ ! -s "${tmp_utf8}.clean" ]; then
-    echo "⚠️ Fichier vide, ignoré : $file"
-    continue
-  fi
+  [ ! -s "$clean" ] && echo "⚠️ Fichier vide : $file — ignoré." && continue
 
-  # Lecture de la première ligne (entêtes)
-  header_line=$(head -n 1 "${tmp_utf8}.clean")
-
-  # Détection du séparateur (tab, point-virgule, espace multiple)
-  detected_delim=$'\t'
-  if echo "$header_line" | grep -q ';'; then
-    detected_delim=';'
-  fi
+  header_line=$(head -n 1 "$clean")
+  detected_delim=";"
+  echo "$header_line" | grep -q $'\t' && detected_delim=$'\t'
+  echo "$header_line" | grep -q ',' && detected_delim=','
 
   IFS="$detected_delim" read -r -a rawcols <<< "$header_line"
 
@@ -90,38 +79,32 @@ for file in "$SOURCE"/*.txt; do
     cols_sql+=("\`${col_s}\` TEXT")
   done
 
-  if [ "${#cols_sql[@]}" -eq 0 ]; then
-    echo "⚠️ Aucune colonne trouvée dans $file, création table générique."
-    cols_sql=(\`data\` TEXT)
-  fi
+  [ "${#cols_sql[@]}" -eq 0 ] && cols_sql=(\`data\` TEXT)
 
-  create_stmt="DROP TABLE IF EXISTS \`${tablename}\`;"
-  create_stmt+="CREATE TABLE \`${tablename}\` ($(IFS=,; echo "${cols_sql[*]}")) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;"
+  create_stmt="DROP TABLE IF EXISTS \`${tablename}\`;
+CREATE TABLE \`${tablename}\` ($(IFS=,; echo "${cols_sql[*]}")) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;"
 
-  echo "🧱 Création de la table \`${tablename}\`..."
+  echo "🧩 Création table : \`${tablename}\`..."
   $MYSQL_CMD -D "$DB_NAME" -e "$create_stmt"
 
-  # Import des données
-  echo "📥 Import des données depuis $file..."
-  if [ "$detected_delim" = $'\t' ]; then
+  if [[ "$detected_delim" == $'\t' ]]; then
     delim_escaped="\\t"
   else
-    delim_escaped=$(printf "%s" "$detected_delim" | sed "s/'/''/g")
+    delim_escaped=$(printf "%s" "$detected_delim" | sed "s/'/''/g" | sed 's/\\/\\\\/g')
   fi
 
   load_sql="SET NAMES utf8mb4;
-LOAD DATA LOCAL INFILE '$(printf "%q" "${tmp_utf8}.clean")'
+LOAD DATA LOCAL INFILE '$(printf "%q" "$clean")'
 INTO TABLE \`${tablename}\`
 FIELDS TERMINATED BY '${delim_escaped}'
 OPTIONALLY ENCLOSED BY '\"'
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES;"
 
-  if ! $MYSQL_CMD -D "$DB_NAME" -e "$load_sql"; then
-    echo "⚠️ Erreur d’import pour $file (probablement format irrégulier)."
-  else
-    echo "✅ Import réussi pour \`${tablename}\`."
-  fi
+  echo "📥 Import de $file → table \`${tablename}\`..."
+  $MYSQL_CMD -D "$DB_NAME" -e "$load_sql"
+
+  echo "✅ Import terminé pour \`${tablename}\`."
 done
 
-echo "🎉 Import terminé pour la base \`$DB_NAME\`."
+echo "🎉 Tous les fichiers TXT importés dans la base \`${DB_NAME}\`."
