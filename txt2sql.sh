@@ -11,49 +11,26 @@ select SUBDIR in "$ROOT"/*/; do
 done
 
 # 🔧 Préparation des chemins
-source="$SUBDIR"
-basename=$(basename "$SUBDIR")
-destination="${source}csv/"
-DB_NAME="$basename"
+SOURCE="$SUBDIR"
+BASENAME=$(basename "$SUBDIR")
+DB_NAME="$BASENAME"
 
-echo "📁 Dossier sélectionné : $source"
-echo "📄 Destination CSV : $destination"
+echo "📁 Dossier sélectionné : $SOURCE"
 echo "🗄️ Base MySQL : $DB_NAME"
 
-mkdir -p "$destination"
-
-# 🔄 Conversion TXT → CSV
-for file in "$source"*.txt; do
-  [ -f "$file" ] || continue
-  filename=$(basename "$file" .txt)
-  output="${destination}${filename}.csv"
-  tmpfile="/tmp/${filename}.utf8"
-
-  echo "🔄 Conversion de $filename ..."
-
-  # Conversion UTF-16 → UTF-8
-  if ! iconv -f UTF-16 -t UTF-8 "$file" -o "$tmpfile" 2>/dev/null; then
-    cp "$file" "$tmpfile"
-  fi
-
-  # Conversion tabulations → point-virgule
-  awk '{
-    line=$0
-    gsub(/\t/, ";", line)
-    print line
-  }' "$tmpfile" > "$output"
-
-  echo "✅ Converti : $file → $output"
-done
-
-# 🔽 Import CSV → MySQL
+# ⚙️ Paramètres MySQL (Docker)
 MYSQL_USER='root'
 MYSQL_PASS='root'
-MYSQL_CMD="mysql --local-infile=1 -u${MYSQL_USER} -p${MYSQL_PASS}"
+MYSQL_HOST='127.0.0.1'
+MYSQL_PORT='5000'
 
-echo "🛠️ Création de la base \`$DB_NAME\` si elle n'existe pas..."
-$MYSQL_CMD -e "CREATE DATABASE IF NOT EXISTS \`$DB_NAME\` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
+MYSQL_CMD="mysql --local-infile=1 -u${MYSQL_USER} -p${MYSQL_PASS} -h${MYSQL_HOST} -P${MYSQL_PORT}"
 
+# 🛠️ Création base
+echo "🧱 Création de la base \`${DB_NAME}\` si elle n'existe pas..."
+$MYSQL_CMD -e "CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
+
+# 🔧 Temp dir
 TMPDIR="$(mktemp -d)"
 trap "rm -rf \"$TMPDIR\"" EXIT
 
@@ -66,24 +43,21 @@ sanitize_colname() {
 }
 
 shopt -s nullglob
-for csv in "$destination"/*.csv "$destination"/*.CSV; do
+for file in "$SOURCE"*.txt; do
   echo "----------------------------------------"
-  echo "📄 Traitement du fichier : $csv"
+  echo "📄 Traitement du fichier : $file"
 
-  basefile=$(basename "$csv")
-  tablename=$(basename "$csv" .csv | sed -E 's/[^a-zA-Z0-9_]+/_/g' | tr '[:upper:]' '[:lower:]')
-  clean="$TMPDIR/${basefile}.clean.txt"
+  tablename="$(basename "$file" .txt | sed -E 's/[^a-zA-Z0-9_]+/_/g' | tr '[:upper:]' '[:lower:]')"
+  clean="$TMPDIR/${tablename}.utf8"
 
-  tr -d '\000' < "$csv" | sed 's/\r$//' > "$clean"
+  # Convert UTF-16 → UTF-8 si besoin
+  iconv -f UTF-16 -t UTF-8 "$file" -o "$clean" 2>/dev/null || cp "$file" "$clean"
+  tr -d '\000' < "$clean" | sed 's/\r$//' > "${clean}.tmp"
+  mv "${clean}.tmp" "$clean"
 
-  if [ ! -s "$clean" ]; then
-    echo "⚠️ Fichier vide : $csv — ignoré."
-    continue
-  fi
+  [ ! -s "$clean" ] && echo "⚠️ Fichier vide : $file — ignoré." && continue
 
   header_line=$(head -n 1 "$clean")
-
-  # Détection du délimiteur
   detected_delim=";"
   echo "$header_line" | grep -q $'\t' && detected_delim=$'\t'
   echo "$header_line" | grep -q ',' && detected_delim=','
@@ -105,38 +79,32 @@ for csv in "$destination"/*.csv "$destination"/*.CSV; do
     cols_sql+=("\`${col_s}\` TEXT")
   done
 
-  if [ "${#cols_sql[@]}" -eq 0 ]; then
-    cols_sql=(\`data\` TEXT)
-    detected_delim=","
-  fi
+  [ "${#cols_sql[@]}" -eq 0 ] && cols_sql=(\`data\` TEXT)
 
-  # Création de la table
-  create_sql="CREATE TABLE IF NOT EXISTS \`${tablename}\` ($(IFS=,; echo "${cols_sql[*]}"));"
+  create_stmt="DROP TABLE IF EXISTS \`${tablename}\`;
+CREATE TABLE \`${tablename}\` ($(IFS=,; echo "${cols_sql[*]}")) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;"
 
-  $MYSQL_CMD -D "$DB_NAME" -e "$create_sql"
+  echo "🧩 Création table : \`${tablename}\`..."
+  $MYSQL_CMD -D "$DB_NAME" -e "$create_stmt"
 
-  # Délimiteur échappé
   if [[ "$detected_delim" == $'\t' ]]; then
     delim_escaped="\\t"
   else
-    delim_escaped="$detected_delim"
+    delim_escaped=$(printf "%s" "$detected_delim" | sed "s/'/''/g" | sed 's/\\/\\\\/g')
   fi
 
-  # Importation du fichier
-  load_sql=$(cat <<EOF
-SET NAMES utf8mb4;
-LOAD DATA LOCAL INFILE '${clean}'
+  load_sql="SET NAMES utf8mb4;
+LOAD DATA LOCAL INFILE '$(printf "%q" "$clean")'
 INTO TABLE \`${tablename}\`
 FIELDS TERMINATED BY '${delim_escaped}'
-OPTIONALLY ENCLOSED BY '"'
+OPTIONALLY ENCLOSED BY '\"'
 LINES TERMINATED BY '\n'
-IGNORE 1 LINES;
-EOF
-)
+IGNORE 1 LINES;"
 
-  echo "📥 Import dans \`${tablename}\` ..."
-  echo "$load_sql" | $MYSQL_CMD -D "$DB_NAME"
+  echo "📥 Import de $file → table \`${tablename}\`..."
+  $MYSQL_CMD -D "$DB_NAME" -e "$load_sql"
+
   echo "✅ Import terminé pour \`${tablename}\`."
 done
 
-echo "🎉 Tous les fichiers ont été convertis et importés dans la base \`$DB_NAME\`."
+echo "🎉 Tous les fichiers TXT importés dans la base \`${DB_NAME}\`."
