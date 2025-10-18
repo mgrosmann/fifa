@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# 🔐 Mot de passe MySQL
+pass="root"
+DB="FIFA15"
+TABLE1="players"
+TABLE2="teamplayerlinks"
+OUTFILE1="players.csv"
+OUTFILE2="teamplayerlinks.csv"
+
+# 📝 Création du fichier SQL
+cat <<EOF > 15.sql
+ALTER TABLE FIFA15.players
+ADD COLUMN gender INT DEFAULT 0,
+ADD COLUMN emotion INT DEFAULT 1;
+
+ALTER TABLE FIFA15.teamplayerlinks
+ADD COLUMN leaguegoalsprevmatch INT DEFAULT 0,
+ADD COLUMN leaguegoalsprevthreematches INT DEFAULT 0;
+EOF
+
+# 🛠️ Exécution du script SQL
+mysql -uroot -p"$pass" < 15.sql
+
+# ✅ Export des deux tables fixes
+mysql -uroot -p"$pass" -D "$DB" -e "SELECT * FROM \`$TABLE1\`;" \
+--batch --column-names > "$OUTFILE1"
+
+mysql -uroot -p"$pass" -D "$DB" -e "SELECT * FROM \`$TABLE2\`;" \
+--batch --column-names > "$OUTFILE2"
+
+if [ $? -eq 0 ]; then
+    echo "✅ Export terminé : $OUTFILE1 et $OUTFILE2"
+else
+    echo "❌ Erreur lors de l'export"
+    exit 1
+fi
+
+# 📦 Conversion vers format DB Master
+python3 /mnt/c/Users/PC/PATH/script/convertor/16/playerfifa16.py "./$OUTFILE1"
+python3 /mnt/c/Users/PC/PATH/script/convertor/dbmaster.py players_fifa16_format.txt
+python3 /mnt/c/Users/PC/PATH/script/convertor/16/teamplayerlinksfifa16.py "./$OUTFILE2"
+python3 /mnt/c/Users/PC/PATH/script/convertor/dbmaster.py teamplayerlinks_fifa16_format.txt
