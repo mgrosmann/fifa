@@ -4,10 +4,11 @@ import pandas as pd
 
 # --- 🔧 CONFIGURATION DES CHEMINS ---
 FIFA_PATHS = {
-    "FIFA14": r"C:\Users\PC\Documents\FM_temp\FIFA14\csv",
-    "FIFA15": r"C:\Users\PC\Documents\FM_temp\FIFA15\csv",
-    "FIFA16": r"C:\Users\PC\Documents\FM_temp\FIFA16\csv",
+    "FIFA14": "/mnt/c/Users/PC/Documents/FM_temp/FIFA14/csv",
+    "FIFA15": "/mnt/c/Users/PC/Documents/FM_temp/FIFA15/csv",
+    "FIFA16": "/mnt/c/Users/PC/Documents/FM_temp/FIFA16/csv",
 }
+
 
 
 def list_csv_files(base_path):
