@@ -7,7 +7,8 @@ MYSQL_HOST='127.0.0.1'
 MYSQL_PORT='5000' 
 TABLE1="teams"
 OUTFILE1="teams.csv"
-FILE="/mnt/c/Users/PC/Documents/FM_temp/FIFA14/players.txt"
+TABLE2="players"
+OUTFILE2="players.csv"
 
 # 📝 Création du fichier SQL
 cat <<EOF > 14.sql
@@ -32,7 +33,6 @@ else
 fi
 
 # 📦 Conversion vers format DB Master
-cp $FILE players.txt
 python3 /mnt/c/Users/PC/PATH/script/convertor/15/playersfifa15.py
 python3 /mnt/c/Users/PC/PATH/script/convertor/dbmaster.py players_fifa15_format.txt
 python3 /mnt/c/Users/PC/PATH/script/convertor/15/teamsfifa15.py
