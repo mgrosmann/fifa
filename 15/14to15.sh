@@ -36,4 +36,4 @@ fi
 python3 /mnt/c/Users/PC/PATH/fifa/15/player15.py
 python3 /mnt/c/Users/PC/PATH/fifa/dbmaster.py players_fifa15_format.txt
 python3 /mnt/c/Users/PC/PATH/fifa/15/team15.py
-python3 /mnt/c/Users/PC/PATH/fifa/dbmaster.py team_fifa15_format.txt
+python3 /mnt/c/Users/PC/PATH/fifa/dbmaster.py teams_fifa15_format.txt
