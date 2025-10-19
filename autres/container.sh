@@ -3,7 +3,7 @@ apt install openssh-server -y
 apt install curl -y
 apt install gpg -y
 apt install lsb-release -y
-curl https://mgrosmann.onrender.com/script/projet/docker.sh
+curl https://mgrosmann.onrender.com/script/projet/docker.sh > docker.sh
 apt install mariadb-client-compat -y
 docker run -d \
   --name fifa \
@@ -13,4 +13,6 @@ docker run -d \
   mysql:8 \
   --local-infile=1 \
   --secure-file-priv=""
+#MYSQL_HOST='127.0.0.1'
+#MYSQL_PORT='5000' -P${MYSQL_PORT} -h${MYSQL_HOST}
 #mysql -uroot -proot -P 5000 -h 127.0.0.1
