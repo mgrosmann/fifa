@@ -1,6 +1,7 @@
 #!/bin/bash
 # 🔐 Mot de passe MySQL
-pass="root"
+MYSQL_USER='root'
+MYSQL_PASS='root'
 DB="FIFA14"
 MYSQL_HOST='127.0.0.1'
 MYSQL_PORT='5000' 
@@ -33,7 +34,7 @@ else
 fi
 
 # 📦 Conversion vers format DB Master
-python3 /mnt/c/Users/PC/PATH/script/convertor/15/playerfifa15.py "./$OUTFILE1"
+python3 /mnt/c/Users/PC/PATH/script/convertor/15/playersfifa15.py "./$OUTFILE1"
 python3 /mnt/c/Users/PC/PATH/script/convertor/dbmaster.py players_fifa15_format.txt
 python3 /mnt/c/Users/PC/PATH/script/convertor/15/teamsfifa15.py "./$OUTFILE2"
 python3 /mnt/c/Users/PC/PATH/script/convertor/dbmaster.py teamplayerlinks_fifa15_format.txt

@@ -1,6 +1,7 @@
 #!/bin/bash
 # 🔐 Mot de passe MySQL
-pass="root"
+MYSQL_USER='root'
+MYSQL_PASS='root'
 DB="FIFA16"
 MYSQL_HOST='127.0.0.1'
 MYSQL_PORT='5000' 
