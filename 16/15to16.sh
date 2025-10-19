@@ -38,7 +38,7 @@ else
 fi
 
 # 📦 Conversion vers format DB Master
-python3 /mnt/c/Users/PC/PATH/script/convertor/16/player16.py
-python3 /mnt/c/Users/PC/PATH/script/convertor/dbmaster.py players_fifa16_format.txt
-python3 /mnt/c/Users/PC/PATH/script/convertor/16/tpl16.py
-python3 /mnt/c/Users/PC/PATH/script/convertor/dbmaster.py teamplayerlinks_fifa16_format.txt
+python3 /mnt/c/Users/PC/PATH/fifa/16/player16.py
+python3 /mnt/c/Users/PC/PATH/fifa/dbmaster.py players_fifa16_format.txt
+python3 /mnt/c/Users/PC/PATH/fifa/16/tpl16.py
+python3 /mnt/c/Users/PC/PATH/fifa/dbmaster.py teamplayerlinks_fifa16_format.txt

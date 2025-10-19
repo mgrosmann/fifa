@@ -41,5 +41,5 @@ else
 fi
 
 # 📦 Conversion vers format DB Master
-python3 /mnt/c/Users/PC/PATH/script/convertor/dbmaster.py "./$OUTFILE1"
-python3 /mnt/c/Users/PC/PATH/script/convertor/dbmaster.py "./$OUTFILE2"
+python3 /mnt/c/Users/PC/PATH/fifa/dbmaster.py "./$OUTFILE1"
+python3 /mnt/c/Users/PC/PATH/fifa/dbmaster.py "./$OUTFILE2"
