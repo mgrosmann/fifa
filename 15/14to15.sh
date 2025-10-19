@@ -22,16 +22,17 @@ $MYSQL_CMD "$DB" < 14.sql
 
 # ✅ Export des deux tables fixes
 $MYSQL_CMD -D "$DB" --batch --column-names -e "SELECT * FROM \`$TABLE1\`;" > "$OUTFILE1"
-
+$MYSQL_CMD -D "$DB" --batch --column-names -e "SELECT * FROM \`$TABLE2\`;" > "$OUTFILE2"
 
 if [ $? -eq 0 ]; then
-    echo "✅ Export terminé : $OUTFILE1"
+    echo "✅ Export terminé : $OUTFILE1 et $OUTFILE2"
 else
     echo "❌ Erreur lors de l'export"!
     exit 1
 fi
 
 # 📦 Conversion vers format DB Master
+cp $FILE players.txt
 python3 /mnt/c/Users/PC/PATH/script/convertor/15/playersfifa15.py
 python3 /mnt/c/Users/PC/PATH/script/convertor/dbmaster.py players_fifa15_format.txt
 python3 /mnt/c/Users/PC/PATH/script/convertor/15/teamsfifa15.py
