@@ -33,7 +33,7 @@ else
 fi
 
 # 📦 Conversion vers format DB Master
-python3 /mnt/c/Users/PC/PATH/script/convertor/15/playersfifa15.py
+python3 /mnt/c/Users/PC/PATH/script/convertor/15/player15.py
 python3 /mnt/c/Users/PC/PATH/script/convertor/dbmaster.py players_fifa15_format.txt
-python3 /mnt/c/Users/PC/PATH/script/convertor/15/teamsfifa15.py
+python3 /mnt/c/Users/PC/PATH/script/convertor/15/team15.py
 python3 /mnt/c/Users/PC/PATH/script/convertor/dbmaster.py team_fifa15_format.txt
