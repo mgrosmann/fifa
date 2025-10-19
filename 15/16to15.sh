@@ -1,8 +1,9 @@
 #!/bin/bash
-
 # 🔐 Mot de passe MySQL
 pass="root"
 DB="FIFA16"
+MYSQL_HOST='127.0.0.1'
+MYSQL_PORT='5000' 
 TABLE1="players"
 TABLE2="teamplayerlinks"
 OUTFILE1="players.csv"
@@ -23,14 +24,13 @@ DROP COLUMN leaguegoalsprevthreematches;
 EOF
 
 # 🛠️ Exécution du script SQL
-mysql -uroot -p"$pass" < 16.sql
+MYSQL_CMD="mysql --local-infile=1 -u${MYSQL_USER} -p${MYSQL_PASS} -P${MYSQL_PORT} -h${MYSQL_HOST}"
+$MYSQL_CMD "$DB" < 16.sql
 
 # ✅ Export des deux tables fixes
-mysql -uroot -p"$pass" -D "$DB" -e "SELECT * FROM \`$TABLE1\`;" \
---batch --column-names > "$OUTFILE1"
+$MYSQL_CMD -D "$DB" --batch --column-names -e "SELECT * FROM \`$TABLE1\`;" > "$OUTFILE1"
+$MYSQL_CMD -D "$DB" --batch --column-names -e "SELECT * FROM \`$TABLE2\`;" > "$OUTFILE2"
 
-mysql -uroot -p"$pass" -D "$DB" -e "SELECT * FROM \`$TABLE2\`;" \
---batch --column-names > "$OUTFILE2"
 
 if [ $? -eq 0 ]; then
     echo "✅ Export terminé : $OUTFILE1 et $OUTFILE2"

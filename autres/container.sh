@@ -5,6 +5,11 @@ apt install gpg -y
 apt install lsb-release -y
 curl https://mgrosmann.onrender.com/script/projet/docker.sh > docker.sh
 apt install mariadb-client-compat -y
+apt install python3-pip -y
+apt install python3-venv -y
+python3 -m venv venv
+source venv/bin/activate
+pip install pandas
 docker run -d \
   --name fifa \
   -e MYSQL_ROOT_PASSWORD=root \
