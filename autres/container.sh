@@ -1,4 +1,5 @@
 apt UPDATE
+apt install git -y
 apt install openssh-server -y
 apt install curl -y
 apt install gpg -y
@@ -18,13 +19,3 @@ docker run -d \
   mysql:8 \
   --local-infile=1 \
   --secure-file-priv=""
-#MYSQL_HOST='127.0.0.1'
-#MYSQL_PORT='5000' -P${MYSQL_PORT} -h${MYSQL_HOST}
-#mysql -uroot -proot -P 5000 -h 127.0.0.1
-#ALTER USER 'root'@'localhost' IDENTIFIED WITH caching_sha2_password BY 'root';
-#FLUSH PRIVILEGES;
-
-
-CREATE USER 'fifa'@'localhost' IDENTIFIED BY 'fifa';
-GRANT ALL PRIVILEGES ON *.* TO 'fifa' WITH GRANT OPTION;
-FLUSH PRIVILEGES;
