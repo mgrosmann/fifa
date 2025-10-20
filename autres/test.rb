@@ -20,7 +20,3 @@ pour mettre à jour de local vers github -> git add .  git commit -m "update"  g
 23 allier droit
 25 BUTEUR 
 27 allier gauche
-
-ordre ltl
-fifa 14 et 15="homega;homegf;points;awaygf;awayga;teamshortform;hasachievedobjective;secondarytable;yettowin;unbeatenallcomps;unbeatenleague;champion;leagueid;prevleagueid;previousyeartableposition;highestpossible;teamform;highestprobable;homewins;artificialkey;nummatchesplayed;teamid;gapresult;grouping;currenttableposition;awaywins;objective;actualvsexpectations;homelosses;unbeatenhome;lastgameresult;unbeatenaway;awaylosses;awaydraws;homedraws;teamlongform"
-FIFA 16      ="homega;previousyeartableposition;homegf;currenttableposition;awaygf;awayga;teamshortform;hasachievedobjective;secondarytable;yettowin;unbeatenallcomps;unbeatenleague;champion;leagueid;prevleagueid;highestpossible;teamform;highestprobable;homewins;artificialkey;nummatchesplayed;teamid;gapresult;grouping;awaywins;objective;points;actualvsexpectations;homelosses;unbeatenhome;lastgameresult;unbeatenaway;awaylosses;awaydraws;homedraws;teamlongform"
