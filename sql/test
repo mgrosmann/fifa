@@ -1,23 +1,5 @@
-MYSQL_HOST='127.0.0.1'
-MYSQL_PORT='5000'
--h${MYSQL_HOST} -P${MYSQL_PORT}
-
-
-
-0 gardien
-3 dd
-5 dc 
-7 dg 
-8 dlg
-10 mdc 
-12 mg
-14 mc
-16 mg
-18 moc 
-21 AT/CF
-23 allier droit
-25 BUTEUR 
-27 allier gauche
-
-
-Erreur de lecture : No columns to parse from file
+"Pour fifa 14:
+ 21 Germany 2. Bundesliga (2) 2 20 6 1 52 Argentina Primera División (1) 1 353 6 0 
+ Pour fifa 15: 21 Germany 2. Bundesliga (2) 2 20 5 0 52 Argentina Primera División (1) 1 353 3 0 
+ Pour fifa 16: 21 Germany 2. Bundesliga (2) 2 20 5 1 52 Argentina Primera División (1) 1 353 8 0 
+ colonne: countryid leaguename level leagueid leaguetimeslice iswithintransferwindow"
