@@ -1,13 +1,13 @@
 import pandas as pd
 
 # --- fichiers ---
-source_csv = "leagueteamlinks.csv"          # ton fichier FIFA 14
+source_csv = "leagueteamlinks.csv"          # ton fichier FIFA 16
 output_txt = "leagueteamlinks_fifa15_format.txt"   # sortie FIFA 15 compatible
 
 # --- ordre exact des colonnes FIFA 15 ---
 fifa15_order = """homega;homegf;points;awaygf;awayga;teamshortform;hasachievedobjective;secondarytable;yettowin;unbeatenallcomps;unbeatenleague;champion;leagueid;prevleagueid;previousyeartableposition;highestpossible;teamform;highestprobable;homewins;artificialkey;nummatchesplayed;teamid;gapresult;grouping;currenttableposition;awaywins;objective;actualvsexpectations;homelosses;unbeatenhome;lastgameresult;unbeatenaway;awaylosses;awaydraws;homedraws;teamlongform""".replace("\n", "").split(";")
 
-# --- chargement du CSV FIFA 14 ---
+# --- chargement du CSV FIFA 16 ---
 df = pd.read_csv(source_csv, sep="\\t", engine='python')
 
 # --- sélection et réorganisation ---
