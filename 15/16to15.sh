@@ -49,3 +49,10 @@ python3 /mnt/c/Users/PC/PATH/fifa/dbmaster.py "./$OUTFILE1"
 python3 /mnt/c/Users/PC/PATH/fifa/dbmaster.py "./$OUTFILE2"
 python3 /mnt/c/Users/PC/PATH/fifa/15/ltl15.py
 python3 /mnt/c/Users/PC/PATH/fifa/dbmaster.py leagueteamlinks_fifa15_format.txt
+mkdir -p /mnt/c/Users/PATH/fifa/15/imported_files_16/
+cp /mnt/c/Users/PC/Documents/FM_temp/FIFA16/leagues.txt /mnt/c/Users/PATH/fifa/15/imported_files_16/
+cp /mnt/c/Users/PC/Documents/FM_temp/FIFA16/playernames.txt /mnt/c/Users/PATH/fifa/15/imported_files_16/
+cp /mnt/c/Users/PC/Documents/FM_temp/FIFA16/teams.txt /mnt/c/Users/PATH/fifa/15/imported_files_16/
+mv players_dbmaster.txt /mnt/c/Users/PATH/fifa/15/imported_files_16/players.txt
+mv teamplayerlinks_dbmaster.txt /mnt/c/Users/PATH/fifa/15/imported_files_16/teamplayerlinks.txt
+mv leagueteamlinks_fifa15_format_dbmaster.txt /mnt/c/Users/PATH/fifa/15/imported_files_16/leagueteamlinks.txt

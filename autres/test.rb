@@ -20,3 +20,6 @@ pour mettre à jour de local vers github -> git add .  git commit -m "update"  g
 23 allier droit
 25 BUTEUR 
 27 allier gauche
+
+les fichiers a importer:
+teams teamplayerlinks player playernames leagues leagueteamlinks
