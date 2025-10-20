@@ -5,7 +5,7 @@ PASS="root"
 MYSQL_HOST='127.0.0.1'
 MYSQL_PORT='5000'
 
-LEAGUE_IDS=(13 14 16 17 19 20 31 32 53 54 60 61)
+LEAGUE_IDS=(13 14 60 61 16 17 19 20 31 32 53 54)
 
 echo "⚽️ Comptage du nombre d'équipes par championnat"
 echo "----------------------------------------------------"
