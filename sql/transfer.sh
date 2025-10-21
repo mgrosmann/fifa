@@ -15,7 +15,9 @@ while true; do
         FROM players p
         LEFT JOIN playernames pn_first ON p.firstnameid = pn_first.nameid
         LEFT JOIN playernames pn_last ON p.lastnameid = pn_last.nameid
-        WHERE CONCAT(pn_first.name, ' ', pn_last.name) LIKE '%$search_name%';
+        LEFT JOIN playernames pn_common ON p.commonnameid = pn_common.nameid
+        WHERE CONCAT(pn_first.name, ' ', pn_last.name) LIKE '%$search_name%'
+        OR pn_common.name LIKE '%$search_name%';
     ")
 
     if [[ -z "$players" ]]; then
