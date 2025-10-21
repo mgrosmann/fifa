@@ -42,8 +42,18 @@ while true; do
         selected_player=$(echo "$players" | sed -n "${player_selection}p")
     fi
 
-    playerid=$(echo "$selected_player" | awk '{print $1}')
-    fullname=$(echo "$selected_player" | awk '{for(i=2;i<=NF;i++){printf $i " "} print ""}')
+   playerid=$(echo "$selected_player" | awk '{print $1}')
+fullname=$(echo "$selected_player" | awk -F'\t' '{print $2}')
+commonname=$(echo "$selected_player" | awk -F'\t' '{print $3}')
+
+# Nettoyer affichage du nom
+if [[ -n "$commonname" && "$commonname" != "NULL" ]]; then
+    display_name="$fullname ($commonname)"
+else
+    display_name="$fullname"
+fi
+
+echo "📋 Équipes de $display_name :"
 
 
     # Afficher les équipes actuelles du joueur
@@ -59,7 +69,6 @@ while true; do
         continue
     fi
 
-    echo "📋 Équipes de $fullname :"
     echo "$teams" | nl -w2 -s'  '
 
     read -p "➡️  Entrez le numéro de l'équipe à transférer : " team_selection
