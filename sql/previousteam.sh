@@ -5,13 +5,7 @@ USER="root"
 PASSWORD="root"
 HOST="127.0.0.1"
 PORT="5000"
-TEAM_NAME="$1"  # Nom de l'équipe passée en argument
-
-if [[ -z "$TEAM_NAME" ]]; then
-    echo "❌ Utilisation : bash previousteam.sh 'Nom de l équipe'"
-    exit 1
-fi
-
+read -p "Nom de l'équipe : " TEAM_NAME
 # Requête SQL avec séparateur explicite '|'
 players=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -se "
 SELECT 
