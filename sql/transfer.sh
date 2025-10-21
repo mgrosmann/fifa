@@ -11,14 +11,20 @@ while true; do
 
     # Rechercher tous les joueurs correspondant au nom
     players=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -se "
-        SELECT p.playerid, CONCAT(pn_first.name, ' ', pn_last.name) AS fullname
-        FROM players p
-        LEFT JOIN playernames pn_first ON p.firstnameid = pn_first.nameid
-        LEFT JOIN playernames pn_last ON p.lastnameid = pn_last.nameid
-        LEFT JOIN playernames pn_common ON p.commonnameid = pn_common.nameid
-        WHERE CONCAT(pn_first.name, ' ', pn_last.name) LIKE '%$search_name%'
-        OR pn_common.name LIKE '%$search_name%';
-    ")
+    SELECT p.playerid, CONCAT(pn_first.name, ' ', pn_last.name) AS fullname,
+           IFNULL(pn_common.name,'') AS commonname,
+           IFNULL(t.teamname,'Inconnu') AS current_team,
+           p.overallrating
+    FROM players p
+    LEFT JOIN playernames pn_first ON p.firstnameid = pn_first.nameid
+    LEFT JOIN playernames pn_last ON p.lastnameid = pn_last.nameid
+    LEFT JOIN playernames pn_common ON p.commonnameid = pn_common.nameid
+    LEFT JOIN teamplayerlinks tpl ON p.playerid = tpl.playerid
+    LEFT JOIN teams t ON tpl.teamid = t.teamid
+    WHERE CONCAT(pn_first.name, ' ', pn_last.name) LIKE '%$search_name%'
+       OR pn_common.name LIKE '%$search_name%';
+")
+
 
     if [[ -z "$players" ]]; then
         echo "❌ Aucun joueur trouvé pour '$search_name'."
@@ -31,7 +37,7 @@ while true; do
         selected_player="$players"
     else
         echo "👥 Plusieurs joueurs trouvés :"
-        echo "$players" | nl -w2 -s'  '
+        echo "$players" | awk -F'\t' '{printf "%s - %s (%s) - Club: %s - Overall: %s\n", NR, $2, $3, $4, $5}'
         read -p "➡️  Entrez le numéro du joueur à transférer : " player_selection
         selected_player=$(echo "$players" | sed -n "${player_selection}p")
     fi
@@ -82,3 +88,4 @@ while true; do
     read -p "Voulez-vous continuer ? (y/n) : " cont
     [[ \"$cont\" != \"y\" ]] && break
 done
+
