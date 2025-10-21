@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DB_NAME="FIFA15"
+DB_NAME="FIFA14"
 USER="root"
 PASSWORD="root"
 HOST="127.0.0.1"
@@ -35,7 +35,8 @@ while true; do
     fi
 
     playerid=$(echo "$selected_player" | awk '{print $1}')
-    fullname=$(echo "$selected_player" | cut -d' ' -f2-)
+    fullname=$(echo "$selected_player" | awk '{for(i=2;i<=NF;i++){printf $i " "} print ""}')
+
 
     # Afficher les équipes actuelles du joueur
     teams=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -se "
