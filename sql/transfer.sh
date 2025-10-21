@@ -37,7 +37,7 @@ while true; do
         selected_player="$players"
     else
         echo "👥 Plusieurs joueurs trouvés :"
-        echo "$players" | awk -F'\t' '{printf "%s - %s (%s) - Club: %s - Overall: %s\n", NR, $2, $3, $4, $5}'
+        echo "$players" | awk -F'\t' '{printf "%s - ID: %s - %s (%s) - Club: %s - Overall: %s\n", NR, $1, $2, $3, $4, $5}'
         read -p "➡️  Entrez le numéro du joueur à transférer : " player_selection
         selected_player=$(echo "$players" | sed -n "${player_selection}p")
     fi
