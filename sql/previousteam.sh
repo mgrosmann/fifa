@@ -5,8 +5,36 @@ USER="root"
 PASSWORD="root"
 HOST="127.0.0.1"
 PORT="5000"
-read -p "Nom de l'équipe : " TEAM_NAME
-# Requête SQL avec séparateur explicite '|'
+
+# --- Recherche tolérante du nom de l’équipe ---
+read -p "Nom (ou partie du nom) de l’équipe : " TEAM_SEARCH
+
+matching_teams=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -se "
+    SELECT teamid, teamname FROM teams WHERE teamname LIKE '%$TEAM_SEARCH%';
+")
+
+if [[ -z "$matching_teams" ]]; then
+    echo "❌ Aucun club trouvé correspondant à '$TEAM_SEARCH'."
+    exit 0
+fi
+
+num_matches=$(echo "$matching_teams" | wc -l)
+
+if [[ $num_matches -eq 1 ]]; then
+    TEAM_ID=$(echo "$matching_teams" | awk '{print $1}')
+    TEAM_NAME=$(echo "$matching_teams" | cut -d' ' -f2-)
+else
+    echo "🏟️ Clubs correspondants :"
+    echo "$matching_teams" | nl -w2 -s'  '
+    read -p "➡️  Entrez le numéro du club voulu : " club_selection
+    selected_club=$(echo "$matching_teams" | sed -n "${club_selection}p")
+    TEAM_ID=$(echo "$selected_club" | awk '{print $1}')
+    TEAM_NAME=$(echo "$selected_club" | cut -d' ' -f2-)
+fi
+
+echo "✅ Équipe sélectionnée : $TEAM_NAME"
+
+# --- Requête SQL avec séparateur explicite '|'
 players=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -se "
 SELECT 
     p.playerid,
@@ -22,7 +50,7 @@ LEFT JOIN teamplayerlinks tpl ON p.playerid = tpl.playerid
 LEFT JOIN teams t_current ON tpl.teamid = t_current.teamid
 LEFT JOIN previousteam pt ON p.playerid = pt.playerid
 LEFT JOIN teams t_prev ON pt.previousteamid = t_prev.teamid
-WHERE t_current.teamname = '$TEAM_NAME'
+WHERE tpl.teamid = $TEAM_ID
 " | sed 's/\t/|/g')
 
 # Vérifier s’il y a des joueurs
@@ -31,7 +59,7 @@ if [[ -z "$players" ]]; then
     exit 0
 fi
 
-# Lecture ligne par ligne en découpant sur '|'
+# --- Lecture ligne par ligne ---
 IFS=$'\n'
 for line in $players; do
     IFS='|' read -r playerid fullname current_team_id current_team_name prev_team_id prev_team_name <<< "$line"
@@ -52,4 +80,3 @@ for line in $players; do
         echo "➡️  $fullname reste dans $current_team_name."
     fi
 done
-
