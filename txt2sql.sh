@@ -2,7 +2,7 @@
 set -euo pipefail
 export LC_ALL=C.UTF-8
 
-BASE_DIR="/mnt/c/Users/PC/Documents/FM_temp/"
+BASE_DIR="/mnt/c/github/txt"
 
 echo "📁 Dossiers disponibles dans : $BASE_DIR"
 select folder in "$BASE_DIR"*/; do

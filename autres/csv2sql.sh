@@ -3,7 +3,7 @@ set -euo pipefail
 
 # -------- CONFIG --------
 # Chemin Windows donné par toi
-CSV_DIR_WIN='/mnt/c/Users/PC/Documents/FM_temp/FIFA16/csv'
+CSV_DIR_WIN='/mnt/c/github/txt/FIFA16/csv'
 
 # MySQL credentials
 MYSQL_USER='root'

@@ -41,16 +41,16 @@ else
 fi
 
 # 📦 Conversion vers format DB Master
-python3 /mnt/c/Users/PC/PATH/fifa/16/player16.py
-python3 /mnt/c/Users/PC/PATH/fifa/dbmaster.py players_fifa16_format.txt
-python3 /mnt/c/Users/PC/PATH/fifa/16/tpl16.py
-python3 /mnt/c/Users/PC/PATH/fifa/dbmaster.py teamplayerlinks_fifa16_format.txt
-python3 /mnt/c/Users/PC/PATH/fifa/16/ltl16.py
-python3 /mnt/c/Users/PC/PATH/fifa/dbmaster.py leagueteamlinks_fifa15_format.txt
-mkdir -p /mnt/c/Users/PATH/fifa/16/imported_files_15/
-cp /mnt/c/Users/PC/Documents/FM_temp/FIFA16/leagues.txt /mnt/c/Users/PATH/fifa/16/imported_files_15/
-cp /mnt/c/Users/PC/Documents/FM_temp/FIFA16/playernames.txt /mnt/c/Users/PATH/fifa/16/imported_files_15/
-cp /mnt/c/Users/PC/Documents/FM_temp/FIFA16/teams.txt /mnt/c/Users/PATH/fifa/16/imported_files_15/
+python3 /mnt/c/github/fifa/16/player16.py
+python3 /mnt/c/github/fifa/dbmaster.py players_fifa16_format.txt
+python3 /mnt/c/github/fifa/16/tpl16.py
+python3 /mnt/c/github/fifa/dbmaster.py teamplayerlinks_fifa16_format.txt
+python3 /mnt/c/github/fifa/16/ltl16.py
+python3 /mnt/c/github/fifa/dbmaster.py leagueteamlinks_fifa15_format.txt
+mkdir -p /mnt/c/github/fifa/16/imported_files_15/
+cp /mnt/c/github/txt/FIFA16/leagues.txt /mnt/c/Users/PATH/fifa/16/imported_files_15/
+cp /mnt/c/github/txt/FIFA16/playernames.txt /mnt/c/Users/PATH/fifa/16/imported_files_15/
+cp /mnt/c/github/txt/FIFA16/teams.txt /mnt/c/Users/PATH/fifa/16/imported_files_15/
 mv players_fifa16_format_dbmaster.txt /mnt/c/Users/PATH/fifa/16/imported_files_15/players.txt
 mv teamplayerlinks_fifa16_format_dbmaster.txt /mnt/c/Users/PATH/fifa/16/imported_files_15/teamplayerlinks.txt
 mv leagueteamlinks_fifa15_format_dbmaster.txt /mnt/c/Users/PATH/fifa/16/imported_files_15/leagueteamlinks.txt

@@ -1,7 +1,7 @@
 #!/bin/bash
 export LC_ALL=C.UTF-8
-source="/mnt/c/Users/PC/Documents/FM_temp/FIFA16/"
-destination="/mnt/c/Users/PC/Documents/FM_temp/FIFA16/csv/"
+source="/mnt/c/github/txt/FIFA16/"
+destination="/mnt/c/github/txt/FIFA16/csv/"
 #source="/mnt/c/Users/mgrosmann/Documents/DB Master/fifa16/"
 #destination="/mnt/c/Users/mgrosmann/Documents/DB Master/fifa16/csv/"
 
