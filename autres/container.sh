@@ -5,6 +5,7 @@ apt install curl -y
 apt install gpg -y
 apt install lsb-release -y
 curl https://mgrosmann.onrender.com/script/projet/docker.sh > docker.sh
+bash docker.sh
 apt install mariadb-client-compat -y
 apt install python3-pip -y
 apt install python3-venv -y
