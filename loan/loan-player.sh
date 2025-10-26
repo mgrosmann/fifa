@@ -66,7 +66,7 @@ fi
 
 # Mettre à jour le club du joueur (le prêter)
 mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -e "
-UPDATE teamplayerlinks SET teamid=$loan_team WHERE playerid=$playerid;
+UPDATE teamplayerlinks SET teamid=$loan_team, position=29  WHERE playerid=$playerid;
 "
 
 # Ajouter le prêt dans playerloans

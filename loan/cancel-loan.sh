@@ -40,7 +40,7 @@ SELECT teamname FROM teams WHERE teamid=$loanedfrom LIMIT 1;
 
 # Mise à jour de teamplayerlinks
 mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -e "
-UPDATE teamplayerlinks SET teamid=$loanedfrom WHERE playerid=$playerid;
+UPDATE teamplayerlinks SET teamid=$loanedfrom, position=29 WHERE playerid=$playerid;
 "
 
 # Suppression de la ligne dans playerloans
