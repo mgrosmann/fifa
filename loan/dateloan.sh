@@ -11,15 +11,19 @@ mode="$1"
 value="$2"
 
 if [[ "$mode" == "id" ]]; then
-    # Convertir date -> loandateend
-    # Supporte format DD/MM/YYYY
-    days=$(( ( $(date -d "$(echo $value | awk -F/ '{print $3"-"$2"-"$1}')" +%s) - $(date -d "$BASE_DATE" +%s) ) / 86400 ))
+    # Lire "30/06/2026" correctement et convertir en format ISO
+    parsed=$(echo "$value" | awk -F/ '{printf "%04d-%02d-%02d", $3, $2, $1}')
+    
+    # Calcul précis en UTC pour éviter les décalages horaires
+    days=$(( ( $(date -u -d "$parsed" +%s) - $(date -u -d "$BASE_DATE" +%s) ) / 86400 ))
     loandateend=$((BASE_ID + days))
     echo "$loandateend"
+
 elif [[ "$mode" == "date" ]]; then
-    # Convertir loandateend -> date
+    # Convertir loandateend -> date JJ/MM/AAAA
     days=$(( value - BASE_ID ))
-    date -d "$BASE_DATE + $days days" +"%d/%m/%Y"
+    date -u -d "$BASE_DATE + $days days" +"%d/%m/%Y"
+
 else
     echo "Usage:"
     echo "  $0 id DD/MM/YYYY      # Convertit une date en loandateend"
