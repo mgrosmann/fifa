@@ -4,15 +4,12 @@ Année	Date exacte	Joueur	loandateend	Δ jours	Observation
 2014	30/06/2014	Rulli	157679	+180	OK
 2015	01/01/2015	Nicolas Nkoulou	157864	+185	OK
 2015	30/06/2015	Javier Hernández	158044	+180	OK
-2015	30/06/2015	Fernando Torres	158044	0	⚠️ Concurrent (même jour)
-2015	30/06/2015	Lirola	158044	0	⚠️ Concurrent (même jour)
 2016	01/01/2016	Benjamin Mendy	158229	+185	OK
 2016	30/06/2016	Balerdi	158410	+181	OK
 2017	01/01/2017	Imbula	158595	+185	OK
 2017	30/06/2017	Kondogbia	158775	+180	OK
 2018	01/01/2018	Thauvin	158960	+185	OK
 2018	30/06/2018	Sergi Darder	159140	+180	OK
-2018	30/06/2018	Maupay	159140	0	⚠️ Concurrent
 2019	01/01/2019	Payet	159325	+185	OK
 2019	30/06/2019	Gouiri	159505	+180	OK
 2020	01/01/2020	Ocampos	159690	+185	OK
@@ -28,7 +25,6 @@ Année	Date exacte	Joueur	loandateend	Δ jours	Observation
 2025	30/06/2025	Paixao	161697	+180	OK
 2026	01/01/2026	Gignac	161882	+185	OK
 2026	30/06/2026	Lassana Diarra	162062	+180	OK
-2026	30/06/2026	Højbjerg	162062	0	⚠️ Concurrent
 
 
 DE 1er JANVIER a 30 juin = 180 jour (sauf année bisxestile avec 2016 2020 2024, dans ce cas 181)
