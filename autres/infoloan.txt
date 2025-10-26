@@ -1,0 +1,219 @@
+🔍 Recherche des prêts avec loandateend inconnu...
+-----------------------------------------------
+playerid	fullname	loandateend	teamname
+219771	Gabriel Augusto Xavier	160785	FIFPro
+204738	Renato Ibarra	160937	Inconnu
+203834	Ju Tae Yun	161151	Sangju Sangmu
+199231	Tae Hwan Kim	161151	Korea Republic
+214217	Benjamín Vidal	161151	CD Palestino
+255307	Braian Martínez	161151	Club Atlético Aldosivi
+214462	Iván Arboleda	161151	Newell's Old Boys
+255197	Nicolás Morgantini	161151	Club Atlético Platense
+272952	David Štípek	161151	Free Agents
+258291	Manuel Llano	161151	Godoy Cruz
+215267	Tobías Figueroa	161151	Unión Española
+181030	Lucas Rios	161151	EC Vitória
+224304	Łukasz Moneta	161151	Zagłębie Lubin
+240224	Ronald Escobar	161151	San Luis de Quillota
+199231	Tae Hwan Kim	161151	Sangju Sangmu
+202981	Jin Ho Choi	161151	Sangju Sangmu
+234097	Renato Tarifeño	161151	Audax Italiano
+201445	Douglas Bacelar	161151	Associação Chapecoense de Futebol
+225915	Agustín Fontana	161151	Defensa y Justicia
+244757	Augusto Schott	161151	Club Atlético Platense
+214111	Sergio Otálvaro	161151	Olimpia
+240576	Mauro Ortíz	161151	Club Atlético Patronato
+244448	Juan Sánchez Purata	161151	Atlanta United FC
+236989	Spencer Richey	161151	Free Agents
+231222	Fabián Henríquez	161151	Club Atlético Huracán
+237283	Nicolás Reniero	161151	Argentinos Juniors
+256502	Aaron Molinas	161151	Club Atlético Tigre
+224344	Andrés Vilches	161151	Uni. Católica
+207811	Reum Yeo	161151	Sangju Sangmu
+199236	Chul Hong	161151	Sangju Sangmu
+199236	Chul Hong	161151	Korea Republic
+232709	Damian Batallini	161151	Club Atlético Independiente
+214662	Reinaldo Lenis	161151	Atl. Nacional
+211457	Aaron Olanare	161151	Amkar Perm
+214016	Hárrison Mojica	161151	Atl. Bucaramanga
+257549	Lucas Brochero	161151	Arsenal de Sarandí
+231212	Esteban Rolón	161151	Club Atlético Belgrano de Córdoba
+220617	Rafael Thyere Marques	161151	Associação Chapecoense de Futebol
+159418	Marcos Arouca	161151	Clube Atlético Mineiro
+265603	Rodrigo dos Santos	161151	Free Agents
+236859	Harrison Mancilla	161151	Club Atlético Sarmiento
+226787	Santiago Rosales	161151	Free Agents
+241176	Lucas Vera	161151	Club Atlético Huracán
+246108	Alexander Díaz	161151	Arsenal de Sarandí
+248555	Edwin Mosquera	161151	Defensa y Justicia
+254585	Julián Palacios	161151	Club Atlético Banfield
+233034	Juan Andrada	161151	Club Atlético Banfield
+232765	Tomás Molina	161151	Central Córdoba
+235987	Iván Gómez	161151	Club Atlético Platense
+260676	Thomaz Santos	161151	Free Agents
+260128	Yago Fernandes	161151	Clube Atlético Mineiro
+252706	Elías López	161151	Godoy Cruz
+257154	Mariano Peralta	161151	Club Atlético Unión
+220624	Lucas Acosta	161151	Club Atlético Sarmiento
+213618	Diego Vallejos	161151	Stabæk Fotball
+215168	Juan Garro	161151	Newell's Old Boys
+226086	Ángel González	161151	Club Atlético Lanús
+240457	Alejandro Maciel	161151	Club Atlético Banfield
+214270	Carlos Escobar	161151	San Luis de Quillota
+225858	Marcos Ledesma	161151	Club Atlético Platense
+241833	Kevin Gutiérrez	161151	Defensa y Justicia
+245249	Manuel Insaurralde	161151	Club de Gimnasia y Esgrima La Plata
+246263	Marcelo Weigandt	161151	Inter Miami CF
+275529	Jean de Souza	161151	FIFPro 2
+242002	Guido Mainero	161151	Club Atlético Sarmiento
+208895	Cleber Pereira	161151	Paraná Clube
+218387	Nelson Espinoza	161151	San Luis de Quillota
+251613	Juan José Cáceres	161151	Club Atlético Lanús
+268062	Luidy Viegas	161151	Ceará Sporting Club
+259271	Ignacio Gariglio	161151	Arsenal de Sarandí
+258700	Matías Godoy	161151	Central Córdoba
+224403	Gabriel Alanís	161151	Defensa y Justicia
+208141	Gabriel Appelt Pires	161151	FIFPro 2
+239897	Yan Kazaev	161151	Tom Tomsk
+220712	Thalles Lima de Conceição Penha	161151	Free Agents
+242343	Nicolas Thaller	161151	Club Atlético Tucumán
+252193	Ramiro Ruiz Rodríguez	161151	Club Atlético Talleres
+232826	Francis Mac Allister	161151	Rosario Central 
+213274	Luis Ojeda	161151	Free Agents
+275512	Guilherme dos Santos	161151	Associação Chapecoense de Futebol
+234458	Carlos Quintana	161151	Club Atlético Patronato
+230659	Moisés Wolschick	161151	Free Agents
+226616	Jonathan Galván	161151	Club Atlético Huracán
+242185	Yeferson Quintana	161151	San Jose Earthquakes
+152817	Rafael Marques	161151	Sport Club do Recife
+231507	Alexis Soto	161151	Defensa y Justicia
+227477	Facundo Altamirano	161151	Club Atlético Patronato
+215010	Emanuel Brítez	161151	Club Atlético Unión
+219636	Fabián Manzano	161151	CD Palestino
+220148	Nicolás Orsini	161151	Club Atlético Unión
+255886	Francisco Gerometta	161151	Club de Gimnasia y Esgrima La Plata
+235946	Sebastián Lomónaco	161151	Arsenal de Sarandí
+225396	Branco Ampuero	161151	Uni. Católica
+266725	Flabián Londoño	161151	Club Atlético Tigre
+224461	Walter Montoya	161151	Central Córdoba
+239854	Wesley Dias	161151	Paraná Clube
+275614	Guilherme Costa	161151	EC Vitória
+241568	Cristian Ferreira	161151	Newell's Old Boys
+212029	Johnath da Silva	161151	Sport Club do Recife
+212614	Lucca Borges	161151	S.C. Internacional
+211564	Romário Santos	161151	Ceará Sporting Club
+222707	Marcos Guilherme Santos	161151	Free Agents
+271040	Ermek Kuantaev	161151	Free Agents
+240964	Nicolás Linares	161151	Central Córdoba
+216023	Michael Lepe	161151	CD Antofagasta
+240969	Julián Carranza	161151	Philadelphia Union
+190232	Fellipe Bastos	161151	Sport Club do Recife
+228729	Bruno Valdez	161151	Cerro Porteño
+251831	Diego Garcia	161151	Club Atlético Patronato
+264473	Leonardo Natel Viera	161151	Casa Pia
+221489	Jason Flores	161151	CD Antofagasta
+278041	Jiajie Wang	161151	Free Agents
+182949	Shouting Wang	161151	Free Agents
+219825	Islamnur Abdulavov	161151	Tom Tomsk
+219686	Carlos Carvalho	161151	Paraná Clube
+214784	Jorge Pereyra Díaz	161151	Free Agents
+271040	Ermek Kuantaev	161151	Kazakhstan
+240320	Gustavo Gotti	161151	Deportes Temuco
+243170	Francisco Apaolaza	161151	Arsenal de Sarandí
+246469	Agustín Urzi	161151	Racing Club
+223793	Srdjan Grahovac	161151	HNK Rijeka
+265513	Róger Guedes	161151	Clube Atlético Mineiro
+259209	Mateo Bajamich	161151	Club Atlético Huracán
+255256	Franco Paredes	161151	Club Atlético Sarmiento
+279515	Goran Milović	161151	Free Agents
+232549	Marcos Peano	161151	Defensa y Justicia
+240251	Luis Salas	161151	CD Antofagasta
+264147	Nicolás Palavecino	161151	Defensa y Justicia
+215152	Agustín Allione	161151	Esporte Clube Bahia
+243862	James Igbekeme	161151	Columbus Crew SC
+214279	Hardy Cavero	161151	CD Antofagasta
+212941	Mayke Rocha	161151	Palmeiras FC
+204422	Dylan McGowan	161151	Gangwon FC
+271206	Sean Goldberg	161151	Beitar Jerusalem
+229722	Kevin Medel	161151	Everton de Viña
+198623	Nicky Low	161151	Derry City
+215213	Axel Werner	161151	Rosario Central 
+223241	Marcelo Benítez	161151	Rosario Central 
+248231	Hernán López Muñoz	161151	Central Córdoba
+263694	Rodrigo Montes	161151	Central Córdoba
+268090	Leonardo Ortiz	161151	Sport Club do Recife
+214753	José Luis Muñoz	161151	CD Palestino
+216712	Edson da Cruz	161151	Esporte Clube Bahia
+224152	Peterson da Cruz	161151	Free Agents
+254702	Ricardo Garay	161151	Rosario Central 
+265610	Lucas Fernandes	161151	EC Vitória
+198213	Leandro Damião da Silva	161151	Free Agents
+275562	Luiz Fernando Ferreira	161151	Minnesota United FC
+204448	Krisztián Adorján	161151	Dundalk
+193110	Ghilherme Camacho	161151	Clube Atlético Paranaense
+221990	Yonathan Cabral	161151	Club Atlético Lanús
+221831	Chang Moo Shin	161151	Sangju Sangmu
+255457	Miguel Navarro	161151	Venezuela
+247081	Nazareno Romero	161151	Rosario Central 
+212431	Nam Chun Kim	161151	Sangju Sangmu
+213374	Aderllan Santos	161151	Rio Ave FC
+222582	Yeong Bin Kim	161151	Sangju Sangmu
+275607	Fabrício Bruno Soares	161151	Associação Chapecoense de Futebol
+253012	Lautaro Morales	161151	Club Atlético Talleres
+230904	Carlos Eduardo Ferreira de Souza	161151	GD Estoril-Praia
+233092	Joaquín Pereyra	161151	Club Atlético Tucumán
+233892	Tomás Sandoval	161151	Club Atlético Platense
+215496	Joelinton Lima	161151	Paraná Clube
+202974	Se Gye Sin	161151	Sangju Sangmu
+211267	Ricardo Centurión	161151	San Lorenzo de Almagro
+228961	Mauro Pitton	161151	Arsenal de Sarandí
+241696	Hernán De la Fuente	161151	Club Atlético Tucumán
+235049	Ian Escobar	161151	Club Atlético Banfield
+228646	Nicolás Delgadillo	161151	Club Atlético Platense
+245354	José Paradela	161151	Club Atlético Tigre
+254586	Alan Marinelli	161151	Club Atlético Platense
+240035	Néstor Albiach Roger	161151	Free Agents
+214710	Juan Carlos Espinoza	161151	CD O'Higgins
+241566	Nahuel Gallardo	161151	Club Atlético Colón
+182045	Hao Rong	161151	Shanghai Greenland Shenhua
+236270	Jefferson Orejuela	161151	Liga de Quito
+222693	Héctor Fertoli	161151	Club Atlético Huracán
+244884	Matías Pellegrini	161151	Free Agents
+278588	Yuan Zhang	161151	Guizhou Hengfeng Zhicheng
+263018	David Sousa	161151	Cercle Brugge KSV 
+213966	Cleberson Martins	161151	Figueirense
+211264	Gaspar Servio	161151	FIFPro 3
+52402	Sebastián Díaz	161151	Audax Italiano
+209454	Mateusz Lewandowski	161151	Śląsk Wrocław
+224147	Guzmán Pereira	161151	Peñarol
+235925	Gastón Gómez	161151	San Lorenzo de Almagro
+235966	Gonzalo Goñi	161151	Arsenal de Sarandí
+275310	Gastón Rodríguez	161151	Liga de Quito
+208113	Bryan Silva	161151	EC Vitória
+214989	Martín Benítez	161151	Grêmio FBPA
+265605	Gustavo Ferrareis	161151	Figueirense
+254835	Martín Rabuñal	161151	Rosario Central 
+235704	Sam Todd	161151	Finn Harps
+235719	Joel Soñora	161151	Club Atlético Vélez Sarsfield
+255457	Miguel Navarro	161151	Club Atlético Talleres
+229466	Cris Martinez	161302	Free Agents
+241523	Marcus Forss	161313	Finland
+241523	Marcus Forss	161313	Bolton Wanderers
+242181	Neto Borges	161313	Bristol City FC
+218659	Matt Targett	161314	Middlesbrough FC
+211990	Odisseas Vlachodimos	161314	Sevilla FC
+211990	Odisseas Vlachodimos	161314	Greece
+192922	Óscar Jiménez	161320	Club León
+215487	Gustav Engvall	161362	IFK Göteborg
+258972	Isaak Touré	161362	FC Lorient
+277823	Daniel Peretz	161677	Israel
+229391	João Palhinha	161677	Portugal
+229391	João Palhinha	161677	Tottenham Hotspur FC
+277823	Daniel Peretz	161677	Hamburger SV
+271916	Bryan Zaragoza	161677	RC Celta de Vigo
+209572	Abdullah Al Owayshir	161714	Al-Wehdah Club
+265438	Emilio Lara	161714	Necaxa
+257868	Santiago Naveda	161714	Club Santos Laguna
+216247	Marcel Tisserand	161714	DR Congo
+216247	Marcel Tisserand	161714	Al-Khaleej FC
+241963	Hamed Al Ghamdi	161714	Al-Ittihad FC
