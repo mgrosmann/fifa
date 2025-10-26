@@ -1,0 +1,31 @@
+Analyse chronologique de loandateend
+Année	Date exacte	Joueur	loandateend	Δ jours	Observation
+2014	01/01/2014	Steve Mandanda	157499	—	✅ Base
+2014	30/06/2014	Rulli	157679	+180	OK
+2015	01/01/2015	Nicolas Nkoulou	157864	+185	OK
+2015	30/06/2015	Javier Hernández	158044	+180	OK
+2015	30/06/2015	Fernando Torres	158044	0	⚠️ Concurrent (même jour)
+2015	30/06/2015	Lirola	158044	0	⚠️ Concurrent (même jour)
+2016	01/01/2016	Benjamin Mendy	158229	+185	OK
+2016	30/06/2016	Balerdi	158410	+181	OK
+2017	01/01/2017	Imbula	158595	+185	OK
+2017	30/06/2017	Kondogbia	158775	+180	OK
+2018	01/01/2018	Thauvin	158960	+185	OK
+2018	30/06/2018	Sergi Darder	159140	+180	OK
+2018	30/06/2018	Maupay	159140	0	⚠️ Concurrent
+2019	01/01/2019	Payet	159325	+185	OK
+2019	30/06/2019	Gouiri	159505	+180	OK
+2020	01/01/2020	Ocampos	159690	+185	OK
+2020	30/06/2020	Harit	159871	+181	OK
+2021	30/06/2021	Greenwood	160236	+365	OK (année complète)
+2022	01/01/2022	Batshuayi	160421	+185	OK
+2022	30/06/2022	Angel Gomes	160601	+180	OK
+2023	01/01/2023	Brice Samba	160786	+185	OK
+2023	30/06/2023	Aubameyang	160966	+180	OK
+2024	01/01/2024	Romain Alessandrini	161151	+185	OK
+2024	30/06/2024	Aguerd	161332	+181	OK
+2025	01/01/2025	Maxime Lopez	161517	+185	OK
+2025	30/06/2025	Paixao	161697	+180	OK
+2026	01/01/2026	Gignac	161882	+185	OK
+2026	30/06/2026	Lassana Diarra	162062	+180	OK
+2026	30/06/2026	Højbjerg	162062	0	⚠️ Concurrent
