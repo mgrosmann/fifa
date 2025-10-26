@@ -29,3 +29,7 @@ Année	Date exacte	Joueur	loandateend	Δ jours	Observation
 2026	01/01/2026	Gignac	161882	+185	OK
 2026	30/06/2026	Lassana Diarra	162062	+180	OK
 2026	30/06/2026	Højbjerg	162062	0	⚠️ Concurrent
+
+
+DE 1er JANVIER a 30 juin = 180 jour (sauf année bisxestile avec 2016 2020 2024, dans ce cas 181)
+de 30 juin A 1er Janvier = 185 jour
