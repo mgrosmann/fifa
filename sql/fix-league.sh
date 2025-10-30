@@ -2,6 +2,7 @@
 # ==========================================================
 #  Script : fix-league.sh
 #  But : Vérifier et corriger le nombre d'équipes par championnat
+#        (ajoute automatiquement une équipe libre si manque)
 # ==========================================================
 
 # --- Configuration MySQL ---
@@ -42,21 +43,6 @@ declare -A LEAGUE_NAMES=(
   [54]="Spain Segunda A"
 )
 
-declare -A COUNTRY_IDS=(
-  [13]=14  # England
-  [14]=14
-  [60]=14
-  [61]=14
-  [16]=17  # France
-  [17]=17
-  [19]=19  # Germany
-  [20]=19
-  [31]=27  # Italy
-  [32]=27
-  [53]=45  # Spain
-  [54]=45
-)
-
 # --- Boucle principale ---
 echo "⚽ Vérification du nombre d’équipes par championnat"
 echo "----------------------------------------------------"
@@ -65,7 +51,6 @@ for leagueid in "${!EXPECTED_COUNTS[@]}"; do
   expected=${EXPECTED_COUNTS[$leagueid]}
   name=${LEAGUE_NAMES[$leagueid]}
 
-  # Récupération du nombre d’équipes
   count=$(mysql -u$USER -p$PASS -h${MYSQL_HOST} -P${MYSQL_PORT} -N -D $DB -e "
     SELECT COUNT(*) FROM leagueteamlinks WHERE leagueid = $leagueid;
   ")
@@ -99,26 +84,36 @@ for leagueid in "${!EXPECTED_COUNTS[@]}"; do
   else
     absdiff=$((expected - count))
     echo "⚠️ $name ($leagueid) : $count équipes, $absdiff manquante(s)."
+
     for ((i=1; i<=absdiff; i++)); do
-      read -p "👉 Entrez le teamid à ajouter à $name : " addid
-      # Vérifie si l’équipe existe déjà
-      exists=$(mysql -u$USER -p$PASS -h${MYSQL_HOST} -P${MYSQL_PORT} -N -D $DB -e "
-        SELECT COUNT(*) FROM teams WHERE teamid = $addid;
+      # Cherche une équipe libre (non liée à un championnat)
+      free_team=$(mysql -u$USER -p$PASS -h${MYSQL_HOST} -P${MYSQL_PORT} -N -D $DB -e "
+        SELECT t.teamid, t.teamname
+        FROM teams t
+        LEFT JOIN leagueteamlinks ltl ON t.teamid = ltl.teamid
+        WHERE ltl.teamid IS NULL
+        ORDER BY t.teamid ASC
+        LIMIT 1;
       ")
-      if [ "$exists" -eq 0 ]; then
-        echo "⚙️ L’équipe $addid n’existe pas. Création..."
-        read -p "👉 Nom de l’équipe : " teamname
-        countryid=${COUNTRY_IDS[$leagueid]}
+
+      if [ -n "$free_team" ]; then
+        free_id=$(echo "$free_team" | awk '{print $1}')
+        free_name=$(echo "$free_team" | cut -d' ' -f2-)
+        echo "✨ Équipe libre trouvée : $free_name (ID $free_id)"
         mysql -u$USER -p$PASS -h${MYSQL_HOST} -P${MYSQL_PORT} -N -D $DB -e "
-          INSERT INTO teams (teamid, teamname, countryid) VALUES ($addid, '$teamname', $countryid);
+          INSERT IGNORE INTO leagueteamlinks (leagueid, teamid) VALUES ($leagueid, $free_id);
         "
-        echo "✅ Équipe '$teamname' (ID $addid) créée avec countryid=$countryid."
+        echo "➕ Équipe '$free_name' ajoutée à $name."
+      else
+        echo "❌ Aucune équipe libre trouvée. Veuillez créer une équipe manuellement."
+        read -p "👉 Entrez le teamid à ajouter : " addid
+        read -p "👉 Nom de l’équipe : " teamname
+        mysql -u$USER -p$PASS -h${MYSQL_HOST} -P${MYSQL_PORT} -N -D $DB -e "
+          INSERT INTO teams (teamid, teamname) VALUES ($addid, '$teamname');
+          INSERT INTO leagueteamlinks (leagueid, teamid) VALUES ($leagueid, $addid);
+        "
+        echo "✅ Équipe '$teamname' (ID $addid) créée et ajoutée à $name."
       fi
-      # Ajout au lien league-team
-      mysql -u$USER -p$PASS -h${MYSQL_HOST} -P${MYSQL_PORT} -N -D $DB -e "
-        INSERT IGNORE INTO leagueteamlinks (leagueid, teamid) VALUES ($leagueid, $addid);
-      "
-      echo "➕ Équipe $addid ajoutée à $name."
     done
   fi
 done
