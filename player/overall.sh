@@ -64,25 +64,20 @@ for line in $players; do
     echo "Overall Rating actuel : $overall"
     echo "Potential actuel     : $potential"
 
-    read -p "Modifier l'Overall Rating ? (y/n) : " yn
+    read -p "Modifier Overall Rating et Potential ensemble ? (y/n) : " yn
     if [[ "$yn" == "y" ]]; then
         read -p "Nouveau Overall Rating : " new_overall
-        overall=$new_overall
-    fi
-
-    read -p "Modifier le Potential ? (y/n) : " yn
-    if [[ "$yn" == "y" ]]; then
         read -p "Nouveau Potential : " new_pot
-        potential=$new_pot
+        # Mise à jour en base
+        mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -e "
+            UPDATE players 
+            SET overallrating=$new_overall, potential=$new_pot 
+            WHERE playerid=$playerid;
+        "
+        echo "✅ $fullname mis à jour (Overall: $new_overall, Potential: $new_pot)."
+    else
+        echo "➡️ $fullname reste inchangé."
     fi
-
-    # Mise à jour en base
-    mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -e "
-        UPDATE players 
-        SET overallrating=$overall, potential=$potential 
-        WHERE playerid=$playerid;
-    "
-    echo "✅ $fullname mis à jour (Overall: $overall, Potential: $potential)."
 done
 
 echo "🏁 Mise à jour terminée."
