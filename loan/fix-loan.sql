@@ -24,9 +24,11 @@ WHERE pl.teamidloanedfrom = tpl.teamid;
 SELECT pl.playerid,
        CONCAT(IFNULL(pn_first.name,''),' ',IFNULL(pn_last.name,'')) AS fullname,
        pl.teamidloanedfrom,
-       tpl.teamid AS current_team
+       tpl.teamid AS current_team,
+       t.teamname AS current_team_name
 FROM playerloans pl
 JOIN teamplayerlinks tpl ON pl.playerid = tpl.playerid
+JOIN teams t ON tpl.teamid = t.teamid
 LEFT JOIN players p ON p.playerid = pl.playerid
 LEFT JOIN playernames pn_first ON p.firstnameid = pn_first.nameid
 LEFT JOIN playernames pn_last  ON p.lastnameid = pn_last.nameid
