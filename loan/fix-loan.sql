@@ -3,6 +3,9 @@ SET loandateend = 162062
 WHERE loandateend < 161728;
 
 
+
+
+
 --suppression des prêts à soi-même
 DELETE pl
 FROM playerloans pl
