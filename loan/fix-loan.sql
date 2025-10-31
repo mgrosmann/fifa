@@ -1,20 +1,12 @@
 UPDATE FIFA15.playerloans
 SET loandateend = 162062
 WHERE loandateend < 161728;
-
-
-
-
-
+-----------------------------------
 --suppression des prêts à soi-même
 DELETE pl
 FROM playerloans pl
 JOIN teamplayerlinks tpl ON pl.playerid = tpl.playerid
 WHERE pl.teamidloanedfrom = tpl.teamid;
-
-
-
-
 --pour debug quand preter à soi-même
 SELECT pl.playerid,
        CONCAT(IFNULL(pn_first.name,''),' ',IFNULL(pn_last.name,'')) AS fullname,
