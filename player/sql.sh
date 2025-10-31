@@ -1,47 +1,65 @@
 #!/bin/bash
 
-# --- Configuration ---
-DB="FIFA14"
+DB_NAME="FIFA15"
 USER="root"
-PASS="root"
-MYSQL_HOST='127.0.0.1'
-MYSQL_PORT='5000'
-read -p "Quel équipe ? " TEAMNAME
+PASSWORD="root"
+HOST="127.0.0.1"
+PORT="5000"
 
-echo "🔎 Étape 1 : Recherche de l'équipe \"$TEAMNAME\"..."
-TEAMID=$(mysql -u$USER -p$PASS -h${MYSQL_HOST} -P${MYSQL_PORT} -N -D $DB -e "SELECT teamid FROM teams WHERE teamname = '$TEAMNAME';")
+# --- Demande du nom du club ---
+read -p "Nom (ou partie du nom) du club : " CLUB_SEARCH
 
-if [ -z "$TEAMID" ]; then
-  echo "❌ Équipe \"$TEAMNAME\" non trouvée."
-  exit 1
+# Recherche des clubs correspondants
+matching_teams=$(mysql -u "$USER" -p"$PASSWORD" -h "$HOST" -P "$PORT" -D "$DB_NAME" -se "
+    SELECT teamid, teamname 
+    FROM teams 
+    WHERE teamname LIKE '%$CLUB_SEARCH%';
+")
+
+if [[ -z "$matching_teams" ]]; then
+    echo "❌ Aucun club trouvé correspondant à '$CLUB_SEARCH'."
+    exit 1
 fi
-echo "✅ ID trouvé : $TEAMID"
 
-# --- Étape 2 : Extraction des PlayerIDs ---
-echo "🔎 Étape 2 : Récupération des joueurs de l'équipe..."
-mysql -u$USER -p$PASS -h${MYSQL_HOST} -P${MYSQL_PORT} -N -D $DB -e "SELECT playerid FROM teamplayerlinks WHERE teamid = '$TEAMID';" > player_ids.txt
+num_matches=$(echo "$matching_teams" | wc -l)
 
-NUM_PLAYERS=$(wc -l < player_ids.txt)
-echo "✅ $NUM_PLAYERS joueurs trouvés."
+# Si un seul club trouvé
+if [[ $num_matches -eq 1 ]]; then
+    TEAM_ID=$(echo "$matching_teams" | awk '{print $1}')
+    TEAM_NAME=$(mysql -u "$USER" -p"$PASSWORD" -h "$HOST" -P "$PORT" -D "$DB_NAME" -se "
+        SELECT teamname FROM teams WHERE teamid = $TEAM_ID;
+    ")
+else
+    echo "🏁 Clubs trouvés :"
+    echo "$matching_teams" | nl -w2 -s'  '
+    read -p "➡️  Entrez le numéro du club voulu : " club_selection
+    selected_club=$(echo "$matching_teams" | sed -n "${club_selection}p")
+    TEAM_ID=$(echo "$selected_club" | awk '{print $1}')
+    TEAM_NAME=$(mysql -u "$USER" -p"$PASSWORD" -h "$HOST" -P "$PORT" -D "$DB_NAME" -se "
+        SELECT teamname FROM teams WHERE teamid = $TEAM_ID;
+    ")
+fi
 
-# --- Étape 3 : Affichage des infos détaillées ---
-echo "🔎 Étape 3 : Récupération des informations joueurs..."
+echo ""
+echo "✅ Club sélectionné : $TEAM_NAME (ID $TEAM_ID)"
+echo "--------------------------------------------"
+echo "📋 Liste des joueurs :"
+echo ""
 
-# On convertit la liste en CSV pour le IN (...)
-PLAYER_IDS=$(tr '\n' ',' < player_ids.txt | sed 's/,$//')
-
-mysql -u$USER -p$PASS -h${MYSQL_HOST} -P${MYSQL_PORT} -D $DB -e "
-SELECT 
-    p.playerid,
-    CONCAT(pn_first.name, ' ', pn_last.name) AS fullname,
-    p.overallrating,
-    p.potential
-FROM players p
-INNER JOIN playernames pn_first ON p.firstnameid = pn_first.nameid
-INNER JOIN playernames pn_last ON p.lastnameid = pn_last.nameid
-WHERE p.playerid IN ($PLAYER_IDS)
-#ORDER BY p.preferredposition1;
-ORDER BY p.potential DESC;
+# --- Requête principale ---
+mysql -u "$USER" -p"$PASSWORD" -h "$HOST" -P "$PORT" -D "$DB_NAME" --table -e "
+    SELECT 
+        p.playerid AS 'ID',
+        CONCAT(IFNULL(pn_first.name,''), ' ', IFNULL(pn_last.name,'')) AS 'Nom complet',
+        p.overallrating AS 'Overall',
+        p.potential AS 'Potentiel'
+    FROM players p
+    JOIN teamplayerlinks tpl ON p.playerid = tpl.playerid
+    LEFT JOIN playernames pn_first ON p.firstnameid = pn_first.nameid
+    LEFT JOIN playernames pn_last  ON p.lastnameid = pn_last.nameid
+    WHERE tpl.teamid = $TEAM_ID
+    ORDER BY p.overallrating DESC, p.potential DESC;
 "
 
-echo "🏁 Terminé."
+echo ""
+echo "🏁 Fin de la liste."
