@@ -16,3 +16,6 @@ exclure selection nationale des resultats=
 111451,111455,111456,111459,111461,111462,111465,111466,111473,111475,111481,111483,111487,
 111489,111527,111545,111548,111550,111740,112048
       )"
+
+les scrits qui lisent une équipe 1 par 1:
+previousteam|set-previousteam|overall|
