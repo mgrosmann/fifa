@@ -22,14 +22,18 @@ num_matches=$(echo "$matching_teams" | wc -l)
 
 if [[ $num_matches -eq 1 ]]; then
     TEAM_ID=$(echo "$matching_teams" | awk '{print $1}')
-    TEAM_NAME=$(echo "$matching_teams" | cut -d' ' -f2-)
+    TEAM_NAME=$(mysql -u "$USER" -p"$PASSWORD" -h "$HOST" -P "$PORT" -D "$DB_NAME" -se "
+        SELECT teamname FROM teams WHERE teamid = $TEAM_ID;
+    ")
 else
     echo "🏟️ Clubs correspondants :"
     echo "$matching_teams" | nl -w2 -s'  '
     read -p "➡️  Entrez le numéro du club voulu : " club_selection
     selected_club=$(echo "$matching_teams" | sed -n "${club_selection}p")
     TEAM_ID=$(echo "$selected_club" | awk '{print $1}')
-    TEAM_NAME=$(echo "$selected_club" | cut -d' ' -f2-)
+    TEAM_NAME=$(mysql -u "$USER" -p"$PASSWORD" -h "$HOST" -P "$PORT" -D "$DB_NAME" -se "
+        SELECT teamname FROM teams WHERE teamid = $TEAM_ID;
+    ")
 fi
 
 echo "✅ Équipe sélectionnée : $TEAM_NAME"
