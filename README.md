@@ -50,5 +50,3 @@ It allows easy modification of transfers, loans, players, leagues, and other dat
 - `league/` — league and competition modifications  
 - `to_fifa15/`, `to_fifa16/` — migration scripts for FIFA15/16  
 - `container.sh` — prepare local environment
-
-Free for personal use and FIFA modding (not affiliated with EA
