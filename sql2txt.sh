@@ -4,7 +4,7 @@
 # SQL to TXT exporter for FIFA DB
 # --------------------------
 
-DB="FIFA14"
+DB="FIFA15"
 USER="root"
 PASSWORD="root"
 HOST="127.0.0.1"
@@ -47,7 +47,7 @@ esac
 
 # Export each table
 for tbl in "${tables[@]}"; do
-    OUTFILE="${tbl}.txt"
+    OUTFILE="${tbl}temp.txt"
     echo "Exporting table: $tbl → $OUTFILE"
     
     $MYSQL_CMD -D "$DB" --batch  -e "SELECT * FROM \`$tbl\`;" > "$OUTFILE"
@@ -55,12 +55,15 @@ for tbl in "${tables[@]}"; do
     if [[ $? -eq 0 ]]; then
         echo "✅ $tbl exported successfully"
         
-        # Convert with dbmaster.py to .txt format (UTF-16)
-        bash /mnt/c/github/fifa/txt2utf16.sh "$OUTFILE"
-        
-        # Move TXT to FIFA15 folder
-        mv "$OUTFILE" "$DEST_DIR"
-        echo "📂 $OUTFILE moved to $DEST_DIR"
+        # Convert with txt2utf16.sh
+bash /mnt/c/github/fifa/txt2utf16.sh "$OUTFILE"
+
+# Move the converted file to DEST_DIR with the final name
+mv "${OUTFILE%.*}_utf16.txt" "$DEST_DIR/${tbl}.txt"
+
+# Optional: remove temp file
+rm -f "$OUTFILE"
+echo "📂 Converted UTF-16 file moved to $DEST_DIR/${tbl}.txt"
     else
         echo "❌ Failed to export $tbl"
     fi
