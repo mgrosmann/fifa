@@ -8,7 +8,7 @@ It allows easy modification of transfers, loans, players, leagues, and other dat
 ## 🛠 Workflow / How to use
 
 1. **Export FIFA database to TXT**  
-   Use `dbmaster.py` to export the database to a `.txt` file.
+   Use `dbmaster` to export the database to a `.txt` file.
 
 2. **Import TXT to SQL**  
    Run `txt2sql.sh` to convert the TXT file into SQL format.
@@ -21,12 +21,9 @@ It allows easy modification of transfers, loans, players, leagues, and other dat
    - Leagues
 
 4. **Export modified database to TXT**  
-   Use `sql2txt.sh` to export the SQL database back to TXT.
+   Use `sql2txt.sh` to export the SQL database back to TXT and export to utf-16.
 
-5. **Export to UTF-16 format**  
-   Use `dbmaster.py` for exporting to UTF-16, the format used by `dbmaster`.
-
-6. **Import TXT back to DB Master**  
+5. **Import TXT back to DB Master**  
    Import the modified TXT file back into `dbmaster.py` (only modified tables will be updated).
 
 ---
