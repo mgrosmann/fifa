@@ -6,10 +6,17 @@ PASSWORD="root"
 HOST="127.0.0.1"
 PORT="5000"
 
+# Liste des ID d'équipes à exclure (sélections nationales + All Star)
+EXCLUDED_TEAMS="974,1318,1319,1321,1322,1324,1325,1327,1328,1329,1330,1331,1332,1334,1335,1336,1337,1338,
+1341,1342,1343,1352,1353,1354,1355,1356,1357,1359,1360,1361,1362,1363,1364,1365,1366,1367,
+1369,1370,1375,1377,1383,1386,1387,1391,1393,1395,1411,1413,1415,1667,1886,105013,105022,
+105035,110081,110082,111099,111107,111108,111109,111111,111112,111114,111115,111130,111448,
+111451,111455,111456,111459,111461,111462,111465,111466,111473,111475,111481,111483,111487,
+111489,111527,111545,111548,111550,111740,112048,111596,112606,112828,112190"
+
 while true; do
     read -p "Nom du joueur à transférer : " search_name
 
-    # Rechercher les joueurs correspondants
     players=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -se "
     SELECT p.playerid, CONCAT(pn_first.name, ' ', pn_last.name) AS fullname,
            IFNULL(pn_common.name,'') AS commonname,
@@ -21,8 +28,9 @@ while true; do
     LEFT JOIN playernames pn_common ON p.commonnameid = pn_common.nameid
     LEFT JOIN teamplayerlinks tpl ON p.playerid = tpl.playerid
     LEFT JOIN teams t ON tpl.teamid = t.teamid
-    WHERE CONCAT(pn_first.name, ' ', pn_last.name) LIKE '%$search_name%'
-       OR pn_common.name LIKE '%$search_name%';
+    WHERE (CONCAT(pn_first.name, ' ', pn_last.name) LIKE '%$search_name%'
+       OR pn_common.name LIKE '%$search_name%')
+      AND (t.teamid IS NULL OR t.teamid NOT IN ($EXCLUDED_TEAMS));
     ")
 
     if [[ -z "$players" ]]; then
@@ -53,12 +61,12 @@ while true; do
 
     echo "📋 Équipes de $display_name :"
 
-    # Récupérer les équipes actuelles
     teams=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -se "
         SELECT tpl.teamid, t.teamname
         FROM teamplayerlinks tpl
         LEFT JOIN teams t ON tpl.teamid = t.teamid
-        WHERE tpl.playerid=$playerid;
+        WHERE tpl.playerid=$playerid
+          AND t.teamid NOT IN ($EXCLUDED_TEAMS);
     ")
 
     if [[ -z "$teams" ]]; then
@@ -69,7 +77,6 @@ while true; do
     num_teams=$(echo "$teams" | wc -l)
 
     if [[ $num_teams -eq 1 ]]; then
-        # Si le joueur n’a qu’une seule équipe, on la prend directement
         old_teamid=$(echo "$teams" | awk '{print $1}')
         old_teamname=$(echo "$teams" | cut -d' ' -f2-)
         echo "⚽ Joueur actuellement dans : $old_teamname"
@@ -81,10 +88,12 @@ while true; do
         old_teamname=$(echo "$selected_team" | cut -d' ' -f2-)
     fi
 
-    # Recherche tolérante du club de destination
     read -p "➡️  Nom (ou partie du nom) du club de destination : " new_team_search
     matching_teams=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -se "
-        SELECT teamid, teamname FROM teams WHERE teamname LIKE '%$new_team_search%';
+        SELECT teamid, teamname
+        FROM teams
+        WHERE teamname LIKE '%$new_team_search%'
+          AND teamid NOT IN ($EXCLUDED_TEAMS);
     ")
 
     if [[ -z "$matching_teams" ]]; then
@@ -105,7 +114,6 @@ while true; do
         new_teamname=$(echo "$selected_club" | cut -d' ' -f2-)
     fi
 
-    # Effectuer le transfert
     mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -e "
         UPDATE teamplayerlinks 
         SET teamid=$new_teamid, position=29 
