@@ -56,7 +56,7 @@ for tbl in "${tables[@]}"; do
         echo "✅ $tbl exported successfully"
         
         # Convert with dbmaster.py to .txt format (UTF-16)
-        python3 /mnt/c/github/fifa/dbmaster.py "$OUTFILE"
+        bash  /mnt/c/github/fifa/txt2utf16.sh"$OUTFILE"
         
         # Move TXT to FIFA15 folder
         mv "$OUTFILE" "$DEST_DIR"
