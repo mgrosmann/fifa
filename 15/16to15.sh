@@ -45,10 +45,10 @@ else
 fi
 
 # 📦 Conversion vers format DB Master
-python3 /mnt/c/github/fifa/txt2utf16.sh  "./$OUTFILE1"
-python3 /mnt/c/github/fifa/txt2utf16.sh  "./$OUTFILE2"
-python3 /mnt/c/github/fifa/15/ltl15.py
-python3 /mnt/c/github/fifa/txt2utf16.sh  leagueteamlinks_fifa15_format.txt
+bash /mnt/c/github/fifa/txt2utf16.sh  "./$OUTFILE1"
+bash /mnt/c/github/fifa/txt2utf16.sh  "./$OUTFILE2"
+bash /mnt/c/github/fifa/15/ltl15.sh
+bash /mnt/c/github/fifa/txt2utf16.sh  leagueteamlinks_fifa15_format.txt
 mkdir -p /mnt/c/github/fifa/15/imported_files_16/
 cp /mnt/c/github/txt/FIFA16/leagues.txt mnt/c/github/fifa/15/imported_files_16/
 cp /mnt/c/github/txt/FIFA16/playernames.txt mnt/c/github/fifa/15/imported_files_16/
