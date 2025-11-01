@@ -45,14 +45,14 @@ else
 fi
 
 # 📦 Conversion vers format DB Master
-python3 /mnt/c/github/fifa/dbmaster.py "./$OUTFILE1"
-python3 /mnt/c/github/fifa/dbmaster.py "./$OUTFILE2"
+python3 /mnt/c/github/fifa/txt2utf16.sh  "./$OUTFILE1"
+python3 /mnt/c/github/fifa/txt2utf16.sh  "./$OUTFILE2"
 python3 /mnt/c/github/fifa/15/ltl15.py
-python3 /mnt/c/github/fifa/dbmaster.py leagueteamlinks_fifa15_format.txt
+python3 /mnt/c/github/fifa/txt2utf16.sh  leagueteamlinks_fifa15_format.txt
 mkdir -p /mnt/c/github/fifa/15/imported_files_16/
 cp /mnt/c/github/txt/FIFA16/leagues.txt mnt/c/github/fifa/15/imported_files_16/
 cp /mnt/c/github/txt/FIFA16/playernames.txt mnt/c/github/fifa/15/imported_files_16/
 cp /mnt/c/github/txt/FIFA16/teams.txt mnt/c/github/fifa/15/imported_files_16/
 mv players_dbmaster.txt mnt/c/github/fifa/15/imported_files_16/players.txt
 mv teamplayerlinks_dbmaster.txt mnt/c/github/fifa/15/imported_files_16/teamplayerlinks.txt
-mv leagueteamlinks_fifa15_format_dbmaster.txt mnt/c/github/fifa/15/imported_files_16/leagueteamlinks.txt
+mv leagueteamlinks_fifa15_format_utf16.txt mnt/c/github/fifa/15/imported_files_16/leagueteamlinks.txt
