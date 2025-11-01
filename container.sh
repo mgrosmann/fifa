@@ -7,13 +7,7 @@ curl -fsSL https://mgrosmann.onrender.com/script/projet/docker.sh -o docker.sh
 chmod +x docker.sh
 bash docker.sh
 echo "🧩 Installation de MariaDB client et Python..."
-apt install -y mariadb-client-compat python3-pip python3-venv
-echo "🐍 Création d’un environnement virtuel Python..."
-python3 -m venv venv
-source venv/bin/activate
-echo "📚 Installation des dépendances Python..."
-pip install --upgrade pip
-pip install pandas
+apt install -y mariadb-client-compat
 echo "🐬 Lancement du conteneur MySQL Docker (port 5000)..."
 docker run -d \
   --name fifa \
