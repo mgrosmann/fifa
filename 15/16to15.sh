@@ -7,10 +7,10 @@ MYSQL_HOST='127.0.0.1'
 MYSQL_PORT='5000' 
 TABLE1="players"
 TABLE2="teamplayerlinks"
-OUTFILE1="players.csv"
-OUTFILE2="teamplayerlinks.csv"
+OUTFILE1="players.txt"
+OUTFILE2="teamplayerlinks.txt"
 TABLE3="leagueteamlinks"
-OUTFILE3="leagueteamlinks.csv"
+OUTFILE3="leagueteamlinks.txt"
 
 
 # 📝 Création du fichier SQL

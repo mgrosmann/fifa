@@ -6,9 +6,9 @@ DB="FIFA14"
 MYSQL_HOST='127.0.0.1'
 MYSQL_PORT='5000' 
 TABLE1="teams"
-OUTFILE1="teams.csv"
+OUTFILE1="teams.txt"
 TABLE2="players"
-OUTFILE2="players.csv"
+OUTFILE2="players.txt"
 
 # 📝 Création du fichier SQL
 cat <<EOF > 14.sql
