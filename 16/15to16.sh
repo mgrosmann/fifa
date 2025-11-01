@@ -48,9 +48,9 @@ bash/mnt/c/github/fifa/txt2utf16.sh  teamplayerlinks_fifa16_format.txt
 bash/mnt/c/github/fifa/16/ltl16.sh
 bash/mnt/c/github/fifa/txt2utf16.sh  leagueteamlinks_fifa15_format.txt
 mkdir -p /mnt/c/github/fifa/16/imported_files_15/
-cp /mnt/c/github/txt/FIFA16/leagues.txt mnt/c/github/fifa/16/imported_files_15/
-cp /mnt/c/github/txt/FIFA16/playernames.txt mnt/c/github/fifa/16/imported_files_15/
-cp /mnt/c/github/txt/FIFA16/teams.txt mnt/c/github/fifa/16/imported_files_15/
-mv players_fifa16_format_utf16.txt mnt/c/github/fifa/16/imported_files_15/players.txt
-mv teamplayerlinks_fifa16_format_utf16.txt mnt/c/github/fifa/16/imported_files_15/teamplayerlinks.txt
-mv leagueteamlinks_fifa15_format_utf16.txt mnt/c/github/fifa/16/imported_files_15/leagueteamlinks.txt
+cp /mnt/c/github/txt/FIFA16/leagues.txt /mnt/c/github/fifa/16/imported_files_15/
+cp /mnt/c/github/txt/FIFA16/playernames.txt /mnt/c/github/fifa/16/imported_files_15/
+cp /mnt/c/github/txt/FIFA16/teams.txt /mnt/c/github/fifa/16/imported_files_15/
+mv players_fifa16_format_utf16.txt /mnt/c/github/fifa/16/imported_files_15/players.txt
+mv teamplayerlinks_fifa16_format_utf16.txt /mnt/c/github/fifa/16/imported_files_15/teamplayerlinks.txt
+mv leagueteamlinks_fifa15_format_utf16.txt /mnt/c/github/fifa/16/imported_files_15/leagueteamlinks.txt
