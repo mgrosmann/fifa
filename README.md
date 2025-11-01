@@ -33,7 +33,7 @@ It allows easy modification of transfers, loans, players, leagues, and other dat
 
 ## 📁 Supported Versions
 
-- FIFA 14 (read-only)
+- FIFA 14 (full-modification)
 - FIFA 15 (full modification & migration)
 - FIFA 16 (full modification & migration)
 
@@ -41,7 +41,7 @@ It allows easy modification of transfers, loans, players, leagues, and other dat
 
 ## ⚙️ Scripts Included
 
-- `dbmaster.py` — main Python engine for export/import and conversion  
+- `dbmaster.py` — main Python engine for conversion to utf-16
 - `txt2sql.sh` — convert TXT → SQL  
 - `sql2txt.sh` — convert SQL → TXT  
 - `transfers/` — transfer-related modifications  
@@ -49,16 +49,6 @@ It allows easy modification of transfers, loans, players, leagues, and other dat
 - `players/` — player information edits  
 - `league/` — league and competition modifications  
 - `to_fifa15/`, `to_fifa16/` — migration scripts for FIFA15/16  
-- `setup_env.sh` — prepare local environment
-
----
-
-## 👨‍💻 Author
-
-Marc Grosmann
-
----
-
-## 📜 License
+- `container.sh` — prepare local environment
 
 Free for personal use and FIFA modding (not affiliated with EA
