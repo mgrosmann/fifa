@@ -1,7 +1,7 @@
 import pandas as pd
 
 # --- fichiers ---
-source_csv = "leagueteamlinks.csv"          # ton fichier FIFA 16
+source_csv = "leagueteamlinks.txt"          # ton fichier FIFA 16
 output_txt = "leagueteamlinks_fifa15_format.txt"   # sortie FIFA 15 compatible
 
 # --- ordre exact des colonnes FIFA 15 ---
