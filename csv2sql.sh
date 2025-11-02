@@ -9,6 +9,6 @@ columns="\`$columns\`"
 tail --lines=+2 tmp.csv | while read l ; do
 values=$(echo $l | sed 's/,/\",\"/g' | tr -d "\r\n")
 values="\"$values\""
-echo "INSERT INTO $op($columns) VALUES ($values);"
+echo "INSERT INTO $op($columns) VALUES ($values),"
 done > "$opfile"
 rm tmp.csv
