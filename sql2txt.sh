@@ -56,7 +56,7 @@ for tbl in "${tables[@]}"; do
         echo "✅ $tbl exported successfully"
         
         # Convert with txt2utf16.sh
-bash /mnt/c/github/fifa/txt2utf16.sh "$OUTFILE"
+        iconv -f UTF-8 -t UTF-16LE "$OUTFILE" > "${OUTFILE%.*}_utf16.txt"
 
 # Move the converted file to DEST_DIR with the final name
 mv "${OUTFILE%.*}_utf16.txt" "$DEST_DIR/${tbl}.txt"
