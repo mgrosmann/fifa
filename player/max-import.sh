@@ -1,4 +1,4 @@
-8#!/bin/bash
+#!/bin/bash
 # --- import_massive.sh ---
 # Import massif de joueurs depuis CSV (optimisé et lisible)
 # Si playerid existe déjà ET firstname/lastname identiques, update. Sinon insert.
