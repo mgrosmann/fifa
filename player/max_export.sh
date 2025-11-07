@@ -48,14 +48,15 @@ ORDER BY p.overallrating DESC;
 echo "📥 Export filtré enregistré dans : $OUTPUT_FILE"
 
 # --- Étape 3 : Export CSV léger firstname;lastname;teamid;playerid ---
-echo "firstname;lastname;teamid;playerid" > "$OUTPUT_NAMES"
+echo "firstname;lastname;teamid;playerid;general" > "$OUTPUT_NAMES"
 
 mysql -u"$USER" -p"$PASSWORD" -h"$HOST" -P"$PORT" -D "$DB_NAME" --batch --skip-column-names -e "
 SELECT DISTINCT
     pn_first.name AS firstname,
     pn_last.name AS lastname,
     tpl.teamid,
-    p.playerid
+    p.playerid,
+    p.overallrating
 FROM players p
 JOIN playernames pn_first ON p.firstnameid = pn_first.nameid
 JOIN playernames pn_last ON p.lastnameid = pn_last.nameid

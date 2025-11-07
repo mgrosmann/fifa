@@ -43,7 +43,8 @@ CREATE TEMPORARY TABLE tmp_names (
     firstname VARCHAR(255),
     lastname VARCHAR(255),
     teamid INT,
-    playerid INT
+    playerid INT,
+    general INT
 );
 LOAD DATA LOCAL INFILE '$NAMES_TEAMS_CSV'
 INTO TABLE tmp_names
