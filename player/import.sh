@@ -72,7 +72,7 @@ do
         "
         new_fnameid=$(mysql -N -u "$USER" -p"$PASSWORD" -h "$HOST" -P "$PORT" -D "$DB_NAME" -se "SELECT MAX(nameid) FROM playernames;")
     else
-        new_fnameid="$existing_fname"
+        new_fnameid="$exdisting_fname"
     fi
 
     # --- lastname ---
