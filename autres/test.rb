@@ -113,6 +113,31 @@ comment convertir un fichier tab en csv:
 perl -lpe 's/"/""/g; s/^|$/"/g; s/\t/","/g' < input.tab > output.csv               #|||||||||| (passer de tab au csv avec guillemets)
 tr '\t' ';' < tmp.csv > output.csv                                                 #||||||||| (passer de tab a point virgule sans guillemets)
 head -n 1                                                                           ##||||||| (extraire la 1ere ligne seulement)
-basename test.py .Py                                                         ##||||||| (extraire le nom du fichier sans extension)
+tail --lines=+2 tmp.csv #skip la 1ere ligne
+basename test.py .py | ls sample.txt |cut -d"." -f 1                                 ##||||||| (extraire le nom du fichier sans extension)
 iconv -f UTF-16 -t UTF-8 "players.txt" -o "test.txt" 2>/dev/null || cp players.txt test.txt #||||| (convertir utf16 vers utf8)
 iconv -f UTF-8 -t UTF-16 "test.txt" -o "1players.txt" 2>/dev/null || cp test.txt 1players.txt  #(convertir utf8 vers utf16)
+
+
+
+
+# requete sql pour créer des tables à partir de fichiers csv dans un répertoire
+create_table_sql="create_table.sql"
+for file in "$target_dir"/*.csv; do
+    if [ -f "$file" ]; then
+        table_name=$(basename "$file" .csv)
+        echo "CREATE TABLE \`$table_name\` (test VARCHAR(255));" >> "$create_table_sql"
+    fi
+done
+mysql -u"$USER" -p"$PASSWORD" -h"$HOST" -P"$PORT" -D "$DB_NAME" < "$create_table_sql"
+# requete sql pour créer les colonnes dans les tables à partir de fichiers csv dans un répertoire
+create_columns_sql="create_columns.sql"
+for file in "$target_dir"/*.csv; do
+    if [ -f "$file" ]; then
+        table_name=$(basename "$file" .csv)
+        head -n1 "$file" | tr ';' '\n' | while IFS= read -r column; do
+            echo "ALTER TABLE \`$table_name\` ADD COLUMN IF NOT EXISTS \`$column\` VARCHAR(255);" >> "$create_columns_sql"
+        done
+    fi
+done
+mysql -u"$USER" -p"$PASSWORD" -h"$HOST" -P"$PORT" -D "$DB_NAME" < "$create_columns_sql"
