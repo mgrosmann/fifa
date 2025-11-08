@@ -50,3 +50,48 @@ previousteam|set-previousteam|overall|set-datejointeam
 
 les scripts qui lisent un joueur individuellement:
 transfer.sh|set-datejointeam|cancel-loan|player-loan|change-nationality
+
+# requete sql utile
+rechercher un joueur 
+SELECT p.playerid, p.overallrating, t.teamname, CONCAT(pn_first.name, ' ', pn_last.name) as fullname, pn_first.nameid, pn_last.nameid
+FROM teamplayerlinks tpl
+JOIN teams t ON tpl.teamid = t.teamid
+join players p on tpl.playerid = p.playerid
+JOIN playernames pn_first ON p.firstnameid = pn_first.nameid
+JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid
+WHERE CONCAT(pn_first.name, ' ', pn_last.name) LIKE '%kompany%';
+#afficher tous les joueurs d'un club
+SELECT p.playerid, tpl.position, p.overallrating, p.potential, t.teamname, CONCAT(pn_first.name, ' ', pn_last.name) as fullname, pn_first.nameid, pn_last.nameid
+FROM teamplayerlinks tpl
+JOIN teams t ON tpl.teamid = t.teamid
+join players p on tpl.playerid = p.playerid
+JOIN playernames pn_first ON p.firstnameid = pn_first.nameid
+JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid
+WHERE t.teamname LIKE '%real madrid%';
+#lister nombre de joueurs dans les 7 championnats majeurs
+SELECT l.leagueid,
+       l.leaguename,
+       COUNT(DISTINCT tpl.playerid) AS nb_joueurs
+FROM teamplayerlinks tpl
+JOIN teams t ON tpl.teamid = t.teamid
+join leagueteamlinks ltl on t.teamid = ltl.teamid
+JOIN leagues l ON ltl.leagueid = l.leagueid
+WHERE l.leagueid IN (13, 16, 19, 31, 10, 53, 308)
+GROUP BY l.leagueid, l.leaguename
+ORDER BY l.leagueid;
+#lister nombre total de joueurs dans les 7 championnats majeurs
+SELECT COUNT(DISTINCT tpl.playerid) AS total_joueurs
+FROM teamplayerlinks tpl
+JOIN teams t ON tpl.teamid = t.teamid
+JOIN leagueteamlinks ltl ON t.teamid = ltl.teamid
+WHERE ltl.leagueid IN (13, 16, 19, 31, 10, 53, 308);
+#nombre de joueur par club
+SELECT 
+    t.teamid,
+    t.teamname,
+    COUNT(DISTINCT tpl.playerid) AS nb_joueurs
+FROM teamplayerlinks tpl
+JOIN teams t ON tpl.teamid = t.teamid
+GROUP BY t.teamid, t.teamname
+ORDER BY nb_joueurs DESC;
+#
