@@ -11,13 +11,16 @@ PORT="5000"
 OUTPUT_FILE="players_export.csv"
 OUTPUT_NAMES="players_names_teams.csv"
 OUTPUT_TPL="teamplayerlinks_export.csv"
+tmp_csv="tmp.csv"
+tmp_csv1="tmp1.csv"
 
 echo "🔍 Export des joueurs filtrés (clubs majeurs, PL, 85+, écart >=15, exceptions manuelles)..."
 
 # --- Étape 1 : Récupération des colonnes pour l'en-tête ---
-columns=$(mysql -u"$USER" -p"$PASSWORD" -h"$HOST" -P"$PORT" -D "$DB_NAME" -Bse "SHOW COLUMNS FROM players;" | paste -sd";" -)
-echo "$columns" > "$OUTPUT_FILE"
-
+columns=$(mysql -u"$USER" -p"$PASSWORD" -h"$HOST" -P"$PORT" -D "$DB_NAME" -e "select * from  players limit 1;")
+echo "$columns" > "$tmp_csv"
+tr '\t' ';' < "$tmp_csv" > "$tmp_csv1" && head -n1 "$tmp_csv1" >"$OUTPUT_FILE"
+rm "$tmp_csv" "$tmp_csv1"
 # --- Étape 2 : Export complet filtré ---
 mysql -u"$USER" -p"$PASSWORD" -h"$HOST" -P"$PORT" -D "$DB_NAME" --batch --skip-column-names -e "
 SELECT DISTINCT p.*
@@ -84,8 +87,10 @@ ORDER BY p.overallrating DESC;
 echo "💾 CSV léger exporté dans : $OUTPUT_NAMES"
 
 # --- Étape 4 : Export de la table teamplayerlinks ---
-columns_tpl=$(mysql -u"$USER" -p"$PASSWORD" -h"$HOST" -P"$PORT" -D "$DB_NAME" -Bse "SHOW COLUMNS FROM players;" | paste -sd";" -)
-echo "$columns_tpl" > "$OUTPUT_TPL"
+columns_tpl=$(mysql -u"$USER" -p"$PASSWORD" -h"$HOST" -P"$PORT" -D "$DB_NAME" -e "select * from  teamplayerlinks limit 1;")
+echo "$columns_tpl" > "$tmp_csv"
+tr '\t' ';' < "$tmp_csv" > "$tmp_csv1" && head -n1 "$tmp_csv1" >"$OUTPUT_TPL"
+rm "$tmp_csv" "$tmp_csv1"
 
 mysql -u"$USER" -p"$PASSWORD" -h"$HOST" -P"$PORT" -D "$DB_NAME" --batch --skip-column-names -e "
 SELECT DISTINCT tpl.*
