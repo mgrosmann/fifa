@@ -45,3 +45,10 @@ for file in "$target_dir"/*.csv; do
       fi
 done
 $cmd < "$delete_columns_sql"
+#load data pour insérer les données des fichiers csv dans les tables
+for file in "$target_dir"/*.csv; do
+    if [ -f "$file" ]; then
+        table_name=$(basename "$file" .csv)
+        $cmd -e "LOAD DATA LOCAL INFILE '$file' INTO TABLE \`$table_name\` FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;"
+      fi
+done
