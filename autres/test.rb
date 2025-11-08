@@ -114,3 +114,5 @@ perl -lpe 's/"/""/g; s/^|$/"/g; s/\t/","/g' < input.tab > output.csv            
 tr '\t' ';' < tmp.csv > output.csv                                                 #||||||||| (passer de tab a point virgule sans guillemets)
 head -n 1                                                                           ##||||||| (extraire la 1ere ligne seulement)
 basename test.py .Py                                                         ##||||||| (extraire le nom du fichier sans extension)
+iconv -f UTF-16 -t UTF-8 "players.txt" -o "test.txt" 2>/dev/null || cp players.txt test.txt #||||| (convertir utf16 vers utf8)
+iconv -f UTF-8 -t UTF-16 "test.txt" -o "1players.txt" 2>/dev/null || cp test.txt 1players.txt  #(convertir utf8 vers utf16)
