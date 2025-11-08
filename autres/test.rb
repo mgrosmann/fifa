@@ -79,6 +79,14 @@ JOIN leagues l ON ltl.leagueid = l.leagueid
 WHERE l.leagueid IN (13, 16, 19, 31, 10, 53, 308)
 GROUP BY l.leagueid, l.leaguename
 ORDER BY l.leagueid;
+#nombre de clubs par championnat
+SELECT l.leagueid, l.leaguename, COUNT(DISTINCT t.teamid) AS nb_clubs
+FROM leagueteamlinks ltl
+JOIN teams t ON ltl.teamid = t.teamid
+JOIN leagues l ON ltl.leagueid = l.leagueid
+WHERE l.leagueid IN (13, 16, 19, 31, 10, 53, 308)
+GROUP BY l.leagueid, l.leaguename
+ORDER BY l.leagueid;
 #lister nombre total de joueurs dans les 7 championnats majeurs
 SELECT COUNT(DISTINCT tpl.playerid) AS total_joueurs
 FROM teamplayerlinks tpl
@@ -102,3 +110,9 @@ JOIN players p on tpl.playerid = p.playerid
 JOIN playernames pn_first ON p.firstnameid = pn_first.nameid
 JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid
 ORDER BY CAST(tpl.playerid AS UNSIGNED);
+#lister les équipes d'un championnat
+SELECT t.teamid, t.teamname, l.leaguename
+FROM leagueteamlinks ltl
+JOIN teams t ON ltl.teamid = t.teamid
+Join leagues l ON ltl.leagueid = l.leagueid
+WHERE l.leaguename like '%Ligue 1%'; #bundesliga '%bundesliga (1)%' liga = '%spain p%'
