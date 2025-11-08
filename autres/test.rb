@@ -112,5 +112,5 @@ WHERE l.leaguename like '%Ligue 1%'; #bundesliga '%bundesliga (1)%' liga = '%spa
 comment convertir un fichier tab en csv:
 perl -lpe 's/"/""/g; s/^|$/"/g; s/\t/","/g' < input.tab > output.csv               #|||||||||| (passer de tab au csv avec guillemets)
 tr '\t' ';' < tmp.csv > output.csv                                                 #||||||||| (passer de tab a point virgule sans guillemets)
-head -n 1                                                                           #|||||||| (extraire la 1ere ligne seulement)
-basename test.py .Py                                                          #||||||| (extraire le nom du fichier sans extension)
+head -n 1                                                                           ##||||||| (extraire la 1ere ligne seulement)
+basename test.py .Py                                                         ##||||||| (extraire le nom du fichier sans extension)
