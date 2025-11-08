@@ -108,5 +108,8 @@ FROM leagueteamlinks ltl
 JOIN teams t ON ltl.teamid = t.teamid
 Join leagues l ON ltl.leagueid = l.leagueid
 WHERE l.leaguename like '%Ligue 1%'; #bundesliga '%bundesliga (1)%' liga = '%spain p%'
-#perl -lpe 's/"/""/g; s/^|$/"/g; s/\t/","/g' < input.tab > output.csv               |||||||||| (passer de tab au csv avec guillemets)
-#tr '\t' ';' < tmp.csv > output.csv                                                 ||||||||| (passer de tab a point virgule sans guillemets)
+
+comment convertir un fichier tab en csv:
+perl -lpe 's/"/""/g; s/^|$/"/g; s/\t/","/g' < input.tab > output.csv               #|||||||||| (passer de tab au csv avec guillemets)
+tr '\t' ';' < tmp.csv > output.csv                                                 #||||||||| (passer de tab a point virgule sans guillemets)
+head -n 1                                                                           #|||||||| (extraire la 1ere ligne seulement)
