@@ -141,3 +141,12 @@ for file in "$target_dir"/*.csv; do
     fi
 done
 mysql -u"$USER" -p"$PASSWORD" -h"$HOST" -P"$PORT" -D "$DB_NAME" < "$create_columns_sql"
+#supprimer la colonne test des tables créées
+delete_columns_sql="delete_columns.sql"
+for file in "$target_dir"/*.csv; do
+    if [ -f "$file" ]; then
+        table_name=$(basename "$file" .csv)
+        echo "ALTER TABLE \`$table_name\` DROP COLUMN IF EXISTS \`test\`;" >> "$delete_columns_sql"
+      fi
+done
+mysql -u"$USER" -p"$PASSWORD" -h"$HOST" -P"$PORT" -D "$DB_NAME" < "$delete_columns_sql"
