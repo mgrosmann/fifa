@@ -94,4 +94,11 @@ FROM teamplayerlinks tpl
 JOIN teams t ON tpl.teamid = t.teamid
 GROUP BY t.teamid, t.teamname
 ORDER BY nb_joueurs DESC;
-#
+#classé les joueurs par player id
+SELECT tpl.playerid, CONCAT(pn_first.name, ' ', pn_last.name) as fullname, p.overallrating, t.teamname
+from FIFA14.teamplayerlinks tpl
+JOIN teams t ON tpl.teamid = t.teamid
+JOIN players p on tpl.playerid = p.playerid
+JOIN playernames pn_first ON p.firstnameid = pn_first.nameid
+JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid
+ORDER BY CAST(tpl.playerid AS UNSIGNED);
