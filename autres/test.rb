@@ -121,32 +121,3 @@ iconv -f UTF-8 -t UTF-16 "test.txt" -o "1players.txt" 2>/dev/null || cp test.txt
 
 
 
-# requete sql pour créer des tables à partir de fichiers csv dans un répertoire
-create_table_sql="create_table.sql"
-for file in "$target_dir"/*.csv; do
-    if [ -f "$file" ]; then
-        table_name=$(basename "$file" .csv)
-        echo "CREATE TABLE \`$table_name\` (test VARCHAR(255));" >> "$create_table_sql"
-    fi
-done
-mysql -u"$USER" -p"$PASSWORD" -h"$HOST" -P"$PORT" -D "$DB_NAME" < "$create_table_sql"
-# requete sql pour créer les colonnes dans les tables à partir de fichiers csv dans un répertoire
-create_columns_sql="create_columns.sql"
-for file in "$target_dir"/*.csv; do
-    if [ -f "$file" ]; then
-        table_name=$(basename "$file" .csv)
-        head -n1 "$file" | tr ';' '\n' | while IFS= read -r column; do
-            echo "ALTER TABLE \`$table_name\` ADD COLUMN IF NOT EXISTS \`$column\` VARCHAR(255);" >> "$create_columns_sql"
-        done
-    fi
-done
-mysql -u"$USER" -p"$PASSWORD" -h"$HOST" -P"$PORT" -D "$DB_NAME" < "$create_columns_sql"
-#supprimer la colonne test des tables créées
-delete_columns_sql="delete_columns.sql"
-for file in "$target_dir"/*.csv; do
-    if [ -f "$file" ]; then
-        table_name=$(basename "$file" .csv)
-        echo "ALTER TABLE \`$table_name\` DROP COLUMN IF EXISTS \`test\`;" >> "$delete_columns_sql"
-      fi
-done
-mysql -u"$USER" -p"$PASSWORD" -h"$HOST" -P"$PORT" -D "$DB_NAME" < "$delete_columns_sql"
