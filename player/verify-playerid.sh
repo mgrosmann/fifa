@@ -1,18 +1,12 @@
 #!/bin/bash
-
-USER="root"
-PASSWORD="root"
-HOST="127.0.0.1"
-PORT="5000"
-DB_NAME="FIFA16"
-DB_NAME1="FIFA14"
-
-mysqlcmd="mysql -u$USER -p$PASSWORD -h$HOST -P$PORT -D$DB_NAME"
-mysqlcmd1="mysql -u$USER -p$PASSWORD -h$HOST -P$PORT -D$DB_NAME1"
+DB="FIFA14"
+DB_NAME1="FIFA15"
+cmd="mysql -uroot -proot -P 5000 -h127.0.0.1 -D $DB"
+cmd1=="mysql -uroot -proot -P 5000 -h127.0.0.1 -DFIFA15"
 
 # --- Étape 1 : extraction des playerid depuis FIFA16
-echo "📤 Extraction des playerid depuis $DB_NAME..."
-$mysqlcmd --batch --skip-column-names -e "
+echo "📤 Extraction des playerid depuis $DB..."
+$cmd --batch --skip-column-names -e "
 SELECT DISTINCT
     p.playerid, pn_first.name AS firstname, pn_last.name AS lastname
 FROM players p
@@ -49,7 +43,7 @@ ids=$(cut -d',' -f1 fifa16_ids.txt | paste -sd, -)
 echo "📥 Vérification des playerid dans $DB_NAME1 avec tolérance prénom/nom..."
 
 # --- Étape 3 : playerid existants dans FIFA14 mais identité différente
-$mysqlcmd1 --batch --skip-column-names -e "
+$cmd1 --batch --skip-column-names -e "
 SELECT f14.playerid, f14_first.name AS firstname_fifa14, f14_last.name AS lastname_fifa14
 FROM players f14
 JOIN playernames f14_first ON f14.firstnameid = f14_first.nameid

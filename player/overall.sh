@@ -1,15 +1,12 @@
 #!/bin/bash
 
-DB_NAME="FIFA15"
-USER="root"
-PASSWORD="root"
-HOST="127.0.0.1"
-PORT="5000"
+DB="FIFA14"
+cmd="mysql -uroot -proot -P 5000 -h127.0.0.1 -D $DB"
 
 # --- Recherche tolérante du nom de l’équipe ---
 read -p "Nom (ou partie du nom) de l’équipe : " TEAM_SEARCH
 
-matching_teams=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -se "
+matching_teams=$($cmd  -se "
     SELECT teamid, teamname FROM teams WHERE teamname LIKE '%$TEAM_SEARCH%';
 ")
 
@@ -39,7 +36,7 @@ fi
 echo "✅ Équipe sélectionnée : $TEAM_NAME"
 
 # --- Récupération des joueurs avec rating et potentiel ---
-players=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -se "
+players=$($cmd  -se "
 SELECT 
     p.playerid,
     CONCAT(pn_first.name, ' ', pn_last.name) AS fullname,
@@ -73,7 +70,7 @@ for line in $players; do
         read -p "Nouveau Overall Rating : " new_overall
         read -p "Nouveau Potential : " new_pot
         # Mise à jour en base
-        mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -e "
+        $cmd  -e "
             UPDATE players 
             SET overallrating=$new_overall, potential=$new_pot 
             WHERE playerid=$playerid;

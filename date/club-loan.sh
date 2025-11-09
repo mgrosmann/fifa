@@ -1,17 +1,13 @@
 #!/bin/bash
-
-DB_NAME="FIFA15"
-USER="root"
-PASSWORD="root"
-HOST="127.0.0.1"
-PORT="5000"
+DB="FIFA14"
+cmd="mysql -uroot -proot -P 5000 -h127.0.0.1 -D $DB"
 CONVERT_SCRIPT="./dateloan.sh"
 
 # --- Demande du club ---
 read -p "Nom (ou partie du nom) du club : " CLUB_SEARCH
 
 # Recherche du club
-matching_teams=$(mysql -u "$USER" -p"$PASSWORD" -h "$HOST" -P "$PORT" -D "$DB_NAME" -se "
+matching_teams=$($cmd -se "
     SELECT teamid, teamname 
     FROM teams 
     WHERE teamname LIKE '%$CLUB_SEARCH%';
@@ -29,7 +25,7 @@ if [[ $num_matches -eq 1 ]]; then
     selected_club=$(echo "$matching_teams" | head -n1)
     TEAM_ID=$(echo "$selected_club" | awk '{print $1}')
     # Récupère le nom complet depuis la base
-    TEAM_NAME=$(mysql -u "$USER" -p"$PASSWORD" -h "$HOST" -P "$PORT" -D "$DB_NAME" -se "
+    TEAM_NAME=$($cmd -se "
         SELECT teamname FROM teams WHERE teamid = $TEAM_ID;
     ")
 else
@@ -38,7 +34,7 @@ else
     read -p "➡️  Entrez le numéro du club voulu : " club_selection
     selected_club=$(echo "$matching_teams" | sed -n "${club_selection}p")
     TEAM_ID=$(echo "$selected_club" | awk '{print $1}')
-    TEAM_NAME=$(mysql -u "$USER" -p"$PASSWORD" -h "$HOST" -P "$PORT" -D "$DB_NAME" -se "
+    TEAM_NAME=$($cmd -se "
         SELECT teamname FROM teams WHERE teamid = $TEAM_ID;
     ")
 fi
@@ -60,7 +56,7 @@ if [[ "$CHOICE" == "1" ]]; then
     TITLE="📋 Liste des joueurs prêtés PAR $TEAM_NAME :"
     echo "$TITLE"
 
-    players=$(mysql -u "$USER" -p"$PASSWORD" -h "$HOST" -P "$PORT" -D "$DB_NAME" -Nse "
+    players=$($cmd -Nse "
         SELECT DISTINCT
             p.playerid,
             CONCAT(IFNULL(pn_first.name,''), ' ', IFNULL(pn_last.name,'')) AS fullname,
@@ -88,7 +84,7 @@ elif [[ "$CHOICE" == "2" ]]; then
     TITLE="📋 Liste des joueurs prêtés À $TEAM_NAME :"
     echo "$TITLE"
 
-    players=$(mysql -u "$USER" -p"$PASSWORD" -h "$HOST" -P "$PORT" -D "$DB_NAME" -Nse "
+    players=$($cmd -Nse "
         SELECT DISTINCT
             p.playerid,
             CONCAT(IFNULL(pn_first.name,''), ' ', IFNULL(pn_last.name,'')) AS fullname,

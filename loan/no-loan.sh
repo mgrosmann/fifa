@@ -1,15 +1,11 @@
 #!/bin/bash
 
-DB_NAME="FIFA15"
-USER="root"
-PASSWORD="root"
-HOST="127.0.0.1"
-PORT="5000"
-
+DB="FIFA14"
+cmd="mysql -uroot -proot -P 5000 -h127.0.0.1 -D $DB"
 echo "🔍 Recherche des prêts avec loandateend inconnu..."
 echo "-----------------------------------------------"
 
-mysql -u "$USER" -p"$PASSWORD" -h"$HOST" -P"$PORT" -D "$DB_NAME" -e "
+$cmd -e "
 SELECT p.playerid, 
        CONCAT(pn_first.name, ' ', pn_last.name) AS fullname,
        pl.loandateend,

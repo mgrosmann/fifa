@@ -2,16 +2,12 @@
 # Script de prêt d’un joueur vers un autre club
 # Utilisation : ./loan_player.sh
 
-DB_NAME="FIFA15"
-USER="root"
-PASSWORD="root"
-HOST="127.0.0.1"
-PORT="5000"
-
+DB="FIFA14"
+cmd="mysql -uroot -proot -P 5000 -h127.0.0.1 -D $DB"
 read -p "Nom du joueur à prêter : " search_name
 
 # Récupération du playerid
-playerid=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -Nse "
+playerid=$($cmd -Nse "
 SELECT playerid FROM players p
 JOIN playernames n1 ON p.firstnameid = n1.nameid
 JOIN playernames n2 ON p.lastnameid = n2.nameid
@@ -25,11 +21,11 @@ if [[ -z "$playerid" ]]; then
 fi
 
 # Trouver le club actuel
-current_team=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -Nse "
+current_team=$($cmd -Nse "
 SELECT teamid FROM teamplayerlinks WHERE playerid=$playerid LIMIT 1;
 ")
 
-current_team_name=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -Nse "
+current_team_name=$($cmd -Nse "
 SELECT teamname FROM teams WHERE teamid=$current_team LIMIT 1;
 ")
 
@@ -39,7 +35,7 @@ echo "ℹ️  Club actuel : $current_team_name ($current_team)"
 read -p "Nom du club où le joueur part en prêt : " loan_team_name
 
 # Récupérer l’ID du club à partir du nom
-loan_team=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -Nse "
+loan_team=$($cmd -Nse "
 SELECT teamid FROM teams WHERE teamname LIKE '%$loan_team_name%' LIMIT 1;
 ")
 
@@ -65,17 +61,17 @@ if [[ -z "$loandateend" ]]; then
 fi
 
 # Mettre à jour le club du joueur (le prêter)
-mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -e "
+$cmd -e "
 UPDATE teamplayerlinks SET teamid=$loan_team, position=29  WHERE playerid=$playerid;
 "
 
 # Ajouter le prêt dans playerloans
-mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -e "
+$cmd -e "
 INSERT INTO playerloans (teamidloanedfrom, playerid, loandateend)
 VALUES ($current_team, $playerid, $loandateend);
 "
 
-loan_team_name_real=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -Nse "
+loan_team_name_real=$($cmd -Nse "
 SELECT teamname FROM teams WHERE teamid=$loan_team LIMIT 1;
 ")
 

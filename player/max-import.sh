@@ -6,11 +6,8 @@
 # - Position = 29
 # - jerseynumber = MAX+1 par équipe si NULL
 
-DB_NAME="FIFA14"
-USER="root"
-PASSWORD="root"
-HOST="127.0.0.1"
-PORT="3306"
+DB="FIFA14"
+cmd="mysql -uroot -proot -P 5000 -h127.0.0.1 -D $DB"
 
 PLAYERS_CSV="players.csv"
 NAMES_TEAMS_CSV="players_names_teams.csv"
@@ -29,7 +26,7 @@ done
 
 # --- Import massif players ---
 echo "📥 Import / update players..." | tee -a "$LOG_FILE"
-mysql --local-infile=1 -u"$USER" -p"$PASSWORD" -h"$HOST" -P"$PORT" -D"$DB_NAME" -e "
+$cmd  -e "
 LOAD DATA LOCAL INFILE '$PLAYERS_CSV'
 REPLACE INTO TABLE players
 FIELDS TERMINATED BY ';'
@@ -40,7 +37,7 @@ echo "✅ Players importés / mis à jour." | tee -a "$LOG_FILE"
 
 # --- Import temporaire CSV léger ---
 echo "🔁 Import temporaire CSV léger..." | tee -a "$LOG_FILE"
-mysql --local-infile=1 -u"$USER" -p"$PASSWORD" -h"$HOST" -P"$PORT" -D"$DB_NAME" -e "
+$cmd  -e "
 DROP TEMPORARY TABLE IF EXISTS tmp_names;
 CREATE TEMPORARY TABLE tmp_names (
     firstname VARCHAR(255),
@@ -83,7 +80,7 @@ echo "✅ Firstname / lastname mis à jour." | tee -a "$LOG_FILE"
 
 # --- Import massif teamplayerlinks ---
 echo "📥 Import / update teamplayerlinks..." | tee -a "$LOG_FILE"
-mysql --local-infile=1 -u"$USER" -p"$PASSWORD" -h"$HOST" -P"$PORT" -D"$DB_NAME" -e "
+$cmd  -e "
 LOAD DATA LOCAL INFILE '$TEAMPLAYERLINKS_CSV'
 REPLACE INTO TABLE teamplayerlinks
 FIELDS TERMINATED BY ';'

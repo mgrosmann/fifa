@@ -1,15 +1,12 @@
 #!/bin/bash
 
-DB_NAME="FIFA15"
-USER="root"
-PASSWORD="root"
-HOST="127.0.0.1"
-PORT="5000"
+DB="FIFA14"
+cmd="mysql -uroot -proot -P 5000 -h127.0.0.1 -D $DB"
 
 # --- Sélection du club à parcourir ---
 read -p "Nom (ou partie du nom) de l’équipe à parcourir : " TEAM_SEARCH
 
-matching_teams=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -se "
+matching_teams=$($cmd E -se "
     SELECT teamid, teamname FROM teams WHERE teamname LIKE '%$TEAM_SEARCH%';
 ")
 
@@ -39,7 +36,7 @@ fi
 echo "✅ Équipe sélectionnée : $TEAM_NAME"
 
 # --- Récupération des joueurs de l’équipe ---
-players=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -se "
+players=$($cmd E -se "
 SELECT 
     p.playerid,
     CONCAT(pn_first.name, ' ', pn_last.name) AS fullname,
@@ -78,7 +75,7 @@ for line in $players; do
 
     # Recherche tolérante de l'ancienne équipe
     read -p "Nom (ou partie du nom) de l’ancienne équipe : " OLD_TEAM_SEARCH
-    old_matching=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -se "
+    old_matching=$($cmd E -se "
         SELECT teamid, teamname FROM teams WHERE teamname LIKE '%$OLD_TEAM_SEARCH%';
     ")
 
@@ -103,17 +100,17 @@ for line in $players; do
     echo "🔙 Ancienne équipe choisie : $OLD_TEAM_NAME (ID $OLD_TEAM_ID)"
 
     # --- Mise à jour ou insertion ---
-    exists=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -se "
+    exists=$($cmd E -se "
         SELECT COUNT(*) FROM previousteam WHERE playerid=$playerid;
     ")
 
     if [[ $exists -eq 0 ]]; then
-        mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -e "
+        $cmd E -e "
             INSERT INTO previousteam (playerid, previousteamid) VALUES ($playerid, $OLD_TEAM_ID);
         "
         echo "✅ Ancienne équipe ajoutée : $fullname → $OLD_TEAM_NAME"
     else
-        mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -e "
+        $cmd E -e "
             UPDATE previousteam SET previousteamid=$OLD_TEAM_ID WHERE playerid=$playerid;
         "
         echo "✅ Ancienne équipe mise à jour : $fullname → $OLD_TEAM_NAME"

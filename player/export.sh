@@ -1,11 +1,7 @@
 #!/bin/bash
 
-DB_NAME="FIFA16"
-USER="root"
-PASSWORD="root"
-HOST="127.0.0.1"
-PORT="5000"
-OUTPUT_FILE="players_export.csv"
+DB="FIFA14"
+cmd="mysql -uroot -proot -P 5000 -h127.0.0.1 -D $DB"OUTPUT_FILE="players_export.csv"
 OUTPUT_NAMES="info_export.csv"
 
 # Liste des ID d'équipes à exclure (sélections nationales + All Star)
@@ -20,7 +16,7 @@ EXCLUDED_TEAMS="974,1318,1319,1321,1322,1324,1325,1327,1328,1329,1330,1331,1332,
 
 read -p "🔎 Nom du joueur à exporter : " search_name
 
-players=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -se "
+players=$($cmd -se "
 SELECT p.playerid,
        CONCAT(pn_first.name, ' ', pn_last.name) AS fullname,
        IFNULL(pn_common.name,'') AS commonname,
@@ -60,7 +56,7 @@ commonname=$(echo "$selected_player" | awk -F'\t' '{print $3}')
 echo "📦 Export de $fullname ($playerid)..."
 
 # Récupération des colonnes
-columns=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -Bse "SHOW COLUMNS FROM players;" | awk '{print $1}' | paste -sd";" -)
+columns=$($cmd -Bse "SHOW COLUMNS FROM players;" | awk '{print $1}' | paste -sd";" -)
 
 # Si le fichier n’existe pas, créer l’entête
 if [[ ! -f "$OUTPUT_FILE" ]]; then
@@ -68,7 +64,7 @@ if [[ ! -f "$OUTPUT_FILE" ]]; then
 fi
 
 # Export du joueur
-mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME --batch --skip-column-names -e "
+$cmd --batch --skip-column-names -e "
     SELECT * FROM players WHERE playerid=$playerid;
 " | sed 's/\t/;/g' >> "$OUTPUT_FILE"
 

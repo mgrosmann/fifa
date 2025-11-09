@@ -1,10 +1,7 @@
 #!/bin/bash
 # 🔐 Mot de passe MySQL
-MYSQL_USER='root'
-MYSQL_PASS='root'
-DB="FIFA15"
-MYSQL_HOST='127.0.0.1'
-MYSQL_PORT='5000' 
+DB="FIFA14"
+cmd="mysql -uroot -proot -P 5000 -h127.0.0.1 -D $DB"
 TABLE1="players"
 TABLE2="teamplayerlinks"
 OUTFILE1="players.txt"
@@ -24,13 +21,12 @@ ADD COLUMN leaguegoalsprevthreematches INT DEFAULT 0;
 EOF
 
 # 🛠️ Exécution du script SQL
-MYSQL_CMD="mysql --local-infile=1 -u${MYSQL_USER} -p${MYSQL_PASS} -P${MYSQL_PORT} -h${MYSQL_HOST}"
-$MYSQL_CMD "$DB" < 15.sql
+$cmd "$DB" < 15.sql
 
 # ✅ Export des deux tables fixes
-$MYSQL_CMD -D "$DB" --batch --column-names -e "SELECT * FROM \`$TABLE1\`;" > "$OUTFILE1"
-$MYSQL_CMD -D "$DB" --batch --column-names -e "SELECT * FROM \`$TABLE2\`;" > "$OUTFILE2"
-$MYSQL_CMD -D "$DB" --batch --column-names -e "SELECT * FROM \`$TABLE3\`;" > "$OUTFILE3"
+$cmd -D "$DB" --batch --column-names -e "SELECT * FROM \`$TABLE1\`;" > "$OUTFILE1"
+$cmd -D "$DB" --batch --column-names -e "SELECT * FROM \`$TABLE2\`;" > "$OUTFILE2"
+$cmd -D "$DB" --batch --column-names -e "SELECT * FROM \`$TABLE3\`;" > "$OUTFILE3"
 
 
 if [ $? -eq 0 ]; then

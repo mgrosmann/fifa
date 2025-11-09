@@ -1,15 +1,11 @@
 #!/bin/bash
 
-DB_NAME="PRET1"
-USER="root"
-PASSWORD="root"
-HOST="127.0.0.1"
-PORT="5000"
-
+DB="FIFA14"
+cmd="mysql -uroot -proot -P 5000 -h127.0.0.1 -D $DB"
 read -p "Nom du joueur : " player_name
 
 # Recherche du playerid correspondant (tolérance sur le nom)
-playerid=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -Nse "
+playerid=$($cmd -Nse "
 SELECT p.playerid
 FROM players p
 LEFT JOIN playernames pn_first ON p.firstnameid = pn_first.nameid
@@ -30,7 +26,7 @@ echo "📊 Informations de prêt :"
 echo "--------------------------------------------"
 
 # Afficher toutes les infos de la table playerloans pour ce joueur
-mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -t -e "
+$cmd -t -e "
 SELECT * FROM playerloans WHERE playerid = $playerid;
 "
 

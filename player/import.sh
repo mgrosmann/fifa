@@ -1,11 +1,7 @@
 #!/bin/bash
 
-DB_NAME="FIFA16"
-USER="root"
-PASSWORD="root"
-HOST="127.0.0.1"
-PORT="5000"
-
+DB="FIFA14"
+cmd="mysql -uroot -proot -P 5000 -h127.0.0.1 -D $DB"
 PLAYERS_CSV="players.csv"           # CSV complet de la table players
 NAMES_TEAMS_CSV="players_names_teams.csv"  # CSV léger (firstname;lastname;teamid;playerid)
 
@@ -22,7 +18,7 @@ while IFS=";" read -r firstname lastname teamid playerid
 do
     [[ "$firstname" == "firstname" ]] && continue
 
-    exists=$(mysql -N -u "$USER" -p"$PASSWORD" -h "$HOST" -P "$PORT" -D "$DB_NAME" -se "
+    exists=$($cmd -se "
         SELECT 1 FROM players WHERE playerid=$playerid;
     ")
 
@@ -63,27 +59,27 @@ do
     [[ "$firstname" == "firstname" ]] && continue
 
     # --- firstname ---
-    existing_fname=$(mysql -N -u "$USER" -p"$PASSWORD" -h "$HOST" -P "$PORT" -D "$DB_NAME" -se "
+    existing_fname=$($cmd -se "
         SELECT nameid FROM playernames WHERE name='$firstname';
     ")
     if [[ -z "$existing_fname" ]]; then
         mysql -u "$USER" -p"$PASSWORD" -h "$HOST" -P "$PORT" -D "$DB_NAME" -e "
             INSERT INTO playernames (nameid, name) VALUES ((SELECT IFNULL(MAX(nameid),0)+1 FROM playernames), '$firstname');
         "
-        new_fnameid=$(mysql -N -u "$USER" -p"$PASSWORD" -h "$HOST" -P "$PORT" -D "$DB_NAME" -se "SELECT MAX(nameid) FROM playernames;")
+        new_fnameid=$($cmd -se "SELECT MAX(nameid) FROM playernames;")
     else
         new_fnameid="$exdisting_fname"
     fi
 
     # --- lastname ---
-    existing_lname=$(mysql -N -u "$USER" -p"$PASSWORD" -h "$HOST" -P "$PORT" -D "$DB_NAME" -se "
+    existing_lname=$($cmd -se "
         SELECT nameid FROM playernames WHERE name='$lastname';
     ")
     if [[ -z "$existing_lname" ]]; then
         mysql -u "$USER" -p"$PASSWORD" -h "$HOST" -P "$PORT" -D "$DB_NAME" -e "
             INSERT INTO playernames (nameid, name) VALUES ((SELECT IFNULL(MAX(nameid),0)+1 FROM playernames), '$lastname');
         "
-        new_lnameid=$(mysql -N -u "$USER" -p"$PASSWORD" -h "$HOST" -P "$PORT" -D "$DB_NAME" -se "SELECT MAX(nameid) FROM playernames;")
+        new_lnameid=$($cmd -se "SELECT MAX(nameid) FROM playernames;")
     else
         new_lnameid="$existing_lname"
     fi
@@ -96,7 +92,7 @@ do
     "
 
     # --- teamplayerlinks ---
-    exists=$(mysql -N -u "$USER" -p"$PASSWORD" -h "$HOST" -P "$PORT" -D "$DB_NAME" -se "
+    exists=$($cmd -se "
         SELECT 1 FROM teamplayerlinks WHERE playerid=$playerid AND teamid=$teamid;
     ")
     if [[ -z "$exists" ]]; then

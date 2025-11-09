@@ -1,10 +1,7 @@
 #!/bin/bash
 # 🔐 Mot de passe MySQL
-MYSQL_USER='root'
-MYSQL_PASS='root'
 DB="FIFA14"
-MYSQL_HOST='127.0.0.1'
-MYSQL_PORT='5000' 
+cmd="mysql -uroot -proot -P 5000 -h127.0.0.1 -D $DB"
 TABLE1="teams"
 OUTFILE1="teams.txt"
 TABLE2="players"
@@ -18,12 +15,11 @@ ADD COLUMN rightfreekicktakerid INT DEFAULT 0;
 EOF
 
 # 🛠️ Exécution du script SQL
-MYSQL_CMD="mysql --local-infile=1 -u${MYSQL_USER} -p${MYSQL_PASS} -P${MYSQL_PORT} -h${MYSQL_HOST}"
-$MYSQL_CMD "$DB" < 14.sql
+$cmd "$DB" < 14.sql
 
 # ✅ Export des deux tables fixes
-$MYSQL_CMD -D "$DB" --batch --column-names -e "SELECT * FROM \`$TABLE1\`;" > "$OUTFILE1"
-$MYSQL_CMD -D "$DB" --batch --column-names -e "SELECT * FROM \`$TABLE2\`;" > "$OUTFILE2"
+$cmd -D "$DB" --batch --column-names -e "SELECT * FROM \`$TABLE1\`;" > "$OUTFILE1"
+$cmd -D "$DB" --batch --column-names -e "SELECT * FROM \`$TABLE2\`;" > "$OUTFILE2"
 
 if [ $? -eq 0 ]; then
     echo "✅ Export terminé : $OUTFILE1 et $OUTFILE2"

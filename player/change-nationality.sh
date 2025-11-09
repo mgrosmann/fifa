@@ -1,15 +1,11 @@
 #!/bin/bash
 
-DB_NAME="FIFA15"
-USER="root"
-PASSWORD="root"
-HOST="127.0.0.1"
-PORT="5000"
-
+DB="FIFA14"
+cmd="mysql -uroot -proot -P 5000 -h127.0.0.1 -D $DB"
 # --- Étape 1 : Recherche du joueur ---
 read -p "Nom (ou partie du nom) du joueur : " PLAYER_SEARCH
 
-matching_players=$(mysql -u "$USER" -p"$PASSWORD" -h "$HOST" -P "$PORT" -D "$DB_NAME" -se "
+matching_players=$($cmd -se "
     SELECT 
         p.playerid, 
         CONCAT(IFNULL(pn_first.name,''), ' ', IFNULL(pn_last.name,'')) AS fullname,
@@ -50,7 +46,7 @@ echo ""
 # --- Étape 2 : Recherche de la nouvelle nationalité ---
 read -p "Nouvelle nationalité (ou partie du nom) : " NATION_SEARCH
 
-matching_nations=$(mysql -u "$USER" -p"$PASSWORD" -h "$HOST" -P "$PORT" -D "$DB_NAME" -se "
+matching_nations=$($cmd -se "
     SELECT nationid, nationname FROM nations WHERE nationname LIKE '%$NATION_SEARCH%';
 ")
 
@@ -86,7 +82,7 @@ if [[ "$confirm" != "o" && "$confirm" != "O" ]]; then
 fi
 
 # --- Étape 4 : Mise à jour dans la base ---
-mysql -u "$USER" -p"$PASSWORD" -h "$HOST" -P "$PORT" -D "$DB_NAME" -se "
+$cmd -se "
     UPDATE players 
     SET nationality = $NEW_NATION_ID 
     WHERE playerid = $PLAYER_ID;

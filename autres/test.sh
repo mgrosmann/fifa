@@ -1,6 +1,7 @@
 #!/bin/bash
 ls -d /mnt/c/github/txt/*/
-read -p "voici les database dispon choisisiez votre db (entrée juste les 2 chiffres ex: 14, 15) : " DB
+read -p "voici les database dispon choisisiez votre db (entrée juste les 2 chiffres ex: 14, 15) : " 
+DB="FIFA15"
 cmd="mysql -uroot -proot -h127.0.0.1 -DFIFA${DB} -P5000 -A"
 txt_dir="/mnt/c/github/txt/FIFA${DB}/"
 target_dir="/mnt/c/github/txt/FIFA${DB}/csv/"

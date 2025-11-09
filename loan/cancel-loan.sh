@@ -1,16 +1,12 @@
 #!/usr/bin/env bash
 # Annule le prêt d’un joueur et le renvoie dans son club d’origine
 
-DB_NAME="FIFA15"
-USER="root"
-PASSWORD="root"
-HOST="127.0.0.1"
-PORT="5000"
-
+DB="FIFA14"
+cmd="mysql -uroot -proot -P 5000 -h127.0.0.1 -D $DB"
 read -p "Nom du joueur à rapatrier : " search_name
 
 # Trouver l'ID du joueur
-playerid=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -Nse "
+playerid=$($cmd -Nse "
 SELECT playerid FROM players p
 JOIN playernames n1 ON p.firstnameid = n1.nameid
 JOIN playernames n2 ON p.lastnameid = n2.nameid
@@ -24,7 +20,7 @@ if [[ -z "$playerid" ]]; then
 fi
 
 # Trouver l'équipe d'origine du prêt
-loanedfrom=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -Nse "
+loanedfrom=$($cmd -Nse "
 SELECT teamidloanedfrom FROM playerloans WHERE playerid=$playerid LIMIT 1;
 ")
 
@@ -34,17 +30,17 @@ if [[ -z "$loanedfrom" ]]; then
 fi
 
 # Trouver le nom du club d'origine (optionnel)
-clubname=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -Nse "
+clubname=$($cmd -Nse "
 SELECT teamname FROM teams WHERE teamid=$loanedfrom LIMIT 1;
 ")
 
 # Mise à jour de teamplayerlinks
-mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -e "
+$cmd -e "
 UPDATE teamplayerlinks SET teamid=$loanedfrom, position=29 WHERE playerid=$playerid;
 "
 
 # Suppression de la ligne dans playerloans
-mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -e "
+$cmd -e "
 DELETE FROM playerloans WHERE playerid=$playerid;
 "
 

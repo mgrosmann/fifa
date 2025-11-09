@@ -1,16 +1,13 @@
 #!/bin/bash
 
 # --- Configuration ---
-DB="FIFA16"
-USER="root"
-PASS="root"
-MYSQL_HOST='127.0.0.1'
-MYSQL_PORT='5000'
+DB="FIFA14"
+cmd="mysql -uroot -proot -P 5000 -h127.0.0.1 -D $DB"
 MIN_POTENTIAL=90  # Seuil minimal du potentiel
 MIN_OVERALL=80    #seuil minimal du overall
 echo "🔎 Recherche de tous les joueurs avec un potentiel ≥ $MIN_POTENTIAL..."
 
-mysql -u"$USER" -p"$PASS" -h${MYSQL_HOST} -P${MYSQL_PORT} -D "$DB" -e "
+$cmd  -e "
 SELECT
     CONCAT(pn_first.name, ' ', pn_last.name) AS fullname,
     p.overallrating AS overall,

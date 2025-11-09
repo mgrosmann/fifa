@@ -4,15 +4,9 @@
 # SQL to TXT exporter for FIFA DB
 # --------------------------
 
-DB="FIFA15"
-USER="root"
-PASSWORD="root"
-HOST="127.0.0.1"
-PORT="5000"
 
-MYSQL_CMD="mysql -u $USER -p$PASSWORD -h $HOST -P $PORT"
-
-# Dossier de destination pour FIFA15
+DB="FIFA14"
+cmd="mysql -uroot -proot -P 5000 -h127.0.0.1 -D $DB"
 DEST_DIR="/mnt/c/github/fifa/15/forfifa15/"
 mkdir -p "$DEST_DIR"
 

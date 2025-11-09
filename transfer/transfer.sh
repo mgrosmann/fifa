@@ -1,11 +1,7 @@
 #!/bin/bash
 
-DB_NAME="FIFA14"
-USER="root"
-PASSWORD="root"
-HOST="127.0.0.1"
-PORT="5000"
-
+DB="FIFA14"
+cmd="mysql -uroot -proot -P 5000 -h127.0.0.1 -D $DB"
 # Liste des ID d'équipes à exclure (sélections nationales + All Star)
 EXCLUDED_TEAMS="974,1318,1319,1321,1322,1324,1325,1327,1328,1329,1330,1331,1332,1334,1335,1336,1337,1338,
 1341,1342,1343,1352,1353,1354,1355,1356,1357,1359,1360,1361,1362,1363,1364,1365,1366,1367,
@@ -17,7 +13,7 @@ EXCLUDED_TEAMS="974,1318,1319,1321,1322,1324,1325,1327,1328,1329,1330,1331,1332,
 while true; do
     read -p "Nom du joueur à transférer : " search_name
 
-    players=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -se "
+    players=$($cmd  -se "
     SELECT p.playerid, CONCAT(pn_first.name, ' ', pn_last.name) AS fullname,
            IFNULL(pn_common.name,'') AS commonname,
            IFNULL(t.teamname,'Inconnu') AS current_team,
@@ -61,7 +57,7 @@ while true; do
 
     echo "📋 Équipes de $display_name :"
 
-    teams=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -se "
+    teams=$($cmd  -se "
         SELECT tpl.teamid, t.teamname
         FROM teamplayerlinks tpl
         LEFT JOIN teams t ON tpl.teamid = t.teamid
@@ -89,7 +85,7 @@ while true; do
     fi
 
     read -p "➡️  Nom (ou partie du nom) du club de destination : " new_team_search
-    matching_teams=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -se "
+    matching_teams=$($cmd  -se "
         SELECT teamid, teamname
         FROM teams
         WHERE teamname LIKE '%$new_team_search%'
@@ -114,7 +110,7 @@ while true; do
         new_teamname=$(echo "$selected_club" | cut -d' ' -f2-)
     fi
 
-    mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -e "
+    $cmd  -e "
         UPDATE teamplayerlinks 
         SET teamid=$new_teamid, position=29 
         WHERE playerid=$playerid AND teamid=$old_teamid;

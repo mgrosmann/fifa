@@ -1,11 +1,8 @@
 #!/bin/bash
 # set_join_date.sh — Modifie la date d’arrivée d’un joueur (par équipe ou par nom)
 
-DB_NAME="FIFA15"
-USER="root"
-PASSWORD="root"
-HOST="127.0.0.1"
-PORT="5000"
+DB="FIFA14"
+cmd="mysql -uroot -proot -P 5000 -h127.0.0.1 -D $DB"
 CONVERTER="./dateloan.sh"  # Script de conversion ID/date FIFA
 
 # Liste des équipes à exclure (sélections nationales + All Star)
@@ -27,7 +24,7 @@ read -p "➡️  Choix (1 ou 2) : " mode
 if [[ "$mode" == "1" ]]; then
     read -p "Nom (ou partie du nom) de l’équipe à parcourir : " TEAM_SEARCH
 
-    matching_teams=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -se "
+    matching_teams=$($cmd -se "
         SELECT teamid, teamname 
         FROM teams 
         WHERE teamname LIKE '%$TEAM_SEARCH%'
@@ -42,7 +39,7 @@ if [[ "$mode" == "1" ]]; then
     num_matches=$(echo "$matching_teams" | wc -l)
     if [[ $num_matches -eq 1 ]]; then
         TEAM_ID=$(echo "$matching_teams" | awk '{print $1}')
-        TEAM_NAME=$(mysql -u "$USER" -p"$PASSWORD" -h "$HOST" -P "$PORT" -D "$DB_NAME" -se "
+        TEAM_NAME=$($cmd -se "
             SELECT teamname FROM teams WHERE teamid = $TEAM_ID;
         ")
     else
@@ -51,7 +48,7 @@ if [[ "$mode" == "1" ]]; then
         read -p "➡️  Entrez le numéro du club voulu : " club_selection
         selected_club=$(echo "$matching_teams" | sed -n "${club_selection}p")
         TEAM_ID=$(echo "$selected_club" | awk '{print $1}')
-        TEAM_NAME=$(mysql -u "$USER" -p"$PASSWORD" -h "$HOST" -P "$PORT" -D "$DB_NAME" -se "
+        TEAM_NAME=$($cmd -se "
             SELECT teamname FROM teams WHERE teamid = $TEAM_ID;
         ")
     fi
@@ -59,7 +56,7 @@ if [[ "$mode" == "1" ]]; then
     echo "✅ Équipe sélectionnée : $TEAM_NAME"
     echo "--------------------------------------------"
 
-    players=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -se "
+    players=$($cmd -se "
         SELECT 
             p.playerid,
             CONCAT(IFNULL(pn_first.name,''), ' ', IFNULL(pn_last.name,'')) AS fullname,
@@ -103,7 +100,7 @@ if [[ "$mode" == "1" ]]; then
             continue
         fi
 
-        mysql -u "$USER" -p"$PASSWORD" -h "$HOST" -P "$PORT" -D "$DB_NAME" -se "
+        $cmd -se "
             UPDATE players SET playerjointeamdate = $new_join_id WHERE playerid = $playerid;
         "
         echo "✅ Date modifiée : $fullname → $new_date"
@@ -118,7 +115,7 @@ if [[ "$mode" == "1" ]]; then
 elif [[ "$mode" == "2" ]]; then
     read -p "Nom (ou partie du nom) du joueur : " PLAYER_SEARCH
 
-    matching_players=$(mysql -u $USER -p$PASSWORD -h$HOST -P$PORT -D $DB_NAME -se "
+    matching_players=$($cmd -se "
         SELECT 
             p.playerid, 
             CONCAT(IFNULL(pn_first.name,''), ' ', IFNULL(pn_last.name,'')) AS fullname,
@@ -149,7 +146,7 @@ elif [[ "$mode" == "2" ]]; then
         PLAYER_ID=$(echo "$selected_player" | awk '{print $1}')
     fi
 
-    fullname=$(mysql -u "$USER" -p"$PASSWORD" -h "$HOST" -P "$PORT" -D "$DB_NAME" -se "
+    fullname=$($cmd -se "
         SELECT CONCAT(IFNULL(pn_first.name,''), ' ', IFNULL(pn_last.name,'')) 
         FROM players p 
         LEFT JOIN playernames pn_first ON p.firstnameid = pn_first.nameid
@@ -157,7 +154,7 @@ elif [[ "$mode" == "2" ]]; then
         WHERE playerid = $PLAYER_ID;
     ")
 
-    join_id=$(mysql -u "$USER" -p"$PASSWORD" -h "$HOST" -P "$PORT" -D "$DB_NAME" -se "
+    join_id=$($cmd -se "
         SELECT playerjointeamdate FROM players WHERE playerid = $PLAYER_ID;
     ")
 
@@ -174,7 +171,7 @@ elif [[ "$mode" == "2" ]]; then
     read -p "➡️ Nouvelle date (JJ/MM/AAAA) : " new_date
     new_join_id=$($CONVERTER id "$new_date")
 
-    mysql -u "$USER" -p"$PASSWORD" -h "$HOST" -P "$PORT" -D "$DB_NAME" -se "
+    $cmd -se "
         UPDATE players SET playerjointeamdate = $new_join_id WHERE playerid = $PLAYER_ID;
     "
     echo "✅ Date mise à jour : $fullname → $new_date"
