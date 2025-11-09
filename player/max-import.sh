@@ -7,7 +7,7 @@
 # - jerseynumber = MAX+1 par équipe si NULL
 
 DB="FIFA14"
-cmd="mysql -uroot -proot -P 5000 -h127.0.0.1 -D $DB"
+cmd="mysql --local-infile=1 -uroot -proot -h127.0.0.1 -D $DB -P5000 -A"
 
 PLAYERS_CSV="players.csv"
 NAMES_TEAMS_CSV="players_names_teams.csv"

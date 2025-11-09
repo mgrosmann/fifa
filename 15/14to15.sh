@@ -1,7 +1,7 @@
 #!/bin/bash
 # 🔐 Mot de passe MySQL
 DB="FIFA14"
-cmd="mysql -uroot -proot -P 5000 -h127.0.0.1 -D $DB"
+cmd="mysql --local-infile=1 -uroot -proot -h127.0.0.1 -D $DB -P5000 -A"
 TABLE1="teams"
 OUTFILE1="teams.txt"
 TABLE2="players"
