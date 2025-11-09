@@ -24,7 +24,7 @@ It allows easy modification of transfers, loans, players, leagues, and other dat
    Use `sql2txt.sh` to export the SQL database back to TXT and export to utf-16.
 
 5. **Import TXT back to DB Master**  
-   Import the modified TXT file back into `dbmaster.py` (only modified tables will be updated).
+   Import the modified TXT file back into with db master.
 
 ---
 
@@ -37,8 +37,6 @@ It allows easy modification of transfers, loans, players, leagues, and other dat
 ---
 
 ## ⚙️ Scripts Included
-
-- `dbmaster.py` — main Python engine for conversion to utf-16
 - `txt2sql.sh` — convert TXT → SQL  
 - `sql2txt.sh` — convert SQL → TXT  
 - `transfers/` — transfer-related modifications  
