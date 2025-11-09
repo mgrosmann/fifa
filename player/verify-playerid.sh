@@ -2,7 +2,7 @@
 DB="FIFA14"
 DB_NAME1="FIFA15"
 cmd="mysql -uroot -proot -P 5000 -h127.0.0.1 -D $DB"
-cmd1=="mysql -uroot -proot -P 5000 -h127.0.0.1 -DFIFA15"
+cmd1=="mysql -uroot -proot -P 5000 -h127.0.0.1 -D $DB_NAME1"
 
 # --- Étape 1 : extraction des playerid depuis FIFA16
 echo "📤 Extraction des playerid depuis $DB..."
