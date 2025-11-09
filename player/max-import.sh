@@ -19,14 +19,17 @@ TEAMPLAYERLINKS_CSV="teamplayerlinks.csv"
 LOG_FILE="import_massive_simple.log"
 echo "===== Import démarré $(date) =====" >> "$LOG_FILE"
 
-# --- Vérification fichiers ---
+# --- Vérification des fichiers ---
 for f in "$PLAYERS_CSV" "$NAMES_TEAMS_CSV" "$TEAMPLAYERLINKS_CSV"; do
-    [[ ! -f "$f" ]] && { echo "❌ Fichier manquant : $f" | tee -a "$LOG_FILE"; exit 1; }
+    if [[ ! -f "$f" ]]; then
+        echo "❌ Fichier manquant : $f" | tee -a "$LOG_FILE"
+        exit 1
+    fi
 done
 
 # --- Import massif players ---
 echo "📥 Import / update players..." | tee -a "$LOG_FILE"
-mysql -u"$USER" -p"$PASSWORD" -h"$HOST" -P"$PORT" -D"$DB_NAME" -e "
+mysql --local-infile=1 -u"$USER" -p"$PASSWORD" -h"$HOST" -P"$PORT" -D"$DB_NAME" -e "
 LOAD DATA LOCAL INFILE '$PLAYERS_CSV'
 REPLACE INTO TABLE players
 FIELDS TERMINATED BY ';'
@@ -37,7 +40,7 @@ echo "✅ Players importés / mis à jour." | tee -a "$LOG_FILE"
 
 # --- Import temporaire CSV léger ---
 echo "🔁 Import temporaire CSV léger..." | tee -a "$LOG_FILE"
-mysql -u"$USER" -p"$PASSWORD" -h"$HOST" -P"$PORT" -D"$DB_NAME" -e "
+mysql --local-infile=1 -u"$USER" -p"$PASSWORD" -h"$HOST" -P"$PORT" -D"$DB_NAME" -e "
 DROP TEMPORARY TABLE IF EXISTS tmp_names;
 CREATE TEMPORARY TABLE tmp_names (
     firstname VARCHAR(255),
@@ -56,11 +59,21 @@ IGNORE 1 LINES;
 # --- Update firstname/lastname en masse ---
 echo "🔁 Mise à jour firstname / lastname..." | tee -a "$LOG_FILE"
 mysql -u"$USER" -p"$PASSWORD" -h"$HOST" -P"$PORT" -D"$DB_NAME" -e "
-INSERT IGNORE INTO playernames (nameid, name)
-SELECT IFNULL(MAX(nameid),0)+1, firstname FROM tmp_names GROUP BY firstname;
-INSERT IGNORE INTO playernames (nameid, name)
-SELECT IFNULL(MAX(nameid),0)+1, lastname FROM tmp_names GROUP BY lastname;
+-- Insertion des nouveaux prénoms
+INSERT INTO playernames (nameid, name)
+SELECT (SELECT IFNULL(MAX(CAST(nameid AS UNSIGNED)),0) + ROW_NUMBER() OVER ()) AS nameid,
+       firstname
+FROM (SELECT DISTINCT firstname FROM tmp_names WHERE firstname <> '') AS t
+WHERE firstname NOT IN (SELECT name FROM playernames);
 
+-- Insertion des nouveaux noms
+INSERT INTO playernames (nameid, name)
+SELECT (SELECT IFNULL(MAX(CAST(nameid AS UNSIGNED)),0) + ROW_NUMBER() OVER ()) AS nameid,
+       lastname
+FROM (SELECT DISTINCT lastname FROM tmp_names WHERE lastname <> '') AS t
+WHERE lastname NOT IN (SELECT name FROM playernames);
+
+-- Mise à jour des IDs prénom/nom
 UPDATE players p
 JOIN tmp_names t ON p.playerid = t.playerid
 SET p.firstnameid = (SELECT nameid FROM playernames WHERE name = t.firstname LIMIT 1),
@@ -70,7 +83,7 @@ echo "✅ Firstname / lastname mis à jour." | tee -a "$LOG_FILE"
 
 # --- Import massif teamplayerlinks ---
 echo "📥 Import / update teamplayerlinks..." | tee -a "$LOG_FILE"
-mysql -u"$USER" -p"$PASSWORD" -h"$HOST" -P"$PORT" -D"$DB_NAME" -e "
+mysql --local-infile=1 -u"$USER" -p"$PASSWORD" -h"$HOST" -P"$PORT" -D"$DB_NAME" -e "
 LOAD DATA LOCAL INFILE '$TEAMPLAYERLINKS_CSV'
 REPLACE INTO TABLE teamplayerlinks
 FIELDS TERMINATED BY ';'
@@ -85,10 +98,12 @@ mysql -u"$USER" -p"$PASSWORD" -h"$HOST" -P"$PORT" -D"$DB_NAME" -e "
 UPDATE teamplayerlinks tpl
 JOIN tmp_names t ON tpl.playerid = t.playerid
 SET tpl.position = 29,
-    tpl.jerseynumber = IFNULL(tpl.jerseynumber,
-                              (SELECT IFNULL(MAX(tpl2.jerseynumber),0) + 1
-                               FROM teamplayerlinks tpl2
-                               WHERE tpl2.teamid = tpl.teamid));
+    tpl.jerseynumber = IFNULL(
+        tpl.jerseynumber,
+        (SELECT IFNULL(MAX(CAST(tpl2.jerseynumber AS UNSIGNED)),0) + 1
+         FROM teamplayerlinks tpl2
+         WHERE tpl2.teamid = tpl.teamid)
+    );
 "
 echo "✅ Position / jerseynumber mis à jour." | tee -a "$LOG_FILE"
 

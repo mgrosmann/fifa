@@ -14,42 +14,41 @@ for file in "$txt_dir"/*.txt; do
         dos2unix "$tmp_csv"
         tr '\t' ';' < "$tmp_csv" > "$target_dir/${base_name}.csv"
         rm "$tmp_csv"
+        echo "converision $file to $target_dir/${base_name}.csv"
     fi
 done
 #partie csv a sql
 # requete sql pour créer des tables à partir de fichiers csv dans un répertoire
-create_table_sql="create_table.sql"
 for file in "$target_dir"/*.csv; do
     if [ -f "$file" ]; then
         table_name=$(basename "$file" .csv)
-        echo "CREATE TABLE \`$table_name\` (test VARCHAR(255));" >> "$create_table_sql"
+        $cmd -e "CREATE TABLE \`$table_name\` (test VARCHAR(255));"
+        echo "Table $table_name créée."
     fi
 done
-$cmd < "$create_table_sql"
 # requete sql pour créer les colonnes dans les tables à partir de fichiers csv dans un répertoire
-create_columns_sql="create_columns.sql"
 for file in "$target_dir"/*.csv; do
     if [ -f "$file" ]; then
         table_name=$(basename "$file" .csv)
         head -n1 "$file" | tr ';' '\n' | while IFS= read -r column; do
-            echo "ALTER TABLE \`$table_name\` ADD COLUMN IF NOT EXISTS \`$column\` VARCHAR(255);" >> "$create_columns_sql"
+        $cmd -e "ALTER TABLE \`$table_name\` ADD COLUMN IF NOT EXISTS \`$column\` VARCHAR(255);"
+        echo "Colonne $column ajoutée à la table $table_name."
         done
     fi
 done
-$cmd < "$create_columns_sql"
 #supprimer la colonne test des tables créées
-delete_columns_sql="delete_columns.sql"
 for file in "$target_dir"/*.csv; do
     if [ -f "$file" ]; then
         table_name=$(basename "$file" .csv)
-        echo "ALTER TABLE \`$table_name\` DROP COLUMN IF EXISTS \`test\`;" >> "$delete_columns_sql"
+        $cmd -e "ALTER TABLE \`$table_name\` DROP COLUMN IF EXISTS \`test\`;"
+        echo "Colonne test supprimée de la table $table_name."
       fi
 done
-$cmd < "$delete_columns_sql"
 #load data pour insérer les données des fichiers csv dans les tables
 for file in "$target_dir"/*.csv; do
     if [ -f "$file" ]; then
         table_name=$(basename "$file" .csv)
         $cmd -e "LOAD DATA LOCAL INFILE '$file' INTO TABLE \`$table_name\` FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;"
+        echo "Données insérées dans la table $table_name à partir de $file."
       fi
 done
