@@ -82,7 +82,7 @@ ORDER BY CAST(tpl.playerid AS UNSIGNED) ASC;
 " | sed 's/\t/;/g' >> "$OUTPUT_TPL"
 
 echo "💾 Export de teamplayerlinks enregistré dans : $OUTPUT_TPL"
-
+s
 # --- Comptage des lignes des fichiers ---
 echo "✅ Export complet terminé."
 echo "Les fichiers générés et leurs nombres de lignes :"

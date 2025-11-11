@@ -1,13 +1,15 @@
 #!/bin/bash
-# --- import_massive_simple.sh ---
-# Import massif de joueurs depuis CSV
-# - REPLACE pour players et teamplayerlinks
-# - Met à jour firstname/lastname
-# - Position = 29
-# - jerseynumber = MAX+1 par équipe si NULL
+# --- import_massive_simple.sh (version finale sécurisée) ---
+# Import massif + update intelligent + gestion des agents libres
+# Compatible export.sh (mêmes filtres clubs / ligues)
+# Ajout : encodage UTF-8, LEFT JOIN sur PL, logs de lignes modifiées
 
 DB="FIFA14"
-cmd="mysql --local-infile=1 -uroot -proot -h127.0.0.1 -D $DB -P5000 -A"
+MYSQL_USER="root"
+MYSQL_PASS="root"
+MYSQL_HOST="127.0.0.1"
+MYSQL_PORT="5000"
+cmd="mysql --local-infile=1 -u$MYSQL_USER -p$MYSQL_PASS -h$MYSQL_HOST -P$MYSQL_PORT -D $DB -A -N -e"
 
 PLAYERS_CSV="players.csv"
 NAMES_TEAMS_CSV="players_names_teams.csv"
@@ -26,18 +28,21 @@ done
 
 # --- Import massif players ---
 echo "📥 Import / update players..." | tee -a "$LOG_FILE"
-$cmd  -e "
+$cmd "
+SET NAMES utf8mb4;
 LOAD DATA LOCAL INFILE '$PLAYERS_CSV'
 REPLACE INTO TABLE players
 FIELDS TERMINATED BY ';'
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES;
-"
+SELECT ROW_COUNT();
+" | tee -a "$LOG_FILE"
 echo "✅ Players importés / mis à jour." | tee -a "$LOG_FILE"
 
 # --- Import temporaire CSV léger ---
 echo "🔁 Import temporaire CSV léger..." | tee -a "$LOG_FILE"
-$cmd  -e "
+$cmd "
+SET NAMES utf8mb4;
 DROP TEMPORARY TABLE IF EXISTS tmp_names;
 CREATE TEMPORARY TABLE tmp_names (
     firstname VARCHAR(255),
@@ -51,47 +56,70 @@ INTO TABLE tmp_names
 FIELDS TERMINATED BY ';'
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES;
-"
+SELECT ROW_COUNT();
+" | tee -a "$LOG_FILE"
 
-# --- Update firstname/lastname en masse ---
-echo "🔁 Mise à jour firstname / lastname..." | tee -a "$LOG_FILE"
-mysql -u"$USER" -p"$PASSWORD" -h"$HOST" -P"$PORT" -D"$DB_NAME" -e "
--- Insertion des nouveaux prénoms
+# --- Mise à jour intelligente des prénoms / noms ---
+echo "🔁 Mise à jour firstname / lastname intelligente (tolérante)..." | tee -a "$LOG_FILE"
+
+$cmd "
+SET NAMES utf8mb4;
+
+-- 1️⃣ Insertion des nouveaux prénoms manquants
 INSERT INTO playernames (nameid, name)
 SELECT (SELECT IFNULL(MAX(CAST(nameid AS UNSIGNED)),0) + ROW_NUMBER() OVER ()) AS nameid,
        firstname
 FROM (SELECT DISTINCT firstname FROM tmp_names WHERE firstname <> '') AS t
 WHERE firstname NOT IN (SELECT name FROM playernames);
+SELECT ROW_COUNT();
 
--- Insertion des nouveaux noms
+-- 2️⃣ Insertion des nouveaux noms manquants
 INSERT INTO playernames (nameid, name)
 SELECT (SELECT IFNULL(MAX(CAST(nameid AS UNSIGNED)),0) + ROW_NUMBER() OVER ()) AS nameid,
        lastname
 FROM (SELECT DISTINCT lastname FROM tmp_names WHERE lastname <> '') AS t
 WHERE lastname NOT IN (SELECT name FROM playernames);
+SELECT ROW_COUNT();
 
--- Mise à jour des IDs prénom/nom
+-- 3️⃣ Mise à jour tolérante
 UPDATE players p
 JOIN tmp_names t ON p.playerid = t.playerid
-SET p.firstnameid = (SELECT nameid FROM playernames WHERE name = t.firstname LIMIT 1),
-    p.lastnameid  = (SELECT nameid FROM playernames WHERE name = t.lastname LIMIT 1);
-"
-echo "✅ Firstname / lastname mis à jour." | tee -a "$LOG_FILE"
+LEFT JOIN playernames pn_first ON pn_first.name = t.firstname
+LEFT JOIN playernames pn_last  ON pn_last.name  = t.lastname
+SET 
+    p.firstnameid = COALESCE(pn_first.nameid, p.firstnameid),
+    p.lastnameid  = COALESCE(pn_last.nameid,  p.lastnameid)
+WHERE 
+    NOT EXISTS (
+        SELECT 1
+        FROM playernames fn
+        JOIN playernames ln ON ln.nameid = p.lastnameid
+        WHERE fn.nameid = p.firstnameid
+          AND (fn.name LIKE CONCAT('%', t.firstname, '%') OR t.firstname LIKE CONCAT('%', fn.name, '%'))
+          AND (ln.name LIKE CONCAT('%', t.lastname, '%')  OR t.lastname  LIKE CONCAT('%', ln.name, '%'))
+    );
+SELECT ROW_COUNT();
+" | tee -a "$LOG_FILE"
+
+echo "✅ Firstname / lastname mis à jour (toléramment)." | tee -a "$LOG_FILE"
 
 # --- Import massif teamplayerlinks ---
 echo "📥 Import / update teamplayerlinks..." | tee -a "$LOG_FILE"
-$cmd  -e "
+$cmd "
+SET NAMES utf8mb4;
 LOAD DATA LOCAL INFILE '$TEAMPLAYERLINKS_CSV'
 REPLACE INTO TABLE teamplayerlinks
 FIELDS TERMINATED BY ';'
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES;
-"
+SELECT ROW_COUNT();
+" | tee -a "$LOG_FILE"
 echo "✅ Teamplayerlinks importés / mis à jour." | tee -a "$LOG_FILE"
 
-# --- Mise à jour position et jerseynumber simple ---
+# --- Mise à jour position / jerseynumber ---
 echo "🔁 Mise à jour position / jerseynumber..." | tee -a "$LOG_FILE"
-mysql -u"$USER" -p"$PASSWORD" -h"$HOST" -P"$PORT" -D"$DB_NAME" -e "
+$cmd "
+SET NAMES utf8mb4;
 UPDATE teamplayerlinks tpl
 JOIN tmp_names t ON tpl.playerid = t.playerid
 SET tpl.position = 29,
@@ -101,7 +129,25 @@ SET tpl.position = 29,
          FROM teamplayerlinks tpl2
          WHERE tpl2.teamid = tpl.teamid)
     );
-"
+SELECT ROW_COUNT();
+" | tee -a "$LOG_FILE"
 echo "✅ Position / jerseynumber mis à jour." | tee -a "$LOG_FILE"
+
+# --- Dégagement des joueurs PL / clubs majeurs ---
+echo "🚨 Dégagement des joueurs PL ou clubs majeurs..." | tee -a "$LOG_FILE"
+
+AUTHORISED_TEAMS="21,22,32,34,44,45,46,47,48,52,65,66,73,240,241,243,461,483,110374"
+FREE_AGENT_TEAMID=111592
+
+$cmd "
+SET NAMES utf8mb4;
+UPDATE teamplayerlinks tpl
+LEFT JOIN leagueteamlinks ltl ON tpl.teamid = ltl.teamid
+SET tpl.teamid = $FREE_AGENT_TEAMID
+WHERE (ltl.leagueid = 13 OR tpl.teamid IN ($AUTHORISED_TEAMS));
+SELECT ROW_COUNT();
+" | tee -a "$LOG_FILE"
+
+echo "✅ Joueurs concernés transférés en agents libres (teamid=$FREE_AGENT_TEAMID)." | tee -a "$LOG_FILE"
 
 echo "🏁 Import et mise à jour terminés avec succès !" | tee -a "$LOG_FILE"
