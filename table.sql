@@ -23,10 +23,21 @@ SET @sql := IF(@pk_exists = 0,
   'SELECT "PK already exists for players";');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
--- Index pour accélérer les jointures sur les noms
-CREATE INDEX IF NOT EXISTS idx_players_firstnameid ON players(firstnameid);
-CREATE INDEX IF NOT EXISTS idx_players_lastnameid  ON players(lastnameid);
-CREATE INDEX IF NOT EXISTS idx_players_playerid  ON players(playerid);
+-- Index secondaires sur les colonnes de jointure
+SET @idx_exists := (SELECT COUNT(*) FROM information_schema.STATISTICS 
+                    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='players' AND INDEX_NAME='idx_players_firstnameid');
+SET @sql := IF(@idx_exists=0,'CREATE INDEX idx_players_firstnameid ON players(firstnameid);','SELECT "Index idx_players_firstnameid exists";');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @idx_exists := (SELECT COUNT(*) FROM information_schema.STATISTICS 
+                    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='players' AND INDEX_NAME='idx_players_lastnameid');
+SET @sql := IF(@idx_exists=0,'CREATE INDEX idx_players_lastnameid ON players(lastnameid);','SELECT "Index idx_players_lastnameid exists";');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @idx_exists := (SELECT COUNT(*) FROM information_schema.STATISTICS 
+                    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='players' AND INDEX_NAME='idx_players_playerid');
+SET @sql := IF(@idx_exists=0,'CREATE INDEX idx_players_playerid ON players(playerid);','SELECT "Index idx_players_playerid exists";');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
 
 -- ---------- 2️⃣ TABLE : playernames ----------
@@ -66,9 +77,16 @@ SET @sql := IF(@pk_exists = 0,
   'SELECT "PK already exists for teamplayerlinks";');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
--- Index secondaires pour jointures fréquentes
-CREATE INDEX IF NOT EXISTS idx_tpl_playerid ON teamplayerlinks(playerid);
-CREATE INDEX IF NOT EXISTS idx_tpl_teamid   ON teamplayerlinks(teamid);
+-- Index secondaires utiles
+SET @idx_exists := (SELECT COUNT(*) FROM information_schema.STATISTICS 
+                    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='teamplayerlinks' AND INDEX_NAME='idx_tpl_playerid');
+SET @sql := IF(@idx_exists=0,'CREATE INDEX idx_tpl_playerid ON teamplayerlinks(playerid);','SELECT "Index idx_tpl_playerid exists";');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @idx_exists := (SELECT COUNT(*) FROM information_schema.STATISTICS 
+                    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='teamplayerlinks' AND INDEX_NAME='idx_tpl_teamid');
+SET @sql := IF(@idx_exists=0,'CREATE INDEX idx_tpl_teamid ON teamplayerlinks(teamid);','SELECT "Index idx_tpl_teamid exists";');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
 
 -- ---------- 4️⃣ TABLE : leagues ----------
@@ -108,8 +126,15 @@ SET @sql := IF(@pk_exists = 0,
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
 -- Index secondaires utiles
-CREATE INDEX IF NOT EXISTS idx_ltl_teamid   ON leagueteamlinks(teamid);
-CREATE INDEX IF NOT EXISTS idx_ltl_leagueid ON leagueteamlinks(leagueid);
+SET @idx_exists := (SELECT COUNT(*) FROM information_schema.STATISTICS 
+                    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='leagueteamlinks' AND INDEX_NAME='idx_ltl_teamid');
+SET @sql := IF(@idx_exists=0,'CREATE INDEX idx_ltl_teamid ON leagueteamlinks(teamid);','SELECT "Index idx_ltl_teamid exists";');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+SET @idx_exists := (SELECT COUNT(*) FROM information_schema.STATISTICS 
+                    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='leagueteamlinks' AND INDEX_NAME='idx_ltl_leagueid');
+SET @sql := IF(@idx_exists=0,'CREATE INDEX idx_ltl_leagueid ON leagueteamlinks(leagueid);','SELECT "Index idx_ltl_leagueid exists";');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
 
 -- ---------- 6️⃣ Vérification finale ----------
