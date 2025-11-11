@@ -1,7 +1,8 @@
 #!/bin/bash
 
 DB="FIFA14"
-cmd="mysql -uroot -proot -P 5000 -h127.0.0.1 -D $DB"OUTPUT_FILE="players_export.csv"
+cmd="mysql -uroot -proot -P 5000 -h127.0.0.1 -D $DB"
+OUTPUT_FILE="players_export.csv"
 OUTPUT_NAMES="info_export.csv"
 
 # Liste des ID d'équipes à exclure (sélections nationales + All Star)
