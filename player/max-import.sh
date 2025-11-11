@@ -1,8 +1,8 @@
 #!/bin/bash
-# --- import_massive_simple.sh (version finale sécurisée) ---
-# Import massif + update intelligent + gestion des agents libres
+# --- import_massive_simple.sh (version finale avec update systématique) ---
+# Import massif + update systématique + gestion des agents libres
 # Compatible export.sh (mêmes filtres clubs / ligues)
-# Ajout : encodage UTF-8, LEFT JOIN sur PL, logs de lignes modifiées
+# UTF-8, logs détaillés, LEFT JOIN sur PL
 
 DB="FIFA14"
 MYSQL_USER="root"
@@ -16,7 +16,7 @@ NAMES_TEAMS_CSV="players_names_teams.csv"
 TEAMPLAYERLINKS_CSV="teamplayerlinks.csv"
 
 LOG_FILE="import_massive_simple.log"
-echo "===== Import démarré $(date) =====" >> "$LOG_FILE"
+echo "===== Import démarré $(date) =====" > "$LOG_FILE"
 
 # --- Vérification des fichiers ---
 for f in "$PLAYERS_CSV" "$NAMES_TEAMS_CSV" "$TEAMPLAYERLINKS_CSV"; do
@@ -59,9 +59,8 @@ IGNORE 1 LINES;
 SELECT ROW_COUNT();
 " | tee -a "$LOG_FILE"
 
-# --- Mise à jour intelligente des prénoms / noms ---
-echo "🔁 Mise à jour firstname / lastname intelligente (tolérante)..." | tee -a "$LOG_FILE"
-
+# --- Mise à jour systématique des prénoms / noms ---
+echo "🔁 Mise à jour firstname / lastname pour tous les playerid..." | tee -a "$LOG_FILE"
 $cmd "
 SET NAMES utf8mb4;
 
@@ -81,27 +80,18 @@ FROM (SELECT DISTINCT lastname FROM tmp_names WHERE lastname <> '') AS t
 WHERE lastname NOT IN (SELECT name FROM playernames);
 SELECT ROW_COUNT();
 
--- 3️⃣ Mise à jour tolérante
+-- 3️⃣ Mise à jour systématique pour tous les playerid existants
 UPDATE players p
 JOIN tmp_names t ON p.playerid = t.playerid
 LEFT JOIN playernames pn_first ON pn_first.name = t.firstname
 LEFT JOIN playernames pn_last  ON pn_last.name  = t.lastname
 SET 
     p.firstnameid = COALESCE(pn_first.nameid, p.firstnameid),
-    p.lastnameid  = COALESCE(pn_last.nameid,  p.lastnameid)
-WHERE 
-    NOT EXISTS (
-        SELECT 1
-        FROM playernames fn
-        JOIN playernames ln ON ln.nameid = p.lastnameid
-        WHERE fn.nameid = p.firstnameid
-          AND (fn.name LIKE CONCAT('%', t.firstname, '%') OR t.firstname LIKE CONCAT('%', fn.name, '%'))
-          AND (ln.name LIKE CONCAT('%', t.lastname, '%')  OR t.lastname  LIKE CONCAT('%', ln.name, '%'))
-    );
+    p.lastnameid  = COALESCE(pn_last.nameid,  p.lastnameid);
 SELECT ROW_COUNT();
 " | tee -a "$LOG_FILE"
 
-echo "✅ Firstname / lastname mis à jour (toléramment)." | tee -a "$LOG_FILE"
+echo "✅ Firstname / lastname mis à jour pour tous les joueurs." | tee -a "$LOG_FILE"
 
 # --- Import massif teamplayerlinks ---
 echo "📥 Import / update teamplayerlinks..." | tee -a "$LOG_FILE"
@@ -135,7 +125,6 @@ echo "✅ Position / jerseynumber mis à jour." | tee -a "$LOG_FILE"
 
 # --- Dégagement des joueurs PL / clubs majeurs ---
 echo "🚨 Dégagement des joueurs PL ou clubs majeurs..." | tee -a "$LOG_FILE"
-
 AUTHORISED_TEAMS="21,22,32,34,44,45,46,47,48,52,65,66,73,240,241,243,461,483,110374"
 FREE_AGENT_TEAMID=111592
 
