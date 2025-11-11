@@ -33,7 +33,7 @@ WHERE (
      OR (p.potential - p.overallrating) >= 15
 )
 AND tpl.teamid NOT IN ($EXCLUDED_TEAMS)
-ORDER BY p.playerid DESC;
+ORDER BY CAST(p.playerid AS UNSIGNED) ASC;
 " | sed 's/\t/;/g' >> "$OUTPUT_FILE"
 
 echo "📥 Export filtré enregistré dans : $OUTPUT_FILE"
@@ -59,7 +59,7 @@ WHERE (
      OR (p.potential - p.overallrating) >= 15
 )
 AND tpl.teamid NOT IN ($EXCLUDED_TEAMS)
-ORDER BY p.playerid DESC;
+ORDER BY CAST(p.playerid AS UNSIGNED) ASC;
 " | sed 's/\t/;/g' >> "$OUTPUT_NAMES"
 
 echo "💾 CSV léger exporté dans : $OUTPUT_NAMES"
@@ -78,7 +78,7 @@ WHERE (
      OR (p.potential - p.overallrating) >= 15
 )
 AND tpl.teamid NOT IN ($EXCLUDED_TEAMS)
-ORDER BY tpl.playerid DESC;
+ORDER BY CAST(tpl.playerid AS UNSIGNED) ASC;
 " | sed 's/\t/;/g' >> "$OUTPUT_TPL"
 
 echo "💾 Export de teamplayerlinks enregistré dans : $OUTPUT_TPL"
