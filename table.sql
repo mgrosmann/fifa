@@ -4,13 +4,21 @@
 -- ⚠️ Sauvegarde recommandée avant exécution
 -- ============================================
 
+-- ---------- 0️⃣ Supprimer doublons si présents ----------
+-- Attention : vérifie que 'rowid' ou un identifiant unique existe pour supprimer les doublons
+DELETE l1 FROM leagueteamlinks l1
+JOIN leagueteamlinks l2
+  ON l1.teamid = l2.teamid
+ AND l1.leagueid = l2.leagueid
+ AND l1.rowid > l2.rowid;
+
 -- ---------- 1️⃣ TABLE : players ----------
 ALTER TABLE players
 MODIFY COLUMN playerid INT UNSIGNED NOT NULL,
 MODIFY COLUMN firstnameid INT UNSIGNED NULL,
 MODIFY COLUMN lastnameid INT UNSIGNED NULL;
 
--- Ajout PK si inexistante
+-- PK sur playerid
 SET @pk_exists := (
   SELECT COUNT(*)
   FROM information_schema.TABLE_CONSTRAINTS
@@ -23,7 +31,7 @@ SET @sql := IF(@pk_exists = 0,
   'SELECT "PK already exists for players";');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
--- Index secondaires sur les colonnes de jointure
+-- Index secondaires sur firstnameid / lastnameid / playerid
 SET @idx_exists := (SELECT COUNT(*) FROM information_schema.STATISTICS 
                     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='players' AND INDEX_NAME='idx_players_firstnameid');
 SET @sql := IF(@idx_exists=0,'CREATE INDEX idx_players_firstnameid ON players(firstnameid);','SELECT "Index idx_players_firstnameid exists";');
@@ -44,7 +52,7 @@ PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 ALTER TABLE playernames
 MODIFY COLUMN nameid INT UNSIGNED NOT NULL;
 
--- Ajout PK si inexistante
+-- PK sur nameid
 SET @pk_exists := (
   SELECT COUNT(*)
   FROM information_schema.TABLE_CONSTRAINTS
@@ -64,20 +72,18 @@ MODIFY COLUMN playerid INT UNSIGNED NOT NULL,
 MODIFY COLUMN teamid   INT UNSIGNED NOT NULL,
 MODIFY COLUMN jerseynumber INT UNSIGNED NULL;
 
--- PK composite si absente
+-- PK composite (playerid + teamid)
 SET @pk_exists := (
-  SELECT COUNT(*)
-  FROM information_schema.TABLE_CONSTRAINTS
-  WHERE TABLE_SCHEMA = DATABASE()
-    AND TABLE_NAME = 'teamplayerlinks'
+  SELECT COUNT(*) 
+  FROM information_schema.TABLE_CONSTRAINTS 
+  WHERE TABLE_SCHEMA = DATABASE() 
+    AND TABLE_NAME = 'teamplayerlinks' 
     AND CONSTRAINT_TYPE = 'PRIMARY KEY'
 );
-SET @sql := IF(@pk_exists = 0,
-  'ALTER TABLE teamplayerlinks ADD PRIMARY KEY (playerid, teamid);',
-  'SELECT "PK already exists for teamplayerlinks";');
+SET @sql := IF(@pk_exists=0,'ALTER TABLE teamplayerlinks ADD PRIMARY KEY (playerid, teamid);','SELECT "PK already exists for teamplayerlinks";');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
--- Index secondaires utiles
+-- Index secondaires
 SET @idx_exists := (SELECT COUNT(*) FROM information_schema.STATISTICS 
                     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='teamplayerlinks' AND INDEX_NAME='idx_tpl_playerid');
 SET @sql := IF(@idx_exists=0,'CREATE INDEX idx_tpl_playerid ON teamplayerlinks(playerid);','SELECT "Index idx_tpl_playerid exists";');
@@ -93,17 +99,15 @@ PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 ALTER TABLE leagues
 MODIFY COLUMN leagueid INT UNSIGNED NOT NULL;
 
--- Ajout PK si inexistante
+-- PK sur leagueid
 SET @pk_exists := (
-  SELECT COUNT(*)
-  FROM information_schema.TABLE_CONSTRAINTS
-  WHERE TABLE_SCHEMA = DATABASE()
-    AND TABLE_NAME = 'leagues'
+  SELECT COUNT(*) 
+  FROM information_schema.TABLE_CONSTRAINTS 
+  WHERE TABLE_SCHEMA = DATABASE() 
+    AND TABLE_NAME = 'leagues' 
     AND CONSTRAINT_TYPE = 'PRIMARY KEY'
 );
-SET @sql := IF(@pk_exists = 0,
-  'ALTER TABLE leagues ADD PRIMARY KEY (leagueid);',
-  'SELECT "PK already exists for leagues";');
+SET @sql := IF(@pk_exists=0,'ALTER TABLE leagues ADD PRIMARY KEY (leagueid);','SELECT "PK already exists for leagues";');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
 
@@ -112,28 +116,27 @@ ALTER TABLE leagueteamlinks
 MODIFY COLUMN teamid   INT UNSIGNED NOT NULL,
 MODIFY COLUMN leagueid INT UNSIGNED NOT NULL;
 
--- PK composite si absente
+-- PK composite (teamid + leagueid)
 SET @pk_exists := (
-  SELECT COUNT(*)
-  FROM information_schema.TABLE_CONSTRAINTS
-  WHERE TABLE_SCHEMA = DATABASE()
-    AND TABLE_NAME = 'leagueteamlinks'
+  SELECT COUNT(*) 
+  FROM information_schema.TABLE_CONSTRAINTS 
+  WHERE TABLE_SCHEMA = DATABASE() 
+    AND TABLE_NAME = 'leagueteamlinks' 
     AND CONSTRAINT_TYPE = 'PRIMARY KEY'
 );
-SET @sql := IF(@pk_exists = 0,
-  'ALTER TABLE leagueteamlinks ADD PRIMARY KEY (teamid, leagueid);',
-  'SELECT "PK already exists for leagueteamlinks";');
+SET @sql := IF(@pk_exists=0,'ALTER TABLE leagueteamlinks ADD PRIMARY KEY (teamid, leagueid);','SELECT "PK already exists for leagueteamlinks";');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
--- Index secondaires utiles
-SET @idx_exists := (SELECT COUNT(*) FROM information_schema.STATISTICS 
-                    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='leagueteamlinks' AND INDEX_NAME='idx_ltl_teamid');
-SET @sql := IF(@idx_exists=0,'CREATE INDEX idx_ltl_teamid ON leagueteamlinks(teamid);','SELECT "Index idx_ltl_teamid exists";');
-PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
-
+-- Index secondaire uniquement pour leagueid
 SET @idx_exists := (SELECT COUNT(*) FROM information_schema.STATISTICS 
                     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='leagueteamlinks' AND INDEX_NAME='idx_ltl_leagueid');
 SET @sql := IF(@idx_exists=0,'CREATE INDEX idx_ltl_leagueid ON leagueteamlinks(leagueid);','SELECT "Index idx_ltl_leagueid exists";');
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+
+-- Index secondaire pour teamid aussi
+SET @idx_exists := (SELECT COUNT(*) FROM information_schema.STATISTICS 
+                    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME='leagueteamlinks' AND INDEX_NAME='idx_ltl_teamid');
+SET @sql := IF(@idx_exists=0,'CREATE INDEX idx_ltl_teamid ON leagueteamlinks(teamid);','SELECT "Index idx_ltl_teamid exists";');
 PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
 
 
@@ -144,4 +147,4 @@ WHERE TABLE_SCHEMA = DATABASE()
   AND TABLE_NAME IN ('players','playernames','teamplayerlinks','leagueteamlinks','leagues')
   AND COLUMN_NAME RLIKE 'id';
 
-SELECT '✅ Colonnes converties en INT UNSIGNED, PK et index secondaires créés avec succès' AS status;
+SELECT '✅ Colonnes converties en INT UNSIGNED, PK composite et index secondaires créés avec succès' AS status;

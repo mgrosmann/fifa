@@ -53,7 +53,7 @@ SET
     leagueid = 20,
     leaguetimeslice = 5,
     iswithintransferwindow = 1
-WHERE countryid = 21;
+WHERE countryid = 21 AND level NOT IN (1);
 
 -- Argentina Primera División
 UPDATE FIFA16.leagues
@@ -68,7 +68,7 @@ WHERE countryid = 52;
 -- ---------- Vérification ----------
 SELECT countryid, leaguename, level, leagueid, leaguetimeslice, iswithintransferwindow
 FROM FIFA14.leagues
-WHERE countryid IN (21,52);
+WHERE countryid IN (52) or leaguename like 'Germany 2. Bundesliga%';
 
 SELECT countryid, leaguename, level, leagueid, leaguetimeslice, iswithintransferwindow
 FROM FIFA15.leagues
@@ -76,6 +76,6 @@ WHERE countryid IN (52,83);
 
 SELECT countryid, leaguename, level, leagueid, leaguetimeslice, iswithintransferwindow
 FROM FIFA16.leagues
-WHERE countryid IN (21,52);
+WHERE countryid IN (52) or leaguename like 'Germany 2. Bundesliga%';
 
 -- ✅ Toutes les ligues corrigées
