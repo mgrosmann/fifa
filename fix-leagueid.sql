@@ -18,7 +18,7 @@ UPDATE FIFA14.leagues
 SET 
     leaguename = 'Argentina Primera División (1)',
     level = 1,
-    leagueid = 1,
+    leagueid = 353,
     leaguetimeslice = 6,
     iswithintransferwindow = 0
 WHERE countryid = 52;
@@ -29,7 +29,7 @@ UPDATE FIFA15.leagues
 SET 
     leaguename = 'Argentina Primera División (1)',
     level = 1,
-    leagueid = 1,
+    leagueid = 353,
     leaguetimeslice = 3,
     iswithintransferwindow = 0
 WHERE countryid = 52;
@@ -60,7 +60,7 @@ UPDATE FIFA16.leagues
 SET 
     leaguename = 'Argentina Primera División (1)',
     level = 1,
-    leagueid = 1,
+    leagueid = 353,
     leaguetimeslice = 8,
     iswithintransferwindow = 0
 WHERE countryid = 52;
