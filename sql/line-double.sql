@@ -16,7 +16,7 @@ rm -f /tmp/playernames_duplicates.csv
 
 # Backup des doublons
 $MYSQL $F14_DB -e "
-SELECT nameid, name
+SELECT *
 INTO OUTFILE '/tmp/playernames_duplicates.csv'
 FIELDS TERMINATED BY ';'
 LINES TERMINATED BY '\n'
@@ -65,7 +65,7 @@ rm -f /tmp/teamplayerlinks_duplicates.csv
 
 # Backup des doublons
 $MYSQL $F15_DB -e "
-SELECT playerid, teamid, position, jerseynumber
+Select *
 INTO OUTFILE '/tmp/teamplayerlinks_duplicates.csv'
 FIELDS TERMINATED BY ';'
 LINES TERMINATED BY '\n'
