@@ -59,39 +59,52 @@ IGNORE 1 LINES;
 SELECT ROW_COUNT();
 " | tee -a "$LOG_FILE"
 
-# --- Mise à jour systématique des prénoms / noms ---
-echo "🔁 Mise à jour firstname / lastname pour tous les playerid..." | tee -a "$LOG_FILE"
+echo "🔁 Mise à jour firstname / lastname avec comparaison tolérante..." | tee -a "$LOG_FILE"
+
 $cmd "
 SET NAMES utf8mb4;
 
--- 1️⃣ Insertion des nouveaux prénoms manquants
+-- 1️⃣ Ajout des nouveaux prénoms manquants
 INSERT INTO playernames (nameid, name)
-SELECT (SELECT IFNULL(MAX(CAST(nameid AS UNSIGNED)),0) + ROW_NUMBER() OVER ()) AS nameid,
+SELECT (SELECT IFNULL(MAX(CAST(nameid AS UNSIGNED)),0) + ROW_NUMBER() OVER()) AS nameid,
        firstname
 FROM (SELECT DISTINCT firstname FROM tmp_names WHERE firstname <> '') AS t
 WHERE firstname NOT IN (SELECT name FROM playernames);
 SELECT ROW_COUNT();
 
--- 2️⃣ Insertion des nouveaux noms manquants
+-- 2️⃣ Ajout des nouveaux noms manquants
 INSERT INTO playernames (nameid, name)
-SELECT (SELECT IFNULL(MAX(CAST(nameid AS UNSIGNED)),0) + ROW_NUMBER() OVER ()) AS nameid,
+SELECT (SELECT IFNULL(MAX(CAST(nameid AS UNSIGNED)),0) + ROW_NUMBER() OVER()) AS nameid,
        lastname
 FROM (SELECT DISTINCT lastname FROM tmp_names WHERE lastname <> '') AS t
 WHERE lastname NOT IN (SELECT name FROM playernames);
 SELECT ROW_COUNT();
 
--- 3️⃣ Mise à jour systématique pour tous les playerid existants
+-- 3️⃣ Comparaison tolérante avant update (log uniquement)
+SELECT p.playerid,
+       CONCAT(pn_first_old.name, ' ', pn_last_old.name) AS current_fullname,
+       CONCAT(t.firstname, ' ', t.lastname) AS new_fullname
+FROM players p
+JOIN tmp_names t ON p.playerid = t.playerid
+JOIN playernames pn_first_old ON pn_first_old.nameid = p.firstnameid
+JOIN playernames pn_last_old  ON pn_last_old.nameid  = p.lastnameid
+WHERE LOWER(REPLACE(pn_first_old.name,' ','')) <> LOWER(REPLACE(t.firstname,' ',''))
+   OR LOWER(REPLACE(pn_last_old.name,' ','')) <> LOWER(REPLACE(t.lastname,' ',''));
+
+-- 4️⃣ Update seulement si différence tolérante
 UPDATE players p
 JOIN tmp_names t ON p.playerid = t.playerid
-LEFT JOIN playernames pn_first ON pn_first.name = t.firstname
-LEFT JOIN playernames pn_last  ON pn_last.name  = t.lastname
-SET 
-    p.firstnameid = COALESCE(pn_first.nameid, p.firstnameid),
-    p.lastnameid  = COALESCE(pn_last.nameid,  p.lastnameid);
+JOIN playernames pn_first_new ON pn_first_new.name = t.firstname
+JOIN playernames pn_last_new  ON pn_last_new.name  = t.lastname
+JOIN playernames pn_first_old ON pn_first_old.nameid = p.firstnameid
+JOIN playernames pn_last_old  ON pn_last_old.nameid  = p.lastnameid
+SET p.firstnameid = pn_first_new.nameid,
+    p.lastnameid  = pn_last_new.nameid
+WHERE LOWER(REPLACE(pn_first_old.name,' ','')) <> LOWER(REPLACE(t.firstname,' ',''))
+   OR LOWER(REPLACE(pn_last_old.name,' ','')) <> LOWER(REPLACE(t.lastname,' ',''));
 SELECT ROW_COUNT();
 " | tee -a "$LOG_FILE"
 
-echo "✅ Firstname / lastname mis à jour pour tous les joueurs." | tee -a "$LOG_FILE"
 
 # --- Import massif teamplayerlinks ---
 echo "📥 Import / update teamplayerlinks..." | tee -a "$LOG_FILE"

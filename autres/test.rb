@@ -22,10 +22,12 @@ pour mettre à jour de local vers github -> git add .  git commit -m "update"  g
 27 allier gauche
 28 remplacant
 29 reserviste
-les fichiers a importer:
-teams teamplayerlinks player playernames leagues leagueteamlinks
-
-
+les tables importantes:
+players, playernames
+↕️↕ relié par teamplayerlinks (relié par playerid pour player a teams, et teamid pour teams a players)
+teams    
+↕️ relié par leagueteamlinks (relié par teamid pour teams a leagues, et leagueid pour leagues a teams)
+leagues  
 exclure selection nationale des resultats et équipe all star=
 #t_loanedto.teamid OR t.teamid NOT IN
 AND t.teamid NOT IN ( 
