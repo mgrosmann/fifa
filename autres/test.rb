@@ -123,3 +123,14 @@ iconv -f UTF-8 -t UTF-16 "test.txt" -o "1players.txt" 2>/dev/null || cp test.txt
 
 
 
+#trouver des doublons
+#Doublons dans une colonne (exemple : playernames.name)
+SELECT nameid, COUNT(*) AS occurrences
+FROM FIFA1525.teamplayerlinks
+GROUP BY nameid
+HAVING COUNT(*) > 1;
+#Doublons sur un couple de colonnes (ex: teamid et playerid sur tpl)
+SELECT playerid, teamid, COUNT(*) AS nb
+FROM teamplayerlinks
+GROUP BY playerid, teamid
+HAVING COUNT(*) > 1;

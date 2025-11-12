@@ -1,0 +1,61 @@
+#!/bin/bash
+# --- Recherche d'un joueur ou d'une équipe dans la base FIFA --- mettre -N pour pas afficher les colonnes
+DB="FIFA1525"
+USER="root"
+PASS="root"
+HOST="127.0.0.1"
+PORT="5000"
+cmd="mysql -u$USER -p$PASS -h$HOST -P $PORT -D $DB -A -e"
+
+echo "=== Recherche joueur / équipe ==="
+read -p "🔍 Entrez un playerid, teamid ou un nom (partiel) : " query
+
+# Si la saisie est numérique, on demande à l'utilisateur ce que c’est
+if [[ "$query" =~ ^[0-9]+$ ]]; then
+    echo "🧠 Vous avez entré un identifiant numérique : $query"
+    read -p "Est-ce un (p)layerid ou un (t)eamid ? [p/t] : " type
+    type=$(echo "$type" | tr '[:upper:]' '[:lower:]')
+
+    if [[ "$type" == "p" ]]; then
+        echo "➡ Recherche par playerid = $query..."
+        $cmd "
+            SELECT p.playerid,
+                   p.overallrating,
+                   CONCAT(pn_first.name, ' ', pn_last.name) AS fullname
+            FROM players p
+            JOIN playernames pn_first ON p.firstnameid = pn_first.nameid
+            JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid
+            WHERE p.playerid = $query;
+        "
+    elif [[ "$type" == "t" ]]; then
+        echo "➡ Recherche par teamid = $query..."
+        $cmd "
+            SELECT t.teamname
+            FROM teams t
+            WHERE t.teamid = $query
+        "
+    else
+        echo "❌ Réponse invalide (veuillez taper 'p' ou 't')."
+        exit 1
+    fi
+
+else
+    # Si c'est du texte → recherche sur le nom
+    echo "➡ Recherche par nom contenant '$query'..."
+    $cmd "
+        SELECT p.playerid,
+               p.overallrating,
+               t.teamname,
+               CONCAT(pn_first.name, ' ', pn_last.name) AS fullname,
+               pn_first.nameid,
+               pn_last.nameid
+        FROM teamplayerlinks tpl
+        JOIN teams t        ON tpl.teamid = t.teamid
+        JOIN players p      ON tpl.playerid = p.playerid
+        JOIN playernames pn_first ON p.firstnameid = pn_first.nameid
+        JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid
+        WHERE CONCAT(pn_first.name, ' ', pn_last.name) LIKE '%$query%'
+        ORDER BY t.teamname, fullname;
+    "
+fi
+
