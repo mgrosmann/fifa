@@ -1,4 +1,10 @@
-#ERROR 1062 (23000) at line 58: Duplicate entry '900000' for key 'playernames.PRIMARY'
-#FIFA 14 playernames 90000 3 fois playerid
-#ERROR 1062 (23000) at line 78: Duplicate entry '209911-111489' for key 'teamplayerlinks.PRIMARY'
-#FIFA 15 lignes doublon dans teamplayerlinks
+TABLE FIFA14 playernames: ligne problématique:
+name	commentaryid	nameid	
+A.	        Cole	900000	2 en csv "A.;Cole;900000;2"
+De	        Rose	900000	4904 en csv "De;Rose;900000;4904"
+JesÃºs	Armando	900000	9786 en csv "Jesús;Armando;900000;9786"
+Pour fifa1518
+Kubá;� ;900000;14555
+Ni;� aj;900000;9892
+Gabr;� el;900000;7928
+
