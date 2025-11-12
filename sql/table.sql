@@ -174,4 +174,3 @@ WHERE TABLE_SCHEMA = DATABASE()
   AND COLUMN_NAME RLIKE 'id';
 
 SELECT '✅ Colonnes converties en INT UNSIGNED, PK + AUTO_INCREMENT et index secondaires créés avec succès' AS status;
-
