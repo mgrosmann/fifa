@@ -86,3 +86,6 @@ LINES TERMINATED BY '\n'
 "
 
 echo "✅ $DB18.playernames fixed"
+
+#ID defectueux fc25 "5499;6569;7667;15625;21049"
+#ID defectueux fc24 7667,18286,21049"
