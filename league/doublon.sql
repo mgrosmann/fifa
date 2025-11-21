@@ -32,3 +32,24 @@ WHERE teamid = <OLD_TEAMID>  AND leagueid = <LEAGUEID>;
 --supprimer une équipe en trop
 delete from leagueteamlinks
 where teamid = <TEAM_ID> AND leagueid = <LEAGUEID>;
+------------------------------------------------------------------
+--afficher doublon + nb d'equipe avec doublon
+USE FIFA1525;
+
+SELECT 
+    t.teamid,
+    t.teamname,
+    GROUP_CONCAT(CONCAT(ltl.leagueid, ' (', l.leaguename, ', nb: ', COUNT_lt.nb_equipes, ')') ORDER BY l.level ASC SEPARATOR ', ') AS leagues_info
+FROM teams t
+JOIN leagueteamlinks ltl ON t.teamid = ltl.teamid
+JOIN leagues l ON ltl.leagueid = l.leagueid
+JOIN (
+    SELECT l2.leagueid, COUNT(lt2.teamid) AS nb_equipes
+    FROM leagues l2
+    LEFT JOIN leagueteamlinks lt2 ON l2.leagueid = lt2.leagueid
+    GROUP BY l2.leagueid
+) AS COUNT_lt ON COUNT_lt.leagueid = l.leagueid
+WHERE l.countryid IN (34,14,18,21,27,45,38)
+GROUP BY t.teamid, t.teamname
+HAVING COUNT(DISTINCT ltl.leagueid) > 1
+ORDER BY t.teamname;

@@ -37,7 +37,7 @@ exclude_condition="(
  OR t.teamname LIKE '% xi%'
  OR t.teamname LIKE '%allstar%'
 ) OR ltl.leagueid = 78"
- Where playerid = $playerid  AND NOT (
+AND NOT (
       $exclude_condition
   );
 
@@ -121,9 +121,6 @@ tail --lines=+2 tmp.csv #skip la 1ere ligne
 basename test.py .py | ls sample.txt |cut -d"." -f 1                                 ##||||||| (extraire le nom du fichier sans extension)
 iconv -f UTF-16 -t UTF-8 "players.txt" -o "test.txt" 2>/dev/null || cp players.txt test.txt #||||| (convertir utf16 vers utf8)
 iconv -f UTF-8 -t UTF-16 "test.txt" -o "1players.txt" 2>/dev/null || cp test.txt 1players.txt  #(convertir utf8 vers utf16)
-
-
-
 
 #trouver des doublons
 #Doublons dans une colonne (exemple : playernames.name)
