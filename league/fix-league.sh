@@ -7,10 +7,7 @@
 
 # --- Configuration MySQL ---
 DB="FIFA15"
-USER="root"
-PASS="root"
-MYSQL_HOST='127.0.0.1'
-MYSQL_PORT='5000'
+cmd="mysql -uroot -proot -h127.0.0.1 -P5000 -D $DB"
 
 # --- Configuration attendue ---
 declare -A EXPECTED_COUNTS=(
@@ -51,7 +48,7 @@ for leagueid in "${!EXPECTED_COUNTS[@]}"; do
   expected=${EXPECTED_COUNTS[$leagueid]}
   name=${LEAGUE_NAMES[$leagueid]}
 
-  count=$(mysql -u$USER -p$PASS -h${MYSQL_HOST} -P${MYSQL_PORT} -N -D $DB -e "
+  count=$($cmd -N -e "
     SELECT COUNT(*) FROM leagueteamlinks WHERE leagueid = $leagueid;
   ")
 
@@ -67,7 +64,7 @@ for leagueid in "${!EXPECTED_COUNTS[@]}"; do
   elif [ $diff -gt 0 ]; then
     echo "⚠️ $name ($leagueid) : $count équipes, $diff en trop."
     echo "Liste des équipes :"
-    mysql -u$USER -p$PASS -h${MYSQL_HOST} -P${MYSQL_PORT} -N -D $DB -e "
+    $cmd -N -e "
       SELECT t.teamid, t.teamname 
       FROM teams t 
       INNER JOIN leagueteamlinks ltl ON t.teamid = ltl.teamid 
@@ -76,7 +73,7 @@ for leagueid in "${!EXPECTED_COUNTS[@]}"; do
     "
     for ((i=1; i<=diff; i++)); do
       read -p "👉 Entrez l'ID de l’équipe à supprimer : " delid
-      mysql -u$USER -p$PASS -h${MYSQL_HOST} -P${MYSQL_PORT} -N -D $DB -e "
+      $cmd -N -e "
         DELETE FROM leagueteamlinks WHERE teamid = $delid AND leagueid = $leagueid;
       "
       echo "🗑️ Équipe $delid supprimée de $name."
@@ -87,7 +84,7 @@ for leagueid in "${!EXPECTED_COUNTS[@]}"; do
 
     for ((i=1; i<=absdiff; i++)); do
       # Cherche une équipe libre (non liée à un championnat)
-      free_team=$(mysql -u$USER -p$PASS -h${MYSQL_HOST} -P${MYSQL_PORT} -N -D $DB -e "
+      free_team=$($cmd -N -e "
         SELECT t.teamid, t.teamname
         FROM teams t
         LEFT JOIN leagueteamlinks ltl ON t.teamid = ltl.teamid
@@ -100,7 +97,7 @@ for leagueid in "${!EXPECTED_COUNTS[@]}"; do
         free_id=$(echo "$free_team" | awk '{print $1}')
         free_name=$(echo "$free_team" | cut -d' ' -f2-)
         echo "✨ Équipe libre trouvée : $free_name (ID $free_id)"
-        mysql -u$USER -p$PASS -h${MYSQL_HOST} -P${MYSQL_PORT} -N -D $DB -e "
+        $cmd -N -e "
           INSERT IGNORE INTO leagueteamlinks (leagueid, teamid) VALUES ($leagueid, $free_id);
         "
         echo "➕ Équipe '$free_name' ajoutée à $name."
@@ -108,7 +105,7 @@ for leagueid in "${!EXPECTED_COUNTS[@]}"; do
         echo "❌ Aucune équipe libre trouvée. Veuillez créer une équipe manuellement."
         read -p "👉 Entrez le teamid à ajouter : " addid
         read -p "👉 Nom de l’équipe : " teamname
-        mysql -u$USER -p$PASS -h${MYSQL_HOST} -P${MYSQL_PORT} -N -D $DB -e "
+        $cmd -N -e "
           INSERT INTO teams (teamid, teamname) VALUES ($addid, '$teamname');
           INSERT INTO leagueteamlinks (leagueid, teamid) VALUES ($leagueid, $addid);
         "

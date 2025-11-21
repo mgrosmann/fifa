@@ -7,16 +7,13 @@
 
 # --- Configuration MySQL ---
 DB="FIFA15"
-USER="root"
-PASS="root"
-MYSQL_HOST="127.0.0.1"
-MYSQL_PORT="5000"
+cmd="mysql -uroot -proot -h127.0.0.1 -P5000 -D $DB"
 
 echo "⚽ Vérification des doublons d'équipes dans plusieurs championnats"
 echo "----------------------------------------------------"
 
 # Récupère toutes les équipes présentes dans plusieurs ligues
-mysql -u$USER -p$PASS -h$MYSQL_HOST -P$MYSQL_PORT -N -D $DB -e "
+$cmd -e "
 SELECT 
     t.teamid,
     t.teamname,
@@ -34,10 +31,10 @@ ORDER BY nb_leagues DESC;
     # Affiche le nombre d'équipes par championnat
     echo "Nombre d’équipes par championnat concerné :"
     for leagueid in $(echo $leagues | tr ',' ' '); do
-        count=$(mysql -u$USER -p$PASS -h$MYSQL_HOST -P$MYSQL_PORT -N -D $DB -e "
+        count=$($cmd -e "
             SELECT COUNT(*) FROM leagueteamlinks WHERE leagueid = $leagueid;
         ")
-        name=$(mysql -u$USER -p$PASS -h$MYSQL_HOST -P$MYSQL_PORT -N -D $DB -e "
+        name=$($cmd -e "
             SELECT leaguename FROM leagues WHERE leagueid = $leagueid;
         ")
         echo "   - $name ($leagueid) : $count équipes"
@@ -46,7 +43,7 @@ ORDER BY nb_leagues DESC;
     # Propose de supprimer dans un championnat
     read -p "👉 Entrez l'ID de la ligue où supprimer '$teamname' (ou 'skip' pour passer) : " delleague
     if [[ "$delleague" != "skip" ]]; then
-        mysql -u$USER -p$PASS -h$MYSQL_HOST -P$MYSQL_PORT -N -D $DB -e "
+        $cmd -e "
             DELETE FROM leagueteamlinks WHERE teamid=$teamid AND leagueid=$delleague;
         "
         echo "🗑️ Équipe $teamname supprimée de la ligue $delleague."

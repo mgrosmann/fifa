@@ -1,10 +1,7 @@
 #!/bin/bash
 # --- Configuration ---
 DB="FIFA14"
-USER="root"
-PASS="root"
-MYSQL_HOST='127.0.0.1'
-MYSQL_PORT='5000'
+cmd="mysql -uroot -proot -h127.0.0.1 -P5000 -D $DB"
 
 # --- Liste des ligues disponibles (avec leagueid) ---
 declare -A LEAGUES=(
@@ -58,7 +55,7 @@ echo ""
 
 # --- Étape 2 : Extraction des équipes appartenant à cette ligue ---
 echo "🔎 Étape 2 : Récupération des équipes de la ligue \"$LEAGUENAME\"..."
-mysql -u$USER -p$PASS -h${MYSQL_HOST} -P${MYSQL_PORT} -N -D $DB -e "
+$cmd -e "
 SELECT 
     t.teamid AS 'ID',
     t.teamname AS 'Nom de l’équipe'
