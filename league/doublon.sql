@@ -10,32 +10,14 @@ LEFT JOIN leagueteamlinks ltl ON l.leagueid = ltl.leagueid
 WHERE l.leagueid IN (13,14,60,61,16,17,19,20,31,32,53,54)
 GROUP BY l.leagueid, l.level
 ORDER BY l.leagueid;
--- Liste des équipes présentes dans plus d’un championnat
-SELECT t.teamid, t.teamname, GROUP_CONCAT(ltl.leagueid ORDER BY l.level ASC SEPARATOR ',') AS leagues
-FROM teams t
-JOIN leagueteamlinks ltl ON t.teamid = ltl.teamid
-JOIN leagues l ON ltl.leagueid = l.leagueid
-WHERE l.countryid IN (34,14,18,21,27,45,38)
-GROUP BY t.teamid, t.teamname
-HAVING COUNT(DISTINCT ltl.leagueid) > 1;
 -- Afficher les clubs sans championnat
 SELECT t.teamid, t.teamname
 FROM teams t
 LEFT JOIN leagueteamlinks ltl ON t.teamid = ltl.teamid
 WHERE ltl.teamid IS NULL
 ORDER BY t.teamid ASC;
--- Remplacer l'équipe <OLD_TEAMID> par <NEW_TEAMID> dans la ligue <LEAGUEID>
-UPDATE leagueteamlinks
-SET teamid = <NEW_TEAMID> --equipe libre
-WHERE teamid = <OLD_TEAMID>  AND leagueid = <LEAGUEID>;
--- equipe doublon ⬆️
---supprimer une équipe en trop
-delete from leagueteamlinks
-where teamid = <TEAM_ID> AND leagueid = <LEAGUEID>;
 ------------------------------------------------------------------
 --afficher doublon + nb d'equipe avec doublon
-USE FIFA1525;
-
 SELECT 
     t.teamid,
     t.teamname,
@@ -52,4 +34,15 @@ JOIN (
 WHERE l.countryid IN (34,14,18,21,27,45,38)
 GROUP BY t.teamid, t.teamname
 HAVING COUNT(DISTINCT ltl.leagueid) > 1
-ORDER BY t.teamname;
+ORDER BY t.teamname;-
+----------------------------------------------------------------
+--supprimer une équipe en trop
+delete from leagueteamlinks
+where teamid = <TEAM_ID> AND leagueid = <LEAGUEID>;
+--remplacer l'équipe <OLD_TEAMID> par <NEW_TEAMID> dans la ligue <LEAGUEID>
+UPDATE leagueteamlinks
+SET teamid = <NEW_TEAMID> --equipe libre
+WHERE teamid = <OLD_TEAMID>  AND leagueid = <LEAGUEID>;
+--ajouter une équipe manquante
+INSERT INTO leagueteamlinks (leagueid, teamid)
+VALUES (<LEAGUEID>, <TEAMID>);
