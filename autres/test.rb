@@ -34,7 +34,6 @@ exclude_condition="(
     t.teamname LIKE '%All star%'
  OR t.teamname LIKE '%Adidas%'
  OR t.teamname LIKE '%Nike%'
- OR t.teamname LIKE '%world%'
  OR t.teamname LIKE '% xi%'
  OR t.teamname LIKE '%allstar%'
 ) OR ltl.leagueid = 78"
