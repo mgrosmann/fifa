@@ -6,6 +6,14 @@ PASS="root"
 HOST="127.0.0.1"
 PORT="5000"
 cmd="mysql -u$USER -p$PASS -h$HOST -P $PORT -D $DB -A -e"
+exclude_condition="(
+    t.teamname LIKE '%All star%'
+ OR t.teamname LIKE '%Adidas%'
+ OR t.teamname LIKE '%Nike%'
+ OR t.teamname LIKE '%world%'
+ OR t.teamname LIKE '% xi%'
+ OR t.teamname LIKE '%allstar%'
+) OR ltl.leagueid = 78"
 
 echo "=== Recherche joueur / équipe ==="
 read -p "🔍 Entrez un playerid, teamid ou un nom (partiel) : " query
@@ -21,11 +29,18 @@ if [[ "$query" =~ ^[0-9]+$ ]]; then
         $cmd "
             SELECT p.playerid,
                    p.overallrating,
-                   CONCAT(pn_first.name, ' ', pn_last.name) AS fullname
+                   p.potential,
+                   CONCAT(pn_first.name, ' ', pn_last.name) AS fullname,
+                   t.teamname
             FROM players p
             JOIN playernames pn_first ON p.firstnameid = pn_first.nameid
             JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid
-            WHERE p.playerid = $query;
+            JOIN teamplayerlinks tpl ON p.playerid = tpl.playerid
+            JOIN teams t        ON tpl.teamid = t.teamid
+            JOIN leagueteamlinks ltl ON t.teamid = ltl.teamid
+            WHERE p.playerid = $query AND NOT (
+      $exclude_condition
+  );
         "
     elif [[ "$type" == "t" ]]; then
         echo "➡ Recherche par teamid = $query..."
@@ -45,17 +60,18 @@ else
     $cmd "
         SELECT p.playerid,
                p.overallrating,
+               p.potential,
                t.teamname,
-               CONCAT(pn_first.name, ' ', pn_last.name) AS fullname,
-               pn_first.nameid,
-               pn_last.nameid
+               CONCAT(pn_first.name, ' ', pn_last.name) AS fullname
         FROM teamplayerlinks tpl
         JOIN teams t        ON tpl.teamid = t.teamid
         JOIN players p      ON tpl.playerid = p.playerid
         JOIN playernames pn_first ON p.firstnameid = pn_first.nameid
         JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid
-        WHERE CONCAT(pn_first.name, ' ', pn_last.name) LIKE '%$query%'
-        ORDER BY t.teamname, fullname;
+        JOIN leagueteamlinks ltl ON t.teamid = ltl.teamid
+        WHERE CONCAT(pn_first.name, ' ', pn_last.name) LIKE '%$query%' AND NOT (
+      $exclude_condition
+  )
+        ORDER BY concat(pn_first.name, ' ', pn_last.name);
     "
 fi
-

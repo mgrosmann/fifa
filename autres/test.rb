@@ -29,15 +29,18 @@ teams
 ↕️ relié par leagueteamlinks (relié par teamid pour teams a leagues, et leagueid pour leagues a teams)
 leagues  
 exclure selection nationale des resultats et équipe all star=
-#t_loanedto.teamid OR t.teamid NOT IN
-AND t.teamid NOT IN ( 
-974,1318,1319,1321,1322,1324,1325,1327,1328,1329,1330,1331,1332,1334,1335,1336,1337,1338,
-1341,1342,1343,1352,1353,1354,1355,1356,1357,1359,1360,1361,1362,1363,1364,1365,1366,1367,
-1369,1370,1375,1377,1383,1386,1387,1391,1393,1395,1411,1413,1415,1667,1886,105013,105022,
-105035,110081,110082,111099,111107,111108,111109,111111,111112,111114,111115,111130,111448,
-111451,111455,111456,111459,111461,111462,111465,111466,111473,111475,111481,111483,111487,
-111489,111527,111545,111548,111550,111740,112048,111596,112606,112828,112190,111205
-      )
+#JOIN leagueteamlinks ltl ON t.teamid = ltl.teamid
+exclude_condition="(
+    t.teamname LIKE '%All star%'
+ OR t.teamname LIKE '%Adidas%'
+ OR t.teamname LIKE '%Nike%'
+ OR t.teamname LIKE '%world%'
+ OR t.teamname LIKE '% xi%'
+ OR t.teamname LIKE '%allstar%'
+) OR ltl.leagueid = 78"
+ Where playerid = $playerid  AND NOT (
+      $exclude_condition
+  );
 
 les scrits qui lisent une équipe 1 par 1:
 previousteam|set-previousteam|overall|set-datejointeam
