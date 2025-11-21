@@ -29,3 +29,6 @@ UPDATE leagueteamlinks
 SET teamid = <NEW_TEAMID> --equipe libre
 WHERE teamid = <OLD_TEAMID>  AND leagueid = <LEAGUEID>;
 -- equipe doublon ⬆️
+--supprimer une équipe en trop
+delete from leagueteamlinks
+where teamid = <TEAM_ID> AND leagueid = <LEAGUEID>;
