@@ -1,6 +1,6 @@
 #!/bin/bash
 # --- export_single_player.sh ---
-# Export rapide d’un joueur individuel
+# Export rapide d’un joueur individuel (avec gestion automatique des en-têtes)
 
 DB="FIFA16"
 cmd="mysql -uroot -proot -P5000 -h127.0.0.1 -D $DB"
@@ -15,7 +15,25 @@ exclude_condition="(
     ltl.leagueid = 78
 )"
 
-# --- Recherche par nom ---
+# 👉 Fonction pour gérer l'export CSV (append si existe, header si nouveau)
+append_or_create() {
+    local tmp_file="$1"
+    local output="$2"
+
+    if [[ ! -f "$output" ]]; then
+        echo "🆕 Création du fichier avec en-tête : $output"
+        mv "$tmp_file" "$output"
+    else
+        echo "➕ Ajout sans en-tête → $output"
+        tail --lines=+2 "$tmp_file" >> "$output"
+        rm "$tmp_file"
+    fi
+}
+
+# ==========================
+# Recherche par nom
+# ==========================
+
 read -p "Entrer une partie du nom du joueur : " PlayerName
 
 $cmd -e "
@@ -39,26 +57,37 @@ ORDER BY CAST(p.playerid AS UNSIGNED) ASC;
 echo ""
 read -p "ID du joueur à exporter : " PLAYERID
 
+# =======================================================================
+# FICHIERS
+# =======================================================================
+
 OUTPUT_PLAYER="player_export.csv"
 OUTPUT_NAMES="player_names.csv"
 OUTPUT_TPL="player_tpl.csv"
 
+TMP_PLAYER="tmp_player.csv"
+TMP_NAMES="tmp_names.csv"
+TMP_TPL="tmp_tpl.csv"
+
 echo "🔍 Export du joueur ID $PLAYERID ..."
 
-# ----------------------------
+# ==========================
 # 1. Export complet du joueur
-# ----------------------------
+# ==========================
+
 $cmd -e "
 SELECT *
 FROM players p
 WHERE p.playerid = $PLAYERID;
-" | sed 's/\t/;/g' >> "$OUTPUT_PLAYER"
+" | sed 's/\t/;/g' > "$TMP_PLAYER"
 
+append_or_create "$TMP_PLAYER" "$OUTPUT_PLAYER"
 echo "📄 Export joueurs → $OUTPUT_PLAYER"
 
-# -----------------------------------------------
+# ==========================
 # 2. Export firstname;lastname;teamid;playerid
-# -----------------------------------------------
+# ==========================
+
 $cmd -e "
 SELECT
     pn_first.name AS firstname,
@@ -75,13 +104,15 @@ JOIN leagueteamlinks ltl  ON tpl.teamid    = ltl.teamid
 WHERE p.playerid = $PLAYERID
 AND NOT ( $exclude_condition )
 ORDER BY CAST(p.playerid AS UNSIGNED) ASC;
-" | sed 's/\t/;/g' >> "$OUTPUT_NAMES"
+" | sed 's/\t/;/g' > "$TMP_NAMES"
 
+append_or_create "$TMP_NAMES" "$OUTPUT_NAMES"
 echo "📄 Export noms → $OUTPUT_NAMES"
 
-# ----------------------------
+# ==========================
 # 3. Export teamplayerlinks
-# ----------------------------
+# ==========================
+
 $cmd -e "
 SELECT tpl.*
 FROM teamplayerlinks tpl
@@ -90,9 +121,14 @@ JOIN leagueteamlinks ltl  ON tpl.teamid = ltl.teamid
 WHERE tpl.playerid = $PLAYERID
 AND NOT ( $exclude_condition )
 ORDER BY CAST(tpl.playerid AS UNSIGNED) ASC;
-" | sed 's/\t/;/g' >> "$OUTPUT_TPL"
+" | sed 's/\t/;/g' > "$TMP_TPL"
 
+append_or_create "$TMP_TPL" "$OUTPUT_TPL"
 echo "📄 Export teamplayerlinks → $OUTPUT_TPL"
+
+# ==========================
+# Résumé final
+# ==========================
 
 echo "✅ Terminé !"
 echo "Résultat :"
