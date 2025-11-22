@@ -52,7 +52,7 @@ $cmd -e "
 SELECT *
 FROM players p
 WHERE p.playerid = $PLAYERID;
-" | sed 's/\t/;/g' > "$OUTPUT_PLAYER"
+" | sed 's/\t/;/g' >> "$OUTPUT_PLAYER"
 
 echo "📄 Export joueurs → $OUTPUT_PLAYER"
 
@@ -75,7 +75,7 @@ JOIN leagueteamlinks ltl  ON tpl.teamid    = ltl.teamid
 WHERE p.playerid = $PLAYERID
 AND NOT ( $exclude_condition )
 ORDER BY CAST(p.playerid AS UNSIGNED) ASC;
-" | sed 's/\t/;/g' > "$OUTPUT_NAMES"
+" | sed 's/\t/;/g' >> "$OUTPUT_NAMES"
 
 echo "📄 Export noms → $OUTPUT_NAMES"
 
@@ -90,7 +90,7 @@ JOIN leagueteamlinks ltl  ON tpl.teamid = ltl.teamid
 WHERE tpl.playerid = $PLAYERID
 AND NOT ( $exclude_condition )
 ORDER BY CAST(tpl.playerid AS UNSIGNED) ASC;
-" | sed 's/\t/;/g' > "$OUTPUT_TPL"
+" | sed 's/\t/;/g' >> "$OUTPUT_TPL"
 
 echo "📄 Export teamplayerlinks → $OUTPUT_TPL"
 
