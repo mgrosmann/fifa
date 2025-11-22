@@ -37,7 +37,6 @@ exclude_condition="(
  OR t.teamname LIKE '% xi%'
  OR t.teamname LIKE '%allstar%'
  OR t.teamname LIKE '%all-star%'
- OR t.teamname LIKE '%stars%'
 ) OR ltl.leagueid = 78"
 AND NOT (
       $exclude_condition
@@ -134,4 +133,5 @@ HAVING COUNT(*) > 1;
 SELECT playerid, teamid, COUNT(*) AS nb
 FROM teamplayerlinks
 GROUP BY playerid, teamid
+
 HAVING COUNT(*) > 1;
