@@ -10,11 +10,10 @@
 --8 : lister les équipes d'un championnat
 --9 : Doublons dans une colonne (exemple : playernames.name)
 --10 : Doublons sur un couple de colonnes (ex: teamid et playerid sur tpl)
---11 : afficher joueur selon critière
---12 : nombre de joueurs par club selon critère
---13 : afficher club demandé
---14 : nombre de joueurs par club hors championnats majeurs, avec joueurs dans plusieurs clubs
---15 : nombre de joueurs valides(présent dans plusieurs club) par club hors championnats majeurs + clubs spéciaux
+--11 : afficher joueur selon critière (pour max export)
+--12 : nombre de joueurs par club selon critère (pour max export)
+--13 : afficher club avec joueurs doublons (equipe spéciale ou erreur db)
+--14 : afficher club avec joueurs doublons et comparer avec taille effectif total
 --------------------------------------------------------------------------------------------------------------------
 --1 rechercher un joueur
 SELECT p.playerid, p.overallrating, t.teamname, CONCAT(pn_first.name, ' ', pn_last.name) as fullname, pn_first.nameid, pn_last.nameid
@@ -90,7 +89,7 @@ SELECT playerid, teamid, COUNT(*) AS nb
 FROM teamplayerlinks
 GROUP BY playerid, teamid
 HAVING COUNT(*) > 1;
---11 afficher joueur selon critière
+--11 afficher joueur selon critière (pour max export)
 SELECT p.playerid, p.firstnameid, p.lastnameid, tpl.teamid, p.overallrating, p.potential
 FROM players p
 JOIN teamplayerlinks tpl ON tpl.playerid = p.playerid
@@ -113,7 +112,7 @@ OR (
 111489,111527,111545,111548,111550,111740,112048,111596,112606,112828,112190, 111205
       );
 
---12 nombre de joueurs par club selon critère
+--12 nombre de joueurs par club selon critère (pour max export)
 SELECT tpl.teamid,
        COUNT(DISTINCT p.playerid) AS nb_joueurs
 FROM players p
@@ -135,29 +134,7 @@ WHERE tpl.teamid NOT IN (21, 22, 32, 34, 44, 45, 46, 47, 48, 52, 65, 66, 73, 240
       )
 GROUP BY tpl.teamid
 ORDER BY nb_joueurs DESC;
---13 afficher club demandé
-SELECT teamid, teamname 
-FROM teams
-WHERE teamname LIKE '%Juventus%'
-   OR teamname LIKE '%Milan%'
-   OR teamname LIKE '%Inter%' and teamid in (44)
-   OR teamname LIKE '%Lazio%'
-   OR teamname LIKE '%Roma%' and teamid in (52)
-   OR teamname LIKE '%Fiorentina%'
-   OR teamname LIKE '%Napoli%'
-   OR teamname LIKE '%Paris s%'
-   OR teamname LIKE '%Lyon%'
-   OR teamname LIKE '%Losc%'
-   OR teamname LIKE '%Real mad%'
-   OR teamname LIKE '%Barcelon%'
-   OR teamname LIKE '%Atletico de m%'
-   OR teamname LIKE '%Villarreal%'
-   OR teamname LIKE '%Valencia%'
-   OR teamname LIKE '%Bayern%'
-   OR teamname LIKE '%Dortmund%'
-   OR teamname LIKE '%Bayer 0%'
-   OR teamname LIKE '%Schalke%';
---14 nombre de joueurs par club hors championnats majeurs, avec joueurs dans plusieurs clubs
+--13 afficher club avec joueurs doublons (equipe spéciale ou erreur db)
 SELECT 
     t.teamname, 
     COUNT(DISTINCT tpl.playerid) AS nb_players
@@ -177,7 +154,7 @@ WHERE l.leagueid <> 78
   )
 GROUP BY t.teamid, t.teamname
 ORDER BY nb_players DESC, t.teamname;
---15 nombre de joueurs valides(présent dans plusieurs club) par club hors championnats majeurs + clubs spéciaux
+--14 afficher club avec joueurs doublons et comparer avec taille effectif total
 SELECT 
     t.teamid,
     t.teamname,
