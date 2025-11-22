@@ -36,6 +36,8 @@ exclude_condition="(
  OR t.teamname LIKE '%Nike%'
  OR t.teamname LIKE '% xi%'
  OR t.teamname LIKE '%allstar%'
+ OR t.teamname LIKE '%all-star%'
+ OR t.teamname LIKE '%stars%'
 ) OR ltl.leagueid = 78"
 AND NOT (
       $exclude_condition
