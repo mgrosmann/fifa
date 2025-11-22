@@ -193,7 +193,7 @@ SELECT
         )
         AND l.leagueid <> 78
         AND l.countryid NOT IN (14, 18, 21, 27, 45, 95)
-    THEN tpl.playerid END) AS nb_players_valides,
+    THEN tpl.playerid END) AS nb_players_doublons,
     CASE 
         WHEN t.teamname LIKE '%All star%'
           OR t.teamname LIKE '%Adidas%'
@@ -209,5 +209,5 @@ JOIN teamplayerlinks tpl ON tpl.teamid = t.teamid
 JOIN leagueteamlinks ltl ON t.teamid = ltl.teamid
 JOIN leagues l ON ltl.leagueid = l.leagueid
 GROUP BY t.teamid, t.teamname
-HAVING nb_players_valides > 0 OR special_club = 'YES'
-ORDER BY nb_players_valides DESC, t.teamname;
+HAVING nb_players_doublons > 0 OR special_club = 'YES'
+ORDER BY nb_players_doublons DESC, t.teamname;
