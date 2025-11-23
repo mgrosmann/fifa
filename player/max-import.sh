@@ -15,6 +15,20 @@ NAMES_TEAMS_CSV="players_names_teams.csv"
 TEAMPLAYERLINKS_CSV="teamplayerlinks.csv"
 LOG_FILE="import_massive_simple.log"
 
+# --- Dégagement des joueurs PL / clubs majeurs ---
+echo "🚨 Dégagement des joueurs PL ou clubs majeurs..." | tee -a "$LOG_FILE"
+AUTH_TEAMS="21,22,32,34,44,45,46,47,48,52,65,66,73,240,241,243,461,483,110374"
+FREE_AGENT=111592
+
+$cmd "
+SET NAMES utf8mb4;
+UPDATE teamplayerlinks tpl
+LEFT JOIN leagueteamlinks ltl ON tpl.teamid = ltl.teamid
+SET tpl.teamid=$FREE_AGENT
+WHERE (ltl.leagueid=13 OR tpl.teamid IN ($AUTH_TEAMS));
+SELECT ROW_COUNT();
+" | tee -a "$LOG_FILE"
+
 echo "===== Import démarré $(date) =====" > "$LOG_FILE"
 
 # --- Vérification des fichiers ---
@@ -102,18 +116,6 @@ SET tpl.position=29,
 SELECT ROW_COUNT();
 " | tee -a "$LOG_FILE"
 
-# --- Dégagement des joueurs PL / clubs majeurs ---
-echo "🚨 Dégagement des joueurs PL ou clubs majeurs..." | tee -a "$LOG_FILE"
-AUTH_TEAMS="21,22,32,34,44,45,46,47,48,52,65,66,73,240,241,243,461,483,110374"
-FREE_AGENT=111592
 
-$cmd "
-SET NAMES utf8mb4;
-UPDATE teamplayerlinks tpl
-LEFT JOIN leagueteamlinks ltl ON tpl.teamid = ltl.teamid
-SET tpl.teamid=$FREE_AGENT
-WHERE (ltl.leagueid=13 OR tpl.teamid IN ($AUTH_TEAMS));
-SELECT ROW_COUNT();
-" | tee -a "$LOG_FILE"
 
 echo "🏁 Import et mise à jour terminés avec succès !" | tee -a "$LOG_FILE"
