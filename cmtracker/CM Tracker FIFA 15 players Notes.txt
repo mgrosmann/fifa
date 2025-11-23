@@ -1,0 +1,136 @@
+CM Tracker	FIFA 15 players	Notes
+attributes.*	(tous les attributs FIFA) apart composure	✔ ok
+info.playerid	playerid	idem
+info.name.firstnameid	firstnameid	pointe vers playernames.nameid
+info.name.lastnameid	lastnameid	idem
+info.name.playerjerseynameid	playerjerseynameid	idem
+info.overallrating	overallrating	—
+info.potential	potential	—
+info.birthdate	birthdate	doit être converti avec ton script id/date
+info.height	height	—
+info.weight	weight	—
+info.preferredfoot	preferredfoot	Right=1 / Left=2
+info.skillmoves	skillmoves	—
+info.weafoot	weakfootabilitytypecode	—
+primary_position	preferredposition1	valeur brute CM Tracker → mappée par position
+other_positions	preferredposition2-4	idem
+info.contract.jointeamdate	playerjointeamdate	date → conversion script id/date
+info.contract.enddate	contractvaliduntil	⚠️ FIFA veut uniquement l’année
+caractere physique "info.haircolor","info.eyecolor","info.skintone","info.headtype","info.bodytype",
+                      haircolorcode   eyecolorcode  skintonecode   headtypecode   bodytypecode	—
+
+Champs qu’on ignore dans players :
+
+defendingworkrate / attackingworkrate (existe mais valeur CM Tracker pas standardisée FIFA 15 → on ignore)
+
+real_face, wage, value, traits, etc.
+
+📌 2. Table playerloans (FIFA 15)
+
+⚠️ Ta correction intégrée : playerloans ne contient que loandateend.
+
+CM Tracker	FIFA 15	Notes
+info.contract.isloanedout	(condition)	si 1 → créer une entrée
+info.contract.enddate	loandateend	convertir via script "id"
+
+Champs générés quand isloanedout=1 :
+
+playerid
+
+teamid (prêté à ?) ❓ → CM Tracker ne donne pas la destination du prêt → on met teamid actuel ? ou 0 ? → à clarifier avant génération.
+
+📌 3. Table teamplayerlinks
+CM Tracker	FIFA 15	Notes
+info.teams.club_team.id	teamid	—
+info.playerid	playerid	—
+info.teams.club_team.jerseynumber	jerseynumber	—
+primary_position / position	position	converti selon ton tableau
+
+✔ Tableau final de conversion position (validé)
+CM Tracker code	FIFA 15 positioncode
+0	0 (GK)
+3	3 (RB)
+5	5 (CB)
+7	7 (LB)
+8	8 (LWB)
+10	10 (CDM)
+12	12 (LM)
+14	14 (CM)
+16	16 (RM)
+18	18 (CAM)
+21	21 (CF)
+23	23 (RW)
+25	25 (ST)
+27	27 (LW)
+28	28 (SUB)
+29	29 (RES)
+
+📌 4. Table teams
+
+⚠️ Correction appliquée : il n’y a PAS de leagueid dans teams.
+
+CM Tracker	FIFA 15 teams
+info.teams.club_team.id	teamid
+info.teams.club_team.name	teamname
+info.teams.club_team.domesticprestige	domesticprestige
+
+Champs ignorés :
+
+profitability
+
+slug
+📌 5. Table leagues
+
+⚠️ Correction appliquée.
+
+CM Tracker	FIFA 15
+info.league	leagueid + leaguename
+📌 6. Table leagueteamlinks
+CM Tracker	FIFA 15
+info.teams.club_team.leagueid	leagueid
+info.teams.club_team.id	teamid
+📌 7. Table nations (FIFA 15)
+
+✔ Correction appliquée : noms exacts : nationid, nationname
+
+CM Tracker	FIFA 15
+info.nation.id	nationid
+info.nation.name	nationname
+📌 8. Table playernames (FIFA 15)
+
+⚠️ Correction appliquée : la table ne contient que :
+
+nameid
+
+name
+
+commentaryid
+
+CM Tracker champs	FIFA 15	Notes
+info.name.firstnameid	nameid	mais doit pointer vers une entrée générée
+info.name.lastnameid	nameid	idem
+info.name.playerjerseynameid	nameid	idem
+info.name.firstname	name	→ ligne dédiée pour firstnameid
+info.name.lastname	name	→ ligne dédiée pour lastnameid
+info.name.playerjerseyname	name	→ ligne dédiée pour jerseynameid
+
+commentaryid → valeur par défaut : 900000
+
+➡️ 🟢 Donc je dois générer 3 lignes dans playernames par joueur :
+
+firstnameid → name = firstname
+
+lastnameid → name = lastname
+
+playerjerseynameid → name = jerseyname
+
+📌 9. Dates : format CM Tracker → FIFA 15
+
+Tu as fourni ton script :
+
+✔ birthdate → conversion via script
+✔ jointeamdate → conversion via script
+✔ loandateend → conversion via script
+✔ contractvaliduntil → année seule
+
+➡️ Je le respecterai strictement.

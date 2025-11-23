@@ -1,0 +1,175 @@
+1️⃣ Bloc ATTRIBUTES (stats FIFA)
+CM Tracker	FIFA 15	Notes (table players)
+attributes.acceleration	acceleration	✔ ok
+attributes.sprintspeed	sprintspeed	✔ ok
+attributes.agility	agility	✔ ok
+attributes.balance	balance	✔ ok
+attributes.jumping	jumping	✔ ok
+attributes.stamina	stamina	✔ ok
+attributes.strength	strength	✔ ok
+attributes.reactions	reactions	✔ ok
+attributes.aggression	aggression	✔ ok
+attributes.composure	(aucun)	ignoré par FIFA 15
+attributes.interceptions	interceptions	✔ ok
+attributes.positioning	positioning	✔ ok
+attributes.vision	vision	✔ ok
+attributes.ballcontrol	ballcontrol	✔ ok
+attributes.crossing	crossing	✔ ok
+attributes.dribbling	dribbling	✔ ok
+attributes.finishing	finishing	✔ ok
+attributes.freekickaccuracy	freekickaccuracy	✔ ok
+attributes.headingaccuracy	headingaccuracy	✔ ok
+attributes.longpassing	longpassing	✔ ok
+attributes.shortpassing	shortpassing	✔ ok
+attributes.marking	marking	✔ ok
+attributes.shotpower	shotpower	✔ ok
+attributes.longshots	longshots	✔ ok
+attributes.standingtackle	standingtackle	✔ ok
+attributes.slidingtackle	slidingtackle	✔ ok
+attributes.volleys	volleys	✔ ok
+attributes.curve	curve	✔ ok
+attributes.penalties	penalties	✔ ok
+attributes.gkdiving	gkdiving	✔ ok
+attributes.gkhandling	gkhandling	✔ ok
+attributes.gkkicking	gkkicking	✔ ok
+attributes.gkreflexes	gkreflexes	✔ ok
+attributes.gkpositioning	gkpositioning	✔ ok
+Bloc STATS (non utilisé par FIFA15)
+CM Tracker	Notes
+stats.attack; stats.defending; stats.skill; stats.power; stats.movement; stats.mentality; stats.goalkeeper	Ignoré par FIFA 15
+2️⃣ Bloc INFOS GÉNÉRALES (players)
+CM Tracker	FIFA 15	Notes
+info.playerid	playerid	idem (players, teamplayerlinks, playerloans)
+info.name.firstnameid	firstnameid	pointe vers playernames.nameid
+info.name.lastnameid	lastnameid	idem
+info.name.knownas    commonnameid	idem
+info.name.playerjerseynameid	playerjerseynameid	idem
+info.overallrating	overallrating	—
+info.potential	potential	—
+info.birthdate	birthdate	conversion via script
+info.age	(aucun)	ignoré
+info.height	height	—
+info.weight	weight	—
+info.preferredfoot	preferredfoot	Right=1 / Left=2
+info.skillmoves	skillmoves	—
+info.weafoot	weakfootabilitytypecode	—
+info.internationalrep	internationalrep	—
+info.real_face	hashighqualityhead	—
+info.isretiring	isretiring	—
+info.defensiveworkrate	defensiveworkrate	ignoré
+info.attackingworkrate	attackingworkrate	ignoré
+info.haircolor	haircolorcode	—
+info.eyecolor	eyecolorcode	—
+info.skintone	skintonecode	—
+info.headtype	headtypecode	—
+info.bodytype	bodytypecode	—
+info.traits.trait1	trait1	—
+info.traits.trait2	trait2	—
+info.contract.jointeamdate	playerjointeamdate	conversion via script
+info.contract.enddate	contractvaliduntil	année seule
+3️⃣ Table playerloans
+CM Tracker	FIFA 15	Notes
+info.contract.isloanedout	condition	si 1 → créer une ligne
+info.contract.enddate	loandateend	conversion via script
+Champs générés	playerid, teamid	teamid = actuel ou 0 si inconnu
+4️⃣ Table teamplayerlinks
+CM Tracker	FIFA 15	Notes
+info.teams.club_team.id	teamid	—
+info.playerid	playerid	—
+info.teams.club_team.jerseynumber	jerseynumber	—
+primary_position / other_positions| -> preferredposition1, preferredposition2, preferredposition3, preferredposition4 (table players)
+(position dans teamplayerlinks, mettre 29 par défaut pour réserviste)	converti selon tableau ci-dessous
+Tableau positions CM Tracker → FIFA 15
+CM Tracker code	FIFA 15 positioncode
+--position chiffre vers poste
+0	0 (GK)
+2   2 (RWB)
+3	3 (RB)
+5	5 (CB)
+7	7 (LB)
+8	8 (LWB)
+10	10 (CDM)
+12	12 (LM)
+14	14 (CM)
+16	16 (RM)
+18	18 (CAM)
+21	21 (CF)
+23	23 (RW)
+25	25 (ST)
+27	27 (LW)
+28	28 (SUB)
+29	29 (RES)
+5️⃣ Table teams
+CM Tracker	FIFA 15	Notes
+info.teams.club_team.id	teamid	—
+info.teams.club_team.name	teamname	—
+info.teams.club_team.domesticprestige	domesticprestige	—
+info.teams.club_team.profitability	(aucun)	ignoré
+info.teams.club_team.slug	(aucun)	ignoré
+6️⃣ Table leagues
+CM Tracker	FIFA 15	Notes
+info.league	leagueid + leaguename	—
+7️⃣ Table leagueteamlinks
+CM Tracker	FIFA 15	Notes
+info.teams.club_team.leagueid	leagueid	—
+info.teams.club_team.id	teamid	—
+8️⃣ Table nations
+CM Tracker	FIFA 15	Notes
+info.nation.id	nationid	—
+info.nation.name	nationname	—
+9️⃣ Table playernames
+CM Tracker	FIFA 15	Notes
+info.name.firstnameid	nameid	générer ligne firstname si inexistante
+info.name.lastnameid	nameid	générer ligne lastname si inexistante
+info.name.playerjerseynameid	nameid	générer ligne jerseyname si inexistante
+info.name.firstname	name	correspond à firstnameid
+info.name.lastname	name	correspond à lastnameid
+info.name.playerjerseyname	name	correspond à playerjerseynameid
+commentaryid	900000	valeur par défaut
+🔟 Dates
+
+birthdate, jointeamdate, loandateend → conversion via script fourni
+le script dateloan.sh "#!/usr/bin/env bash
+# convert_loandate.sh
+# Usage:
+#   ./convert_loandate.sh id "01/01/2024"
+#   ./convert_loandate.sh date 161151
+
+BASE_ID=157499
+BASE_DATE="2014-01-01"
+
+mode="$1"
+value="$2"
+
+if [[ "$mode" == "id" ]]; then
+    # Lire "30/06/2026" correctement et convertir en format ISO
+    parsed=$(echo "$value" | awk -F/ '{printf "%04d-%02d-%02d", $3, $2, $1}')
+    
+    # Calcul précis en UTC pour éviter les décalages horaires
+    days=$(( ( $(date -u -d "$parsed" +%s) - $(date -u -d "$BASE_DATE" +%s) ) / 86400 ))
+    loandateend=$((BASE_ID + days))
+    echo "$loandateend"
+
+elif [[ "$mode" == "date" ]]; then
+    # Convertir loandateend -> date JJ/MM/AAAA
+    days=$(( value - BASE_ID ))
+    date -u -d "$BASE_DATE + $days days" +"%d/%m/%Y"
+
+else
+    echo "Usage:"
+    echo "  $0 id DD/MM/YYYY      # Convertit une date en loandateend"
+    echo "  $0 date LOANDATEEND   # Convertit un loandateend en date"
+    exit 1
+fi"
+root@DELL:/mnt/c/github/fifa/date$ bash dateloan.sh id 30/06/2026
+162062
+root@DELL:/mnt/c/github/fifa/date$ bash dateloan.sh date 162062
+30/06/2026
+utiliser pour birthdate et jointeamdate, loandatend tout colonne avec date exceptée conctractvaliduntil
+contractvaliduntil → année seule
+
+info.gender -> gender (existe que depuis fifa 16)
+
+"updated"
+"added"
+"removed" ils n'existent pas, a ignorer
