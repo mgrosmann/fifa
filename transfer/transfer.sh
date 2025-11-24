@@ -109,7 +109,7 @@ while true; do
         new_teamid=$(echo "$selected_club" | awk '{print $1}')
         new_teamname=$(echo "$selected_club" | cut -d' ' -f2-)
     fi
-
+    bash /mnt/github/fifa/key.sh $playerid $new_teamid $DB
     $cmd  -e "
         UPDATE teamplayerlinks 
         SET teamid=$new_teamid, position=29 
