@@ -14,6 +14,7 @@
 --12 : nombre de joueurs par club selon critère (pour max export)
 --13 : afficher club avec joueurs doublons (equipe spéciale ou erreur db)
 --14 : afficher club avec joueurs doublons et comparer avec taille effectif total
+--15: transformer une colonne en int pour les chiffres (ex: playerid)
 --------------------------------------------------------------------------------------------------------------------
 --1 rechercher un joueur
 SELECT p.playerid, p.overallrating, t.teamname, CONCAT(pn_first.name, ' ', pn_last.name) as fullname, pn_first.nameid, pn_last.nameid
@@ -188,3 +189,5 @@ JOIN leagues l ON ltl.leagueid = l.leagueid
 GROUP BY t.teamid, t.teamname
 HAVING nb_players_doublons > 0 OR special_club = 'YES'
 ORDER BY nb_players_doublons DESC, t.teamname;
+--15: transformer une colonne en int pour les chiffres (ex: playerid)
+alter table players MODIFY COLUMN playerid INT UNSIGNED;
