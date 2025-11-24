@@ -26,11 +26,11 @@ UPDATE teamplayerlinks
 SET artificialkey = 999999999
 WHERE playerid = $PLAYERID;
 
--- 🔹 Déterminer le joueur à promouvoir selon position
+-- 🔹 Déterminer le joueur à promouvoir
 SET @promu_id = NULL;
 
+-- Cas titulaire
 IF @old_pos < 28 THEN
-    -- Chercher remplaçant/réserviste avec poste similaire
     SELECT playerid INTO @promu_id
     FROM teamplayerlinks tpl
     JOIN players p ON tpl.playerid=p.playerid
@@ -49,8 +49,10 @@ IF @old_pos < 28 THEN
         ORDER BY position ASC, artificialkey ASC
         LIMIT 1;
     END IF;
-ELSEIF @old_pos = 28 THEN
-    -- Joueur était remplaçant, promouvoir un réserviste
+END IF;
+
+-- Cas remplaçant (28)
+IF @old_pos = 28 AND @promu_id IS NULL THEN
     SELECT playerid INTO @promu_id
     FROM teamplayerlinks
     WHERE teamid=@old_teamid AND position=29
@@ -58,36 +60,46 @@ ELSEIF @old_pos = 28 THEN
     LIMIT 1;
 END IF;
 
--- 🔹 Promouvoir le joueur choisi (s'il existe)
+-- 🔹 Sauvegarder l'ancienne clé du promu avant modification
+SET @promu_old_key = NULL;
 IF @promu_id IS NOT NULL THEN
+    SELECT artificialkey INTO @promu_old_key
+    FROM teamplayerlinks
+    WHERE playerid=@promu_id;
+
+    -- 🔹 Mettre à jour le promu avec la position et la clé du joueur transféré
     UPDATE teamplayerlinks
     SET position=@old_pos,
         artificialkey=@old_key
     WHERE playerid=@promu_id;
 END IF;
 
--- 🔹 Décaler toutes les clés supérieures à l'ancienne clé (le reste)
+-- 🔹 Déterminer la clé de référence pour le décalage
+SET @key_to_shift = COALESCE(@promu_old_key, @old_key);
+
+
+-- 🔹 Décaler toutes les clés supérieures à la clé de référence dans l'équipe d'origine
 UPDATE teamplayerlinks
 SET artificialkey = artificialkey - 1
-WHERE artificialkey > @old_key
+WHERE artificialkey > @key_to_shift
   AND teamid=@old_teamid
   AND playerid <> COALESCE(@promu_id, 0);
 
 -- 🔹 Déterminer la nouvelle clé pour la nouvelle équipe
-SELECT IFNULL(MAX(artificialkey), -1) INTO @new_key
+SELECT IFNULL(MAX(artificialkey), -1) INTO @max_new_teamid
 FROM teamplayerlinks
 WHERE teamid = $NEW_TEAMID;
 
 -- 🔹 Décaler toutes les clés supérieures pour libérer le slot
 UPDATE teamplayerlinks
 SET artificialkey = artificialkey + 1
-WHERE artificialkey > @new_key;
+WHERE artificialkey > @max_new_teamid;
 
 -- 🔹 Mettre à jour le joueur transféré
 UPDATE teamplayerlinks
 SET teamid = $NEW_TEAMID,
     position = 29,
-    artificialkey = @new_key + 1
+    artificialkey = @max_new_teamid + 1
 WHERE playerid = $PLAYERID;
 "
 
