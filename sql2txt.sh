@@ -15,6 +15,7 @@ echo "1) Transfer"
 echo "2) Loan"
 echo "3) Player"
 echo "4) League"
+echo "5) Import"
 read -p "Enter number: " module
 
 # Determine tables to export
@@ -32,6 +33,9 @@ case "$module" in
     ;;
   4)
     tables=("leagueteamlinks")  # League
+    ;;
+  5)
+    tables=("players" "playernames" "teamplayerlinks")  #import 
     ;;
   *)
     echo "❌ Invalid option."
