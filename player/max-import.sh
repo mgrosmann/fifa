@@ -78,18 +78,50 @@ SELECT ROW_COUNT();
 # --- Recalcul artificialkey ---
 $cmd "
 SET NAMES utf8mb4;
+
 UPDATE teamplayerlinks tpl
 JOIN (
-    SELECT playerid,
-           CASE 
-             WHEN position < 28 THEN ROW_NUMBER() OVER(PARTITION BY teamid ORDER BY position ASC, artificialkey ASC)-1
-             WHEN position = 28 THEN ROW_NUMBER() OVER(PARTITION BY teamid ORDER BY artificialkey ASC)-1+28
-             WHEN position = 29 THEN ROW_NUMBER() OVER(PARTITION BY teamid ORDER BY artificialkey ASC)-1+29
-             ELSE artificialkey
-           END AS new_key
+    SELECT 
+        playerid,
+        CASE 
+            -- 🧱 Titulaires (0–10)
+            WHEN position < 28 THEN (
+                ROW_NUMBER() OVER(
+                    PARTITION BY teamid 
+                    ORDER BY
+                        /* 1) GK en premier */
+                        CASE 
+                            WHEN preferredposition1 = 0 OR preferredposition2 = 0 THEN 0
+                            WHEN position BETWEEN 2 AND 8   THEN 1   -- DEF
+                            WHEN position BETWEEN 9 AND 19  THEN 2   -- MID
+                            WHEN position BETWEEN 20 AND 27 THEN 3   -- FWD
+                            ELSE 9
+                        END,
+                        artificialkey ASC
+                ) - 1
+            )
+
+            -- 🧱 Remplaçants (28)
+            WHEN position = 28 THEN
+                28 + ROW_NUMBER() OVER(
+                        PARTITION BY teamid 
+                        ORDER BY artificialkey ASC
+                    ) - 1
+
+            -- 🧱 Réservistes (29)
+            WHEN position = 29 THEN
+                29 + ROW_NUMBER() OVER(
+                        PARTITION BY teamid 
+                        ORDER BY artificialkey ASC
+                    ) - 1
+
+            ELSE artificialkey
+        END AS new_key
     FROM teamplayerlinks
-) AS rk ON tpl.playerid = rk.playerid
+) AS rk 
+    ON tpl.playerid = rk.playerid
 SET tpl.artificialkey = rk.new_key;
-" | tee -a "$LOG_FILE"
+"
+
 
 echo "🏁 Import complet et artificialkey recalculées !" | tee -a "$LOG_FILE"
