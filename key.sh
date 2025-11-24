@@ -26,9 +26,11 @@ UPDATE teamplayerlinks
 SET artificialkey = 999999999
 WHERE playerid = $PLAYERID;
 
--- 🔹 Promouvoir un remplaçant/réserviste si le joueur était titulaire
+-- 🔹 Déterminer le joueur à promouvoir selon position
+SET @promu_id = NULL;
+
 IF @old_pos < 28 THEN
-    -- Trouver le remplaçant/réserviste compatible
+    -- Chercher remplaçant/réserviste avec poste similaire
     SELECT playerid INTO @promu_id
     FROM teamplayerlinks tpl
     JOIN players p ON tpl.playerid=p.playerid
@@ -39,14 +41,32 @@ IF @old_pos < 28 THEN
     ORDER BY tpl.position ASC, tpl.artificialkey ASC
     LIMIT 1;
 
-    -- Mettre à jour le promu avec la position et artificialkey du titulaire
+    -- Si aucun trouvé, prendre n'importe quel remplaçant/réserviste
+    IF @promu_id IS NULL THEN
+        SELECT playerid INTO @promu_id
+        FROM teamplayerlinks
+        WHERE teamid=@old_teamid AND position IN (28,29)
+        ORDER BY position ASC, artificialkey ASC
+        LIMIT 1;
+    END IF;
+ELSEIF @old_pos = 28 THEN
+    -- Joueur était remplaçant, promouvoir un réserviste
+    SELECT playerid INTO @promu_id
+    FROM teamplayerlinks
+    WHERE teamid=@old_teamid AND position=29
+    ORDER BY artificialkey ASC
+    LIMIT 1;
+END IF;
+
+-- 🔹 Promouvoir le joueur choisi (s'il existe)
+IF @promu_id IS NOT NULL THEN
     UPDATE teamplayerlinks
     SET position=@old_pos,
         artificialkey=@old_key
     WHERE playerid=@promu_id;
 END IF;
 
--- 🔹 Décaler toutes les clés supérieures à l'ancienne clé du promu (le reste)
+-- 🔹 Décaler toutes les clés supérieures à l'ancienne clé (le reste)
 UPDATE teamplayerlinks
 SET artificialkey = artificialkey - 1
 WHERE artificialkey > @old_key
