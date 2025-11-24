@@ -2,7 +2,7 @@
 alter table players MODIFY COLUMN playerid INT UNSIGNED;
 alter table players MODIFY COLUMN overallrating INT UNSIGNED;
 alter table players MODIFY COLUMN potential INT UNSIGNED;
-alter table players MODIFY COLUMN nationid INT UNSIGNED;
+alter table players MODIFY COLUMN nationality INT UNSIGNED;
 alter table players MODIFY COLUMN firstnameid INT UNSIGNED;
 alter table players MODIFY COLUMN lastnameid INT UNSIGNED;
 alter table players MODIFY COLUMN commonameid INT UNSIGNED;
@@ -21,3 +21,4 @@ alter table leagueteamlinks MODIFY COLUMN leagueid INT UNSIGNED;
 alter table leagues MODIFY COLUMN leagueid INT UNSIGNED;
 --table playerloans
 alter table playerloans MODIFY COLUMN playerid INT UNSIGNED;
+
