@@ -118,11 +118,11 @@ SET NAMES utf8mb4;
 UPDATE teamplayerlinks tpl
 JOIN tmp_names t ON tpl.playerid = t.playerid
 SET tpl.position = 29,
-    tpl.jerseynumber = COALESCE(
-        tpl.jerseynumber,
-        (SELECT IFNULL(MAX(t2.jerseynumber),0)+1
-         FROM teamplayerlinks t2
-         WHERE t2.teamid = tpl.teamid)
+    tpl.jerseynumber = (
+        SELECT IFNULL(MAX(tp.jerseynumber),0)+1
+        FROM teamplayerlinks tp
+        WHERE tp.teamid = tpl.teamid
+          AND (tpl.jerseynumber IS NULL OR tpl.jerseynumber = tp.jerseynumber)
     );
 
 SELECT ROW_COUNT();
