@@ -1,6 +1,6 @@
 #!/bin/bash
 # ============================================================
-# Import CM Tracker FIFA15 avec valeurs par défaut
+# Import CM Tracker FIFA15 avec valeurs par défaut et noms
 # ============================================================
 
 # --- Configuration MySQL ---
@@ -13,6 +13,7 @@ MYSQL_CMD="mysql -u$DB_USER -p$DB_PASS -h$DB_HOST -P$DB_PORT -D$DB_NAME --local-
 
 CSV_CMTRACKER="players_cmtracker.csv"  # CSV CM Tracker
 CSV_DEFAULT="default_player.csv"       # CSV joueur par défaut (CM15)
+CSV_NAMES="playernames.csv"            # CSV noms des joueurs
 TMP_CSV="/tmp/tmp_players_final.csv"
 
 # ============================================================
@@ -119,7 +120,7 @@ done
 # 3️⃣ Export tmp_players vers CSV temporaire
 # ============================================================
 $MYSQL_CMD -e "
-SELECT * FROM tmp_players where playerid != 50073
+SELECT * FROM tmp_players WHERE playerid != 50073
 INTO OUTFILE '$TMP_CSV'
 FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n';
 "
@@ -133,5 +134,63 @@ REPLACE INTO TABLE players
 FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n';
 "
 
-echo "✔ Tous les joueurs CM Tracker ont été importés dans players avec valeurs par défaut appliquées."
+# ============================================================
+# 5️⃣ Gestion des noms : firstname, lastname, commonname, jerseyname
+# ============================================================
 
+# Créer table temporaire pour les noms
+$MYSQL_CMD -e "
+DROP TEMPORARY TABLE IF EXISTS tmp_names;
+CREATE TEMPORARY TABLE tmp_names (
+    firstname  VARCHAR(100),
+    lastname   VARCHAR(100),
+    commonname VARCHAR(100),
+    jerseyname VARCHAR(100)
+);
+"
+
+# Charger les noms depuis CSV
+tail -n +2 "$CSV_NAMES" | while IFS=';' read -r firstname lastname commonname jerseyname
+do
+    SQL="INSERT INTO tmp_names (firstname, lastname, commonname, jerseyname)
+         VALUES ('$firstname', '$lastname', '$commonname', '$jerseyname');"
+    $MYSQL_CMD -e "$SQL"
+done
+
+# Ajouter les noms manquants dans playernames et mettre à jour les joueurs
+$MYSQL_CMD -e "
+SET NAMES utf8mb4;
+
+INSERT INTO playernames (nameid,name)
+SELECT IFNULL((SELECT MAX(nameid) FROM playernames),0) + ROW_NUMBER() OVER (), firstname
+FROM (SELECT DISTINCT firstname FROM tmp_names WHERE firstname<>'' ) AS t
+WHERE firstname NOT IN (SELECT name FROM playernames);
+
+INSERT INTO playernames (nameid,name)
+SELECT IFNULL((SELECT MAX(nameid) FROM playernames),0) + ROW_NUMBER() OVER (), lastname
+FROM (SELECT DISTINCT lastname FROM tmp_names WHERE lastname<>'' ) AS t
+WHERE lastname NOT IN (SELECT name FROM playernames);
+
+INSERT INTO playernames (nameid,name)
+SELECT IFNULL((SELECT MAX(nameid) FROM playernames),0) + ROW_NUMBER() OVER (), commonname
+FROM (SELECT DISTINCT commonname FROM tmp_names WHERE commonname<>'' ) AS t
+WHERE commonname NOT IN (SELECT name FROM playernames);
+
+INSERT INTO playernames (nameid,name)
+SELECT IFNULL((SELECT MAX(nameid) FROM playernames),0) + ROW_NUMBER() OVER (), jerseyname
+FROM (SELECT DISTINCT jerseyname FROM tmp_names WHERE jerseyname<>'' ) AS t
+WHERE jerseyname NOT IN (SELECT name FROM playernames);
+
+UPDATE players p
+JOIN tmp_names t ON p.playerid = p.playerid
+LEFT JOIN playernames pn_first  ON pn_first.name  = t.firstname
+LEFT JOIN playernames pn_last   ON pn_last.name   = t.lastname
+LEFT JOIN playernames pn_common ON pn_common.name = t.commonname
+LEFT JOIN playernames pn_jersey ON pn_jersey.name = t.jerseyname
+SET p.firstnameid  = pn_first.nameid,
+    p.lastnameid   = pn_last.nameid,
+    p.commonnameid = pn_common.nameid,
+    p.jerseynameid = pn_jersey.nameid;
+"
+
+echo "✔ Tous les joueurs CM Tracker ont été importés dans players avec valeurs par défaut et noms appliqués."
