@@ -42,7 +42,7 @@ FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
 # --- Update playernames avec comparaison tolérante ---
 $cmd "
 SET NAMES utf8mb4;
--- Ajout noms manquants
+
 INSERT INTO playernames (nameid,name)
 SELECT (SELECT IFNULL(MAX(nameid),0)+ROW_NUMBER() OVER()) AS nameid, firstname
 FROM (SELECT DISTINCT firstname FROM tmp_names WHERE firstname<>'') AS t
@@ -53,7 +53,6 @@ SELECT (SELECT IFNULL(MAX(nameid),0)+ROW_NUMBER() OVER()) AS nameid, lastname
 FROM (SELECT DISTINCT lastname FROM tmp_names WHERE lastname<>'') AS t
 WHERE lastname NOT IN (SELECT name FROM playernames);
 
--- Update players
 UPDATE players p
 JOIN tmp_names t ON p.playerid = t.playerid
 JOIN playernames pn_first_new ON pn_first_new.name = t.firstname
@@ -75,6 +74,8 @@ FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
 SELECT ROW_COUNT();
 " | tee -a "$LOG_FILE"
 
+# --- Recalcul complet des artificialkey ---
+$cmd "
 SET NAMES utf8mb4;
 
 UPDATE teamplayerlinks tpl
@@ -83,35 +84,48 @@ JOIN (
            ROW_NUMBER() OVER (
              ORDER BY
                tpl2.teamid ASC,
-               -- rôle global : titulaires avant subs/res
                CASE
-                 WHEN tpl2.position < 28 THEN 0   -- titulaires
-                 WHEN tpl2.position = 28 THEN 1   -- remplaçants
-                 WHEN tpl2.position = 29 THEN 2   -- réservistes
+                 WHEN tpl2.position < 28 THEN 0
+                 WHEN tpl2.position = 28 THEN 1
+                 WHEN tpl2.position = 29 THEN 2
                  ELSE 3
                END,
-               -- à l'intérieur des titulaires : GK -> DEF -> MID -> FWD
                CASE
                  WHEN tpl2.position < 28 THEN
                    CASE
                      WHEN p.preferredposition1 = 0 OR p.preferredposition2 = 0 THEN 0
-                     WHEN tpl2.position BETWEEN 2 AND 8   THEN 1
-                     WHEN tpl2.position BETWEEN 9 AND 19  THEN 2
+                     WHEN tpl2.position BETWEEN 2 AND 8 THEN 1
+                     WHEN tpl2.position BETWEEN 9 AND 19 THEN 2
                      WHEN tpl2.position BETWEEN 20 AND 27 THEN 3
                      ELSE 9
                    END
                  ELSE 9
                END,
-               -- tie-breakers stables
-               tpl2.teamid ASC,
                tpl2.position ASC,
-               COALESCE(tpl2.artificialkey, 999999999) ASC,
+               COALESCE(tpl2.artificialkey, 999999999),
                tpl2.playerid ASC
            ) - 1 AS new_key
     FROM teamplayerlinks tpl2
     LEFT JOIN players p ON p.playerid = tpl2.playerid
 ) AS rk ON tpl.playerid = rk.playerid
 SET tpl.artificialkey = rk.new_key;
+" | tee -a "$LOG_FILE"
 
+# --- Donner à chaque joueur un jerseynumber libre ---
+$cmd "
+SET NAMES utf8mb4;
+
+UPDATE teamplayerlinks tpl
+JOIN tmp_names t ON tpl.playerid = t.playerid
+SET tpl.position = 29,
+    tpl.jerseynumber = COALESCE(
+        tpl.jerseynumber,
+        (SELECT IFNULL(MAX(t2.jerseynumber),0)+1
+         FROM teamplayerlinks t2
+         WHERE t2.teamid = tpl.teamid)
+    );
+
+SELECT ROW_COUNT();
+" | tee -a "$LOG_FILE"
 
 echo "🏁 Import complet et artificialkey recalculées !" | tee -a "$LOG_FILE"
