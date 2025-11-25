@@ -49,7 +49,7 @@ do
     "
 
     # Récupérer le dernier playerid temporaire (copie de default)
-    LAST_PLAYERID=$($MYSQL_CMD -N -e "SELECT playerid FROM tmp_players ORDER BY playerid DESC LIMIT 1;")
+    LAST_PLAYERID=$($MYSQL_CMD -N -e "SELECT playerid FROM tmp_players where playerid = 50073")
 
     # Mettre à jour cette ligne avec les valeurs du CSV CM Tracker
     $MYSQL_CMD -e "
@@ -119,7 +119,7 @@ done
 # 3️⃣ Export tmp_players vers CSV temporaire
 # ============================================================
 $MYSQL_CMD -e "
-SELECT * FROM tmp_players
+SELECT * FROM tmp_players where playerid != 50073
 INTO OUTFILE '$TMP_CSV'
 FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n';
 "
@@ -134,3 +134,4 @@ FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n';
 "
 
 echo "✔ Tous les joueurs CM Tracker ont été importés dans players avec valeurs par défaut appliquées."
+
