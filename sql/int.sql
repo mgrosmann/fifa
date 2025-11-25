@@ -14,6 +14,7 @@ alter table teams MODIFY COLUMN teamid INT UNSIGNED;
 alter table teamplayerlinks MODIFY COLUMN playerid INT UNSIGNED;
 alter table teamplayerlinks MODIFY COLUMN teamid INT UNSIGNED;
 alter table teamplayerlinks MODIFY COLUMN artificialkey INT UNSIGNED;
+alter table teamplayerlinks MODIFY COLUMN jerseynumber INT UNSIGNED;
 --table leagueteamlinks
 alter table leagueteamlinks MODIFY COLUMN teamid INT UNSIGNED;
 alter table leagueteamlinks MODIFY COLUMN leagueid INT UNSIGNED;
@@ -21,5 +22,6 @@ alter table leagueteamlinks MODIFY COLUMN leagueid INT UNSIGNED;
 alter table leagues MODIFY COLUMN leagueid INT UNSIGNED;
 --table playerloans
 alter table playerloans MODIFY COLUMN playerid INT UNSIGNED;
+
 
 
