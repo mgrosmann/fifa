@@ -44,7 +44,7 @@ if [[ "$old_pos" -lt 28 ]]; then
     JOIN players p ON tpl.playerid=p.playerid
     WHERE tpl.teamid=$old_teamid
       AND tpl.position IN (28,29)
-      AND (p.preferredposition1=$pref1 OR p.preferredposition2=$pref1 OR p.preferredposition1=$pref2 OR p.preferredposition2=$pref2)
+      AND (p.preferredposition1=$pref1)
     ORDER BY tpl.position ASC, tpl.artificialkey ASC
     LIMIT 1;
     ")
@@ -74,7 +74,9 @@ echo "Joueur promu : $promu_id"
 
 # 🔹 Sauvegarder clé du promu et mettre à jour sa position
 if [[ -n "$promu_id" ]]; then
-    promu_old_key=$($MYSQL_CMD "SELECT artificialkey FROM teamplayerlinks_copy WHERE playerid=$promu_id;")
+    promu_old_key=$($MYSQL_CMD "SELECT tpl.artificialkey FROM teamplayerlinks_copy tpl
+    JOIN teams t ON tpl.teamid = t.teamid
+    JOIN leagueteamlinks ltl ON tpl.teamid = ltl.teamid WHERE playerid=$promu_id AND NOT $EXCLUDE_CONDITION;")
     $MYSQL_CMD "UPDATE teamplayerlinks_copy SET position=$old_pos, artificialkey=$old_key WHERE playerid=$promu_id;"
 else
     promu_old_key="0"
@@ -83,8 +85,10 @@ fi
 # 🔹 Déterminer la clé de référence pour le décalage
 if [[ "$promu_old_key" == "0" ]]; then
     key_to_shift="$old_key"
+    echo "pas de promu, la clé: $old_key"
 else
     key_to_shift="$promu_old_key"
+    echo "promu trouvé, la clé : $promu_old_key"
 fi
 
 echo "Clé de référence pour décalage : $key_to_shift"
@@ -108,11 +112,13 @@ WHERE artificialkey > $max_new_key;
 
 # 🔹 Mettre à jour le joueur transféré
 $MYSQL_CMD "
-UPDATE teamplayerlinks_copy
-SET teamid=$NEW_TEAMID,
-    position=29,
-    artificialkey=$((max_new_key + 1))
-WHERE playerid=$PLAYERID;
+UPDATE teamplayerlinks_copy tpl
+JOIN teams t ON tpl.teamid = t.teamid
+JOIN leagueteamlinks ltl ON tpl.teamid = ltl.teamid
+SET tpl.teamid=$NEW_TEAMID,
+    tpl.position=29,
+    tpl.artificialkey=$((max_new_key + 1))
+WHERE playerid=$PLAYERID AND NOT $EXCLUDE_CONDITION;
 "
 
 echo "✅ Joueur $PLAYERID transféré vers l'équipe $NEW_TEAMID et artificialkey recalculée."
