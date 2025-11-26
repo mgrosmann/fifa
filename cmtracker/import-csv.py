@@ -196,6 +196,7 @@ with open(CM_CSV, newline='', encoding='utf-8') as fh:
         if key not in playernames_set:
             playernames_set.add(key)
             playernames_list.append({
+                "playerid": playerid,
                 "firstname": firstname,
                 "lastname": lastname,
                 "commonname": commonname,

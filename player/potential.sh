@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # --- Configuration ---
-DB="FIFA14"
-cmd="mysql -uroot -proot -P 5000 -h127.0.0.1 -D $DB"
+DB="FC26"
+cmd="mysql -uroot -proot -D $DB"
 MIN_POTENTIAL=90  # Seuil minimal du potentiel
 MIN_OVERALL=80    #seuil minimal du overall
 echo "🔎 Recherche de tous les joueurs avec un potentiel ≥ $MIN_POTENTIAL..."

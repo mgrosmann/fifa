@@ -1,7 +1,7 @@
 #!/bin/bash
 
-DB="FIFA14"
-cmd="mysql -uroot -proot -P 5000 -h127.0.0.1 -D $DB"
+DB="FC26"
+cmd="mysql -uroot -proot -h127.0.0.1 -P5000 -D $DB"
 # Liste des ID d'équipes à exclure (sélections nationales + All Star)
 EXCLUDED_TEAMS="974,1318,1319,1321,1322,1324,1325,1327,1328,1329,1330,1331,1332,1334,1335,1336,1337,1338,
 1341,1342,1343,1352,1353,1354,1355,1356,1357,1359,1360,1361,1362,1363,1364,1365,1366,1367,
@@ -109,12 +109,7 @@ while true; do
         new_teamid=$(echo "$selected_club" | awk '{print $1}')
         new_teamname=$(echo "$selected_club" | cut -d' ' -f2-)
     fi
-    bash /mnt/github/fifa/key.sh $playerid $new_teamid $DB
-    $cmd  -e "
-        UPDATE teamplayerlinks 
-        SET teamid=$new_teamid, position=29 
-        WHERE playerid=$playerid AND teamid=$old_teamid;
-    "
+    bash /mnt/c/github/fifa/key.sh $playerid $new_teamid $DB
 
     echo "✅ $fullname transféré de $old_teamname vers $new_teamname (position 29 – réserviste)."
 

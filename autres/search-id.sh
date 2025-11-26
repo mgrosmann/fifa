@@ -1,11 +1,11 @@
 #!/bin/bash
 # --- Recherche d'un joueur ou d'une équipe dans la base FIFA --- mettre -N pour pas afficher les colonnes
-DB="FIFA1525"
+DB="FC26"
 USER="root"
 PASS="root"
 HOST="127.0.0.1"
 PORT="5000"
-cmd="mysql -u$USER -p$PASS -h$HOST -P $PORT -D $DB -A -e"
+cmd="mysql -u$USER -p$PASS -h127.0.0.1 -P5000 -D $DB -A -e"
 exclude_condition="(
     t.teamname LIKE '%All star%'
  OR t.teamname LIKE '%Adidas%'

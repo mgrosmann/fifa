@@ -1,197 +1,171 @@
 #!/bin/bash
-# ============================================================
-# Import CM Tracker FIFA15 avec valeurs par défaut et noms
-# ============================================================
 
-# --- Configuration MySQL ---
-DB_NAME="FIFA15"
-DB_USER="root"
-DB_PASS="root"
-DB_HOST="127.0.0.1"
-DB_PORT="5000"
-MYSQL_CMD="mysql -u$DB_USER -p$DB_PASS -h$DB_HOST -P$DB_PORT -D$DB_NAME --local-infile=1"
+MYSQL_CMD="mysql -uroot -proot -h127.0.0.1 -P5000 -DFC26 -N -s"
 
-CSV_CMTRACKER="/mnt/c/github/fifa/cmtracker/players.csv"  # CSV CM Tracker
-CSV_DEFAULT="/mnt/c/github/fifa/cmtracker/test.csv"       # CSV joueur par défaut (CM15)
-CSV_NAMES="/mnt/c/github/fifa/cmtracker/playernames.csv"            # CSV noms des joueurs
-TMP_CSV="/tmp/tmp_players_final.csv"
+CSV_CMTRACKER="/mnt/c/github/fifa/cmtracker/players.csv"
+CSV_DEFAULT="/mnt/c/github/fifa/cmtracker/test.csv"
+NEW_CSV="/tmp/test.csv"
+CSV_TPL="/mnt/c/github/fifa/cmtracker/teamplayerlinks.csv"
+CSV_NAMES="/mnt/c/github/fifa/cmtracker/playernames.csv"
 
-# ============================================================
-# 1️⃣ Charger la ligne par défaut dans tmp_players_default
-# ============================================================
+cp "$CSV_DEFAULT" "$NEW_CSV"
+
+# 1) Charger valeurs par défaut
+$MYSQL_CMD -e "DELETE FROM players WHERE playerid=50075;"
 $MYSQL_CMD -e "
-DROP TEMPORARY TABLE IF EXISTS tmp_players_default;
-CREATE TEMPORARY TABLE tmp_players_default LIKE players;
-LOAD DATA LOCAL INFILE '$CSV_DEFAULT'
-REPLACE INTO TABLE tmp_players_default
-FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n' IGNORE 1 LINES;
-
-DROP TEMPORARY TABLE IF EXISTS tmp_players;
-CREATE TEMPORARY TABLE tmp_players LIKE players;
+LOAD DATA LOCAL INFILE '$NEW_CSV'
+INTO TABLE players
+FIELDS TERMINATED BY ';'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;
 "
 
-# ============================================================
-# 2️⃣ Boucle CSV CM Tracker : copier la ligne par défaut + appliquer les valeurs du CSV
-# ============================================================
+# 2) Update joueurs CMTracker
 tail -n +2 "$CSV_CMTRACKER" | while IFS=';' read -r \
 playerid overallrating potential birthdate playerjointeamdate contractvaliduntil \
 haircolorcode eyecolorcode skintonecode headtypecode bodytypecode height weight \
-preferredfoot skillmoves internationalrep hashighqualityhead isretiring \
-nationid preferredposition1 preferredposition2 preferredposition3 preferredposition4 \
-acceleration sprintspeed agility balance jumping stamina strength reactions aggression \
-interceptions positioning vision ballcontrol crossing dribbling finishing freekickaccuracy \
-headingaccuracy longpassing shortpassing marking shotpower longshots standingtackle \
-slidingtackle volleys curve penalties gkdiving gkhandling gkkicking gkreflexes gkpositioning
+preferredfoot skillmoves internationalrep hashighqualityhead isretiring nationality \
+preferredposition1 preferredposition2 preferredposition3 preferredposition4 \
+acceleration sprintspeed agility balance jumping stamina strength reactions aggression interceptions positioning \
+vision ballcontrol crossing dribbling finishing freekickaccuracy headingaccuracy longpassing shortpassing marking \
+shotpower longshots standingtackle slidingtackle volleys curve penalties gkdiving gkhandling gkkicking gkreflexes gkpositioning
 do
-    # Copier la ligne par défaut
-    $MYSQL_CMD -e "
-    INSERT INTO tmp_players
-    SELECT * FROM tmp_players_default;
-    "
+    echo "== Joueur : $playerid =="
 
-    # Récupérer le dernier playerid temporaire (copie de default)
-    LAST_PLAYERID=$($MYSQL_CMD -N -e "SELECT playerid FROM tmp_players where playerid = 50073")
-
-    # Mettre à jour cette ligne avec les valeurs du CSV CM Tracker
     $MYSQL_CMD -e "
-    UPDATE tmp_players
-    SET
-        playerid = $playerid,
-        overallrating = $overallrating,
-        potential = $potential,
-        birthdate = '$birthdate',
-        playerjointeamdate = '$playerjointeamdate',
-        contractvaliduntil = '$contractvaliduntil',
-        haircolorcode = $haircolorcode,
-        eyecolorcode = $eyecolorcode,
-        skintonecode = $skintonecode,
-        headtypecode = $headtypecode,
-        bodytypecode = $bodytypecode,
-        height = $height,
-        weight = $weight,
-        preferredfoot = $preferredfoot,
-        skillmoves = $skillmoves,
-        internationalrep = $internationalrep,
-        hashighqualityhead = '$hashighqualityhead',
-        isretiring = $isretiring,
-        nationid = $nationid,
-        preferredposition1 = $preferredposition1,
-        preferredposition2 = $preferredposition2,
-        preferredposition3 = $preferredposition3,
-        preferredposition4 = $preferredposition4,
-        acceleration = $acceleration,
-        sprintspeed = $sprintspeed,
-        agility = $agility,
-        balance = $balance,
-        jumping = $jumping,
-        stamina = $stamina,
-        strength = $strength,
-        reactions = $reactions,
-        aggression = $aggression,
-        interceptions = $interceptions,
-        positioning = $positioning,
-        vision = $vision,
-        ballcontrol = $ballcontrol,
-        crossing = $crossing,
-        dribbling = $dribbling,
-        finishing = $finishing,
-        freekickaccuracy = $freekickaccuracy,
-        headingaccuracy = $headingaccuracy,
-        longpassing = $longpassing,
-        shortpassing = $shortpassing,
-        marking = $marking,
-        shotpower = $shotpower,
-        longshots = $longshots,
-        standingtackle = $standingtackle,
-        slidingtackle = $slidingtackle,
-        volleys = $volleys,
-        curve = $curve,
-        penalties = $penalties,
-        gkdiving = $gkdiving,
-        gkhandling = $gkhandling,
-        gkkicking = $gkkicking,
-        gkreflexes = $gkreflexes,
-        gkpositioning = $gkpositioning
-    WHERE playerid = $LAST_PLAYERID;
+UPDATE players
+SET
+    playerid=$playerid,
+    overallrating=$overallrating,
+    potential=$potential,
+    birthdate='$birthdate',
+    playerjointeamdate='$playerjointeamdate',
+    contractvaliduntil='$contractvaliduntil',
+    haircolorcode=$haircolorcode,
+    eyecolorcode=$eyecolorcode,
+    skintonecode=$skintonecode,
+    headtypecode=$headtypecode,
+    bodytypecode=$bodytypecode,
+    height=$height,
+    weight=$weight,
+    preferredfoot='$preferredfoot',
+    skillmoves=$skillmoves,
+    internationalrep=$internationalrep,
+    hashighqualityhead='$hashighqualityhead',
+    isretiring=$isretiring,
+    nationality='$nationality',
+    preferredposition1='$preferredposition1',
+    preferredposition2='$preferredposition2',
+    preferredposition3='$preferredposition3',
+    preferredposition4='$preferredposition4',
+    acceleration=$acceleration,
+    sprintspeed=$sprintspeed,
+    agility=$agility,
+    balance=$balance,
+    jumping=$jumping,
+    stamina=$stamina,
+    strength=$strength,
+    reactions=$reactions,
+    aggression=$aggression,
+    interceptions=$interceptions,
+    positioning=$positioning,
+    vision=$vision,
+    ballcontrol=$ballcontrol,
+    crossing=$crossing,
+    dribbling=$dribbling,
+    finishing=$finishing,
+    freekickaccuracy=$freekickaccuracy,
+    headingaccuracy=$headingaccuracy,
+    longpassing=$longpassing,
+    shortpassing=$shortpassing,
+    marking=$marking,
+    shotpower=$shotpower,
+    longshots=$longshots,
+    standingtackle=$standingtackle,
+    slidingtackle=$slidingtackle,
+    volleys=$volleys,
+    curve=$curve,
+    penalties=$penalties,
+    gkdiving=$gkdiving,
+    gkhandling=$gkhandling,
+    gkkicking=$gkkicking,
+    gkreflexes=$gkreflexes,
+    gkpositioning=$gkpositioning
+WHERE playerid=$playerid;
     "
 done
+#3
+echo "--- TEAMPLAYERLINKS ---"
 
-# ============================================================
-# 3️⃣ Export tmp_players vers CSV temporaire
-# ============================================================
-$MYSQL_CMD -e "
-SELECT * FROM tmp_players WHERE playerid != 50073
-INTO OUTFILE '$TMP_CSV'
-FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n';
-"
-
-# ============================================================
-# 4️⃣ Importer dans players (ON DUPLICATE KEY pour gérer doublons)
-# ============================================================
-$MYSQL_CMD -e "
-LOAD DATA LOCAL INFILE '$TMP_CSV'
-REPLACE INTO TABLE players
-FIELDS TERMINATED BY ';' LINES TERMINATED BY '\n';
-"
-
-# ============================================================
-# 5️⃣ Gestion des noms : firstname, lastname, commonname, jerseyname
-# ============================================================
-
-# Créer table temporaire pour les noms
-$MYSQL_CMD -e "
-DROP TEMPORARY TABLE IF EXISTS tmp_names;
-CREATE TEMPORARY TABLE tmp_names (
-    firstname  VARCHAR(100),
-    lastname   VARCHAR(100),
-    commonname VARCHAR(100),
-    jerseyname VARCHAR(100)
-);
-"
-
-# Charger les noms depuis CSV
-tail -n +2 "$CSV_NAMES" | while IFS=';' read -r firstname lastname commonname jerseyname
+# Lire CSV en ignorant la première ligne
+tail -n +2 "$CSV_TPL" | while IFS=';' read -r teamid playerid jerseynumber position
 do
-    SQL="INSERT INTO tmp_names (firstname, lastname, commonname, jerseyname)
-         VALUES ('$firstname', '$lastname', '$commonname', '$jerseyname');"
-    $MYSQL_CMD -e "$SQL"
+    # Nettoyer les variables (supprimer guillemets, espaces)
+    tpl_teamid=$(echo "$teamid" | tr -d '" ' | xargs)
+    tpl_playerid=$(echo "$playerid" | tr -d '" ' | xargs)
+
+    # Vérification basique
+    if [ -z "$tpl_teamid" ] || [ -z "$tpl_playerid" ] || ! [[ "$tpl_teamid" =~ ^[0-9]+$ ]]; then
+        echo "Ligne ignorée : teamid ou playerid invalide (teamid='$tpl_teamid', playerid='$tpl_playerid')"
+        continue
+    fi
+
+    echo "Traitement : teamid=$tpl_teamid, playerid=$tpl_playerid"
+
+    # Générer une clé unique pour cette équipe
+    KEY=$($MYSQL_CMD --skip-column-names -e "SELECT IFNULL(MAX(artificialkey)+1,1) FROM teamplayerlinks WHERE teamid=$tpl_teamid;")
+    [ -z "$KEY" ] && KEY=1
+
+    # Trouver le prochain numéro de maillot libre
+    number=$($MYSQL_CMD --skip-column-names -e "
+SELECT COALESCE(MIN(tpl1.jerseynumber + 1),1)
+FROM teamplayerlinks tpl1
+LEFT JOIN teamplayerlinks tpl2
+    ON tpl1.jerseynumber + 1 = tpl2.jerseynumber
+   AND tpl1.teamid = tpl2.teamid
+WHERE tpl1.teamid = $tpl_teamid
+  AND tpl2.jerseynumber IS NULL;
+" | tr -d '\n')
+
+    [ -z "$number" ] && number=1
+
+    # Insérer ou mettre à jour
+    $MYSQL_CMD -e "
+INSERT INTO teamplayerlinks
+(teamid, playerid, artificialkey, leaguegoals, isamongtopscorers, yellows,
+ isamongtopscorersinteam, injury, leagueappearances, prevform, form,
+ istopscorer, reds, position, jerseynumber)
+VALUES ($tpl_teamid, $tpl_playerid, $KEY,0,0,0,0,0,0,0,3,0,0,29,$number)
+ON DUPLICATE KEY UPDATE artificialkey=$KEY;
+"
+
 done
 
-# Ajouter les noms manquants dans playernames et mettre à jour les joueurs
-$MYSQL_CMD -e "
-SET NAMES utf8mb4;
+echo "--- FIN TEAMPLAYERLINKS ---"
 
-INSERT INTO playernames (nameid,name)
-SELECT IFNULL((SELECT MAX(nameid) FROM playernames),0) + ROW_NUMBER() OVER (), firstname
-FROM (SELECT DISTINCT firstname FROM tmp_names WHERE firstname<>'' ) AS t
-WHERE firstname NOT IN (SELECT name FROM playernames);
+# 4) PLAYERNAMES
+tail -n +2 "$CSV_NAMES" | while IFS=';' read -r playerid firstname lastname commonname jerseyname
+do
+    echo "DEBUG: playerid='$playerid'"
+    # Ajouter les noms dans playernames si manquant
+    for NAME in "$firstname" "$lastname" "$commonname" "$jerseyname"; do
+        EXISTS=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$NAME';")
+        if [ -z "$EXISTS" ]; then
+            MAX_ID=$($MYSQL_CMD --skip-column-names -e "SELECT IFNULL(MAX(nameid),0) FROM playernames;")
+            NEW_ID=$((MAX_ID+1))
+            $MYSQL_CMD -e "INSERT INTO playernames (nameid,name,commentaryid) VALUES ($NEW_ID,'$NAME',900000);"
+        fi
+    done
 
-INSERT INTO playernames (nameid,name)
-SELECT IFNULL((SELECT MAX(nameid) FROM playernames),0) + ROW_NUMBER() OVER (), lastname
-FROM (SELECT DISTINCT lastname FROM tmp_names WHERE lastname<>'' ) AS t
-WHERE lastname NOT IN (SELECT name FROM playernames);
+    # Récupérer les ids
+    FIRST_ID=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$firstname';")
+    LAST_ID=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$lastname';")
+    COMMON_ID=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$commonname';")
+    JERSEY_ID=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$jerseyname';")
 
-INSERT INTO playernames (nameid,name)
-SELECT IFNULL((SELECT MAX(nameid) FROM playernames),0) + ROW_NUMBER() OVER (), commonname
-FROM (SELECT DISTINCT commonname FROM tmp_names WHERE commonname<>'' ) AS t
-WHERE commonname NOT IN (SELECT name FROM playernames);
-
-INSERT INTO playernames (nameid,name)
-SELECT IFNULL((SELECT MAX(nameid) FROM playernames),0) + ROW_NUMBER() OVER (), jerseyname
-FROM (SELECT DISTINCT jerseyname FROM tmp_names WHERE jerseyname<>'' ) AS t
-WHERE jerseyname NOT IN (SELECT name FROM playernames);
-
-UPDATE players p
-JOIN tmp_names t ON p.playerid = p.playerid
-LEFT JOIN playernames pn_first  ON pn_first.name  = t.firstname
-LEFT JOIN playernames pn_last   ON pn_last.name   = t.lastname
-LEFT JOIN playernames pn_common ON pn_common.name = t.commonname
-LEFT JOIN playernames pn_jersey ON pn_jersey.name = t.jerseyname
-SET p.firstnameid  = pn_first.nameid,
-    p.lastnameid   = pn_last.nameid,
-    p.commonnameid = pn_common.nameid,
-    p.jerseynameid = pn_jersey.nameid;
-"
-
-echo "✔ Tous les joueurs CM Tracker ont été importés dans players avec valeurs par défaut et noms appliqués."
-
+    $MYSQL_CMD -e "
+UPDATE players
+SET firstnameid=$FIRST_ID, lastnameid=$LAST_ID, commonnameid=$COMMON_ID, playerjerseynameid=$JERSEY_ID
+WHERE playerid=$playerid;
+    "
+done
