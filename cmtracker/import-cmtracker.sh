@@ -11,9 +11,9 @@ DB_HOST="127.0.0.1"
 DB_PORT="5000"
 MYSQL_CMD="mysql -u$DB_USER -p$DB_PASS -h$DB_HOST -P$DB_PORT -D$DB_NAME --local-infile=1"
 
-CSV_CMTRACKER="players_cmtracker.csv"  # CSV CM Tracker
-CSV_DEFAULT="default_player.csv"       # CSV joueur par défaut (CM15)
-CSV_NAMES="playernames.csv"            # CSV noms des joueurs
+CSV_CMTRACKER="/mnt/c/github/fifa/cmtracker/players.csv"  # CSV CM Tracker
+CSV_DEFAULT="/mnt/c/github/fifa/cmtracker/test.csv"       # CSV joueur par défaut (CM15)
+CSV_NAMES="/mnt/c/github/fifa/cmtracker/playernames.csv"            # CSV noms des joueurs
 TMP_CSV="/tmp/tmp_players_final.csv"
 
 # ============================================================
@@ -194,3 +194,4 @@ SET p.firstnameid  = pn_first.nameid,
 "
 
 echo "✔ Tous les joueurs CM Tracker ont été importés dans players avec valeurs par défaut et noms appliqués."
+
