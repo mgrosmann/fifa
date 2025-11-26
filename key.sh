@@ -118,6 +118,15 @@ JOIN leagueteamlinks ltl ON tpl.teamid = ltl.teamid
 SET tpl.teamid=$NEW_TEAMID,
     tpl.position=29,
     tpl.artificialkey=$((max_new_key + 1))
+    jerseynumber = (
+    SELECT MIN(t.jerseynumber + 1)
+    FROM teamplayerlinks t
+    LEFT JOIN teamplayerlinks t2
+      ON t2.teamid = t.teamid
+     AND t2.jerseynumber = t.jerseynumber + 1
+    WHERE t.teamid = $NEW_TEAMID
+      AND t2.jerseynumber IS NULL
+)
 WHERE playerid=$PLAYERID AND NOT $EXCLUDE_CONDITION;
 "
 
