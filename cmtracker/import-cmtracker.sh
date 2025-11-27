@@ -8,10 +8,22 @@ NEW_CSV="/tmp/test.csv"
 CSV_TPL="/mnt/c/github/fifa/cmtracker/teamplayerlinks.csv"
 CSV_NAMES="/mnt/c/github/fifa/cmtracker/playernames.csv"
 
+
+# ---------------------------------------------------------
+# 1) RÉINITIALISATION DU JOUEUR PAR DÉFAUT (50075)
+# ---------------------------------------------------------
 cp "$CSV_DEFAULT" "$NEW_CSV"
 
-# 1) Charger valeurs par défaut
-$MYSQL_CMD -e "DELETE FROM players WHERE playerid=50075;"
+default_exists=$($MYSQL_CMD --skip-column-names -e \
+    "SELECT 1 FROM players WHERE playerid=50075;"
+)
+
+if [[ "$default_exists" == "1" ]]; then
+    echo "→ Suppression du joueur par défaut 50075"
+    $MYSQL_CMD -e "DELETE FROM players WHERE playerid=50075;"
+fi
+
+echo "→ Chargement du joueur 50075 (défaut)"
 $MYSQL_CMD -e "
 LOAD DATA LOCAL INFILE '$NEW_CSV'
 INTO TABLE players
@@ -20,7 +32,10 @@ LINES TERMINATED BY '\n'
 IGNORE 1 LINES;
 "
 
-# 2) Update joueurs CMTracker
+
+# ---------------------------------------------------------
+# 2) UPDATE / INSERT DES JOUEURS CMTRACKER
+# ---------------------------------------------------------
 tail -n +2 "$CSV_CMTRACKER" | while IFS=';' read -r \
 playerid overallrating potential birthdate playerjointeamdate contractvaliduntil \
 haircolorcode eyecolorcode skintonecode headtypecode bodytypecode height weight \
@@ -32,28 +47,18 @@ shotpower longshots standingtackle slidingtackle volleys curve penalties gkdivin
 do
     echo "== Joueur : $playerid =="
 
-    $MYSQL_CMD -e "
+    exists=$($MYSQL_CMD --skip-column-names -e "SELECT 1 FROM players WHERE playerid=$playerid;")
+
+    if [[ "$exists" == "1" ]]; then
+        echo "→ Le joueur existe déjà : mise à jour partielle"
+
+        $MYSQL_CMD -e "
 UPDATE players
 SET
-    playerid=$playerid,
     overallrating=$overallrating,
     potential=$potential,
-    birthdate='$birthdate',
-    playerjointeamdate='$playerjointeamdate',
     contractvaliduntil='$contractvaliduntil',
-    haircolorcode=$haircolorcode,
-    eyecolorcode=$eyecolorcode,
-    skintonecode=$skintonecode,
-    headtypecode=$headtypecode,
-    bodytypecode=$bodytypecode,
-    height=$height,
-    weight=$weight,
-    preferredfoot='$preferredfoot',
-    skillmoves=$skillmoves,
     internationalrep=$internationalrep,
-    hashighqualityhead='$hashighqualityhead',
-    isretiring=$isretiring,
-    nationality='$nationality',
     preferredposition1='$preferredposition1',
     preferredposition2='$preferredposition2',
     preferredposition3='$preferredposition3',
@@ -92,31 +97,66 @@ SET
     gkreflexes=$gkreflexes,
     gkpositioning=$gkpositioning
 WHERE playerid=$playerid;
-    "
+        "
+
+    else
+        echo "→ Nouveau joueur : INSERT complet"
+
+        $MYSQL_CMD -e "
+INSERT INTO players (
+    playerid, overallrating, potential, birthdate, playerjointeamdate, contractvaliduntil,
+    haircolorcode, eyecolorcode, skintonecode, headtypecode, bodytypecode, height, weight,
+    preferredfoot, skillmoves, internationalrep, hashighqualityhead, isretiring, nationality,
+    preferredposition1, preferredposition2, preferredposition3, preferredposition4,
+    acceleration, sprintspeed, agility, balance, jumping, stamina, strength, reactions,
+    aggression, interceptions, positioning, vision, ballcontrol, crossing, dribbling, finishing,
+    freekickaccuracy, headingaccuracy, longpassing, shortpassing, marking, shotpower, longshots,
+    standingtackle, slidingtackle, volleys, curve, penalties, gkdiving, gkhandling, gkkicking,
+    gkreflexes, gkpositioning
+)
+VALUES (
+    $playerid, $overallrating, $potential, '$birthdate', '$playerjointeamdate', '$contractvaliduntil',
+    $haircolorcode, $eyecolorcode, $skintonecode, $headtypecode, $bodytypecode, $height, $weight,
+    '$preferredfoot', $skillmoves, $internationalrep, '$hashighqualityhead', $isretiring, '$nationality',
+    '$preferredposition1', '$preferredposition2', '$preferredposition3', '$preferredposition4',
+    $acceleration, $sprintspeed, $agility, $balance, $jumping, $stamina, $strength, $reactions,
+    $aggression, $interceptions, $positioning, $vision, $ballcontrol, $crossing, $dribbling, $finishing,
+    $freekickaccuracy, $headingaccuracy, $longpassing, $shortpassing, $marking, $shotpower, $longshots,
+    $standingtackle, $slidingtackle, $volleys, $curve, $penalties, $gkdiving, $gkhandling, $gkkicking,
+    $gkreflexes, $gkpositioning
+);
+        "
+    fi
+
 done
-#3
+
+
+# ---------------------------------------------------------
+# 3) TEAMPLAYERLINKS
+# ---------------------------------------------------------
 echo "--- TEAMPLAYERLINKS ---"
 
-# Lire CSV en ignorant la première ligne
 tail -n +2 "$CSV_TPL" | while IFS=';' read -r teamid playerid jerseynumber position
 do
-    # Nettoyer les variables (supprimer guillemets, espaces)
     tpl_teamid=$(echo "$teamid" | tr -d '" ' | xargs)
     tpl_playerid=$(echo "$playerid" | tr -d '" ' | xargs)
 
-    # Vérification basique
-    if [ -z "$tpl_teamid" ] || [ -z "$tpl_playerid" ] || ! [[ "$tpl_teamid" =~ ^[0-9]+$ ]]; then
-        echo "Ligne ignorée : teamid ou playerid invalide (teamid='$tpl_teamid', playerid='$tpl_playerid')"
+    [[ -z "$tpl_teamid" || -z "$tpl_playerid" ]] && continue
+
+    exists_tpl=$(
+        $MYSQL_CMD --skip-column-names \
+        -e "SELECT 1 FROM teamplayerlinks WHERE teamid=$tpl_teamid AND playerid=$tpl_playerid;"
+    )
+
+    if [[ "$exists_tpl" == "1" ]]; then
+        echo "→ TPL déjà présent, on saute"
         continue
     fi
 
-    echo "Traitement : teamid=$tpl_teamid, playerid=$tpl_playerid"
+    KEY=$($MYSQL_CMD --skip-column-names -e \
+        "SELECT IFNULL(MAX(artificialkey)+1,1) FROM teamplayerlinks WHERE teamid=$tpl_teamid;"
+    )
 
-    # Générer une clé unique pour cette équipe
-    KEY=$($MYSQL_CMD --skip-column-names -e "SELECT IFNULL(MAX(artificialkey)+1,1) FROM teamplayerlinks WHERE teamid=$tpl_teamid;")
-    [ -z "$KEY" ] && KEY=1
-
-    # Trouver le prochain numéro de maillot libre
     number=$($MYSQL_CMD --skip-column-names -e "
 SELECT COALESCE(MIN(tpl1.jerseynumber + 1),1)
 FROM teamplayerlinks tpl1
@@ -127,45 +167,75 @@ WHERE tpl1.teamid = $tpl_teamid
   AND tpl2.jerseynumber IS NULL;
 " | tr -d '\n')
 
-    [ -z "$number" ] && number=1
+    [[ -z "$number" ]] && number=1
 
-    # Insérer ou mettre à jour
     $MYSQL_CMD -e "
 INSERT INTO teamplayerlinks
 (teamid, playerid, artificialkey, leaguegoals, isamongtopscorers, yellows,
  isamongtopscorersinteam, injury, leagueappearances, prevform, form,
  istopscorer, reds, position, jerseynumber)
-VALUES ($tpl_teamid, $tpl_playerid, $KEY,0,0,0,0,0,0,0,3,0,0,29,$number)
-ON DUPLICATE KEY UPDATE artificialkey=$KEY;
+VALUES ($tpl_teamid, $tpl_playerid, $KEY,0,0,0,0,0,0,0,3,0,0,29,$number);
 "
-
 done
 
 echo "--- FIN TEAMPLAYERLINKS ---"
 
+
+# ---------------------------------------------------------
 # 4) PLAYERNAMES
-tail -n +2 "$CSV_NAMES" | while IFS=';' read -r playerid firstname lastname commonname jerseyname
+# ---------------------------------------------------------
+tail -n +2 "$CSV_NAMES" | while IFS=';' read -r playerid firstname lastname jerseyname
 do
-    echo "DEBUG: playerid='$playerid'"
-    # Ajouter les noms dans playernames si manquant
-    for NAME in "$firstname" "$lastname" "$commonname" "$jerseyname"; do
-        EXISTS=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$NAME';")
-        if [ -z "$EXISTS" ]; then
-            MAX_ID=$($MYSQL_CMD --skip-column-names -e "SELECT IFNULL(MAX(nameid),0) FROM playernames;")
-            NEW_ID=$((MAX_ID+1))
-            $MYSQL_CMD -e "INSERT INTO playernames (nameid,name,commentaryid) VALUES ($NEW_ID,'$NAME',900000);"
+    [[ -z "$playerid" ]] && continue
+
+    fullname_ok=$(
+        $MYSQL_CMD --skip-column-names -e "
+        SELECT p.playerid
+        FROM players p
+        JOIN playernames pn_first  ON p.firstnameid = pn_first.nameid
+        JOIN playernames pn_last   ON p.lastnameid  = pn_last.nameid
+        JOIN playernames pn_jersey ON p.playerjerseynameid = pn_jersey.nameid
+        JOIN teamplayerlinks tpl   ON tpl.playerid = p.playerid
+        WHERE p.playerid=$playerid;
+        "
+    )
+
+    if [[ -n "$fullname_ok" ]]; then
+        echo "→ Noms déjà présents"
+        continue
+    fi
+
+    for NAME in "$firstname" "$lastname" "$jerseyname"; do
+        [[ -z "$NAME" ]] && continue
+
+        exists=$($MYSQL_CMD --skip-column-names \
+            -e "SELECT nameid FROM playernames WHERE name='$NAME';"
+        )
+
+        if [[ -z "$exists" ]]; then
+            maxid=$($MYSQL_CMD --skip-column-names -e \
+                "SELECT IFNULL(MAX(nameid),0) FROM playernames;"
+            )
+            newid=$((maxid+1))
+
+            $MYSQL_CMD -e \
+                "INSERT INTO playernames (nameid,name,commentaryid)
+                 VALUES ($newid,'$NAME',900000);"
         fi
     done
 
-    # Récupérer les ids
-    FIRST_ID=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$firstname';")
-    LAST_ID=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$lastname';")
-    COMMON_ID=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$commonname';")
-    JERSEY_ID=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$jerseyname';")
+    firstid=$($MYSQL_CMD --skip-column-names -e \
+        "SELECT nameid FROM playernames WHERE name='$firstname';")
+    lastid=$($MYSQL_CMD --skip-column-names -e \
+        "SELECT nameid FROM playernames WHERE name='$lastname';")
+    jerseyid=$($MYSQL_CMD --skip-column-names -e \
+        "SELECT nameid FROM playernames WHERE name='$jerseyname';")
 
     $MYSQL_CMD -e "
 UPDATE players
-SET firstnameid=$FIRST_ID, lastnameid=$LAST_ID, commonnameid=$COMMON_ID, playerjerseynameid=$JERSEY_ID
+SET firstnameid=$firstid,
+    lastnameid=$lastid,
+    playerjerseynameid=$jerseyid
 WHERE playerid=$playerid;
     "
 done
