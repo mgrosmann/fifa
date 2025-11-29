@@ -220,23 +220,9 @@ echo "--- FIN TEAMPLAYERLINKS ---"
 # ---------------------------------------------------------
 # 4) PLAYERNAMES
 # ---------------------------------------------------------
-tail -n +2 "$CSV_NAMES" | while IFS=';' read -r playerid firstname lastname jerseyname
+tail -n +2 "$CSV_NAMES" | while IFS=';' read -r playerid firstname lastname commonname jerseyname
 do
-    [[ -z "$playerid" ]] && continue
-
-    fullname_ok=$($MYSQL_CMD --skip-column-names -e "
-        SELECT p.playerid
-        FROM players p
-        JOIN playernames pn_first  ON p.firstnameid = pn_first.nameid
-        JOIN playernames pn_last   ON p.lastnameid  = pn_last.nameid
-        JOIN playernames pn_jersey ON p.playerjerseynameid = pn_jersey.nameid
-        JOIN teamplayerlinks tpl   ON tpl.playerid = p.playerid
-        WHERE p.playerid=$playerid;
-    ")
-
-    [[ -n "$fullname_ok" ]] && continue
-
-    for NAME in "$firstname" "$lastname" "$jerseyname"; do
+    for NAME in "$firstname" "$lastname" "$commonname" "$jerseyname"; do
         [[ -z "$NAME" ]] && continue
         exists=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$NAME';")
         if [[ -z "$exists" ]]; then
@@ -248,12 +234,14 @@ do
 
     firstid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$firstname';")
     lastid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$lastname';")
+    commonid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$commonname';")
     jerseyid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$jerseyname';")
 
     $MYSQL_CMD -e "
 UPDATE players
 SET firstnameid=$firstid,
     lastnameid=$lastid,
+    commonnameid=$commonnameid,
     playerjerseynameid=$jerseyid
 WHERE playerid=$playerid;
 "

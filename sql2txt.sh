@@ -48,7 +48,7 @@ for tbl in "${tables[@]}"; do
     OUTFILE="${tbl}temp.txt"
     echo "Exporting table: $tbl → $OUTFILE"
     
-    $MYSQL_CMD -D "$DB" --batch  -e "SELECT * FROM \`$tbl\`;" > "$OUTFILE"
+    $cmd -D "$DB" --batch  -e "SELECT * FROM \`$tbl\`;" > "$OUTFILE"
     
     if [[ $? -eq 0 ]]; then
         echo "✅ $tbl exported successfully"

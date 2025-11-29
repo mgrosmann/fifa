@@ -190,7 +190,8 @@ with open(CM_CSV, newline='', encoding='utf-8') as fh:
         # Playernames simplified
         firstname = row.get("info.name.firstname", "").strip()
         lastname = row.get("info.name.lastname", "").strip()
-        jerseyname = row.get("info.name.playerjerseyname", "").strip() or firstname
+        commonname = row.get("info.name.knownas", "").strip()
+        jerseyname = row.get("info.name.playerjerseyname", "").strip() or lastname
         key = (firstname, lastname, jerseyname)
         if key not in playernames_set:
             playernames_set.add(key)
@@ -198,6 +199,7 @@ with open(CM_CSV, newline='', encoding='utf-8') as fh:
                 "playerid": playerid,
                 "firstname": firstname,
                 "lastname": lastname,
+                "commonname": commonname,
                 "jerseyname": jerseyname
             })
             # Normalisation de isretiring
