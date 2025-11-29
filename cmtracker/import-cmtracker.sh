@@ -222,8 +222,13 @@ do
         exists=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$NAME';")
         if [[ -z "$exists" ]]; then
             # Get the max nameid and increment it
-            maxid=$($MYSQL_CMD --skip-column-names -e "SELECT IFNULL(MAX(nameid),0) FROM playernames;")
-            newid=$((maxid+1))
+                newid=$($MYSQL_CMD --skip-column-names -e "
+SELECT COALESCE(MIN(pn1.nameid + 1),1)
+FROM playernames pn1
+LEFT JOIN playernames pn2
+    ON pn1.nameid + 1 = pn2.nameid
+WHERE pn2.nameid IS NULL;
+" | tr -d '\n')
             # Insert the new name into playernames table
             $MYSQL_CMD -e "INSERT INTO playernames (nameid,name,commentaryid) VALUES ($newid,'$NAME',900000);"
         fi
