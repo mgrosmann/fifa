@@ -188,7 +188,9 @@ do
 
     KEY=$($MYSQL_CMD --skip-column-names -e \
         "SELECT IFNULL(MAX(artificialkey)+1,1) FROM teamplayerlinks WHERE teamid=$tpl_teamid;")
-
+UPDATE teamplayerlinks
+SET artificialkey = artificialkey + 1
+WHERE artificialkey >= $key;
     number=$($MYSQL_CMD --skip-column-names -e "
 SELECT COALESCE(MIN(tpl1.jerseynumber + 1),1)
 FROM teamplayerlinks tpl1
