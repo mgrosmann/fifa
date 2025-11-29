@@ -30,7 +30,7 @@ IGNORE 1 LINES;
 # ---------------------------------------------------------
 tail -n +2 "$CSV_CMTRACKER" | while IFS=';' read -r \
 playerid overallrating potential birthdate playerjointeamdate contractvaliduntil \
-haircolorcode eyecolorcode skintonecode headtypecode bodytypecode height weight \
+_ _ _ _ _ height weight \
 preferredfoot skillmoves internationalrep hashighqualityhead isretiring nationality \
 preferredposition1 preferredposition2 preferredposition3 preferredposition4 \
 acceleration sprintspeed agility balance jumping stamina strength reactions aggression interceptions positioning \
@@ -114,11 +114,6 @@ SET
     birthdate='$birthdate',
     playerjointeamdate='$playerjointeamdate',
     contractvaliduntil='$contractvaliduntil',
-    haircolorcode=$haircolorcode,
-    eyecolorcode=$eyecolorcode,
-    skintonecode=$skintonecode,
-    headtypecode=$headtypecode,
-    bodytypecode=$bodytypecode,
     height=$height,
     weight=$weight,
     preferredfoot='$preferredfoot',
