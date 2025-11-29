@@ -190,15 +190,13 @@ with open(CM_CSV, newline='', encoding='utf-8') as fh:
         # Playernames simplified
         firstname = row.get("info.name.firstname", "").strip()
         lastname = row.get("info.name.lastname", "").strip()
-        commonname = row.get("info.name.knownas", "").strip()
-        key = (firstname, lastname, commonname)
+        key = (firstname, lastname)
         if key not in playernames_set:
             playernames_set.add(key)
             playernames_list.append({
                 "playerid": playerid,
                 "firstname": firstname,
-                "lastname": lastname,
-                "commonname": commonname
+                "lastname": lastname
             })
             # Normalisation de isretiring
             is_retiring_raw = str(row.get("info.isretiring","")).strip().lower()
@@ -253,9 +251,7 @@ with open(CM_CSV, newline='', encoding='utf-8') as fh:
         # teamplayerlinks
         tpl = {
             "teamid": row.get("info.teams.club_team.id", ""),
-            "playerid": playerid,
-            "jerseynumber": row.get("info.teams.club_team.jerseynumber", ""),
-            "position": 29
+            "playerid": playerid
         }
         teamplayerlinks.append(tpl)
 

@@ -175,7 +175,7 @@ done
 # ---------------------------------------------------------
 echo "--- TEAMPLAYERLINKS ---"
 
-tail -n +2 "$CSV_TPL" | while IFS=';' read -r teamid playerid jerseynumber position
+tail -n +2 "$CSV_TPL" | while IFS=';' read -r teamid playerid 
 do
     tpl_teamid=$(echo "$teamid" | tr -d '" ' | xargs)
     tpl_playerid=$(echo "$playerid" | tr -d '" ' | xargs)
@@ -214,10 +214,10 @@ echo "--- FIN TEAMPLAYERLINKS ---"
 # ---------------------------------------------------------
 # 4) PLAYERNAMES
 # ---------------------------------------------------------
-tail -n +2 "$CSV_NAMES" | while IFS=';' read -r playerid firstname lastname commonname
+tail -n +2 "$CSV_NAMES" | while IFS=';' read -r playerid firstname lastname
 do
     # Insert the names if they don't already exist in the database
-    for NAME in "$firstname" "$lastname" "$commonname" ; do
+    for NAME in "$firstname" "$lastname" ; do
         [[ -z "$NAME" ]] && continue  # Skip if the name is empty
         exists=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$NAME';")
         if [[ -z "$exists" ]]; then
@@ -232,14 +232,12 @@ do
     # Get nameid for each name
     firstid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$firstname';")
     lastid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$lastname';")
-    commonid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$commonname';")
 
     # Update player information with the nameids
     $MYSQL_CMD -e "
     UPDATE players
     SET firstnameid=$firstid,
         lastnameid=$lastid,
-        commonnameid=$commonid,
         playerjerseynameid=$lastid
     WHERE playerid=$playerid;
     "
