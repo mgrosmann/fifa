@@ -31,7 +31,7 @@ IGNORE 1 LINES;
 tail -n +2 "$CSV_CMTRACKER" | while IFS=';' read -r \
 playerid overallrating potential birthdate playerjointeamdate contractvaliduntil \
 _ _ _ _ _ height weight \
-preferredfoot skillmoves internationalrep hashighqualityhead isretiring nationality \
+preferredfoot skillmoves internationalrep _ isretiring nationality \
 preferredposition1 preferredposition2 preferredposition3 preferredposition4 \
 acceleration sprintspeed agility balance jumping stamina strength reactions aggression interceptions positioning \
 vision ballcontrol crossing dribbling finishing freekickaccuracy headingaccuracy longpassing shortpassing marking \
@@ -119,7 +119,6 @@ SET
     preferredfoot='$preferredfoot',
     skillmoves=$skillmoves,
     internationalrep=$internationalrep,
-    hashighqualityhead='$hashighqualityhead',
     isretiring=$isretiring,
     nationality='$nationality',
     preferredposition1='$preferredposition1',
