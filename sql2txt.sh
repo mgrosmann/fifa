@@ -5,7 +5,7 @@
 # --------------------------
 
 
-DB="FIFA14"
+DB="FC26"
 cmd="mysql -uroot -proot -P 5000 -h127.0.0.1 -D $DB"
 DEST_DIR="/mnt/c/github/fifa/15/forfifa15/"
 mkdir -p "$DEST_DIR"
