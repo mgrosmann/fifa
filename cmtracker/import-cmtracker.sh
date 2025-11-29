@@ -222,26 +222,37 @@ echo "--- FIN TEAMPLAYERLINKS ---"
 # ---------------------------------------------------------
 tail -n +2 "$CSV_NAMES" | while IFS=';' read -r playerid firstname lastname commonname jerseyname
 do
-    for NAME in "$firstname" "$lastname" "$commonname" ; do
-        [[ -z "$NAME" ]] && continue
+    # Insert the names if they don't already exist in the database
+    for NAME in "$firstname" "$lastname" "$commonname" "$jerseyname"; do
+        [[ -z "$NAME" ]] && continue  # Skip if the name is empty
         exists=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$NAME';")
         if [[ -z "$exists" ]]; then
+            # Get the max nameid and increment it
             maxid=$($MYSQL_CMD --skip-column-names -e "SELECT IFNULL(MAX(nameid),0) FROM playernames;")
             newid=$((maxid+1))
+            # Insert the new name into playernames table
             $MYSQL_CMD -e "INSERT INTO playernames (nameid,name,commentaryid) VALUES ($newid,'$NAME',900000);"
         fi
     done
 
+    # Get nameid for each name
     firstid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$firstname';")
     lastid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$lastname';")
     commonid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$commonname';")
+    jerseyid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$jerseyname';")
 
+    # If lastname and jerseyname are the same, assign jerseyid to lastid
+    if [[ "$lastname" == "$jerseyname" ]]; then
+        jerseyid=$lastid
+    fi
+
+    # Update player information with the nameids
     $MYSQL_CMD -e "
-UPDATE players
-SET firstnameid=$firstid,
-    lastnameid=$lastid,
-    commonnameid=$commonid,
-    playerjerseynameid=$lastid
-WHERE playerid=$playerid;
-"
+    UPDATE players
+    SET firstnameid=$firstid,
+        lastnameid=$lastid,
+        commonnameid=$commonid,
+        playerjerseynameid=$jerseyid
+    WHERE playerid=$playerid;
+    "
 done
