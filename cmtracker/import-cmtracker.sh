@@ -222,7 +222,7 @@ echo "--- FIN TEAMPLAYERLINKS ---"
 # ---------------------------------------------------------
 tail -n +2 "$CSV_NAMES" | while IFS=';' read -r playerid firstname lastname commonname jerseyname
 do
-    for NAME in "$firstname" "$lastname" "$commonname" "$jerseyname"; do
+    for NAME in "$firstname" "$lastname" "$commonname" ; do
         [[ -z "$NAME" ]] && continue
         exists=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$NAME';")
         if [[ -z "$exists" ]]; then
@@ -235,14 +235,13 @@ do
     firstid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$firstname';")
     lastid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$lastname';")
     commonid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$commonname';")
-    jerseyid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$jerseyname';")
 
     $MYSQL_CMD -e "
 UPDATE players
 SET firstnameid=$firstid,
     lastnameid=$lastid,
-    commonnameid=$commonnameid,
-    playerjerseynameid=$jerseyid
+    commonnameid=$commonid,
+    playerjerseynameid=$lastid
 WHERE playerid=$playerid;
 "
 done
