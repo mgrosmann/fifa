@@ -161,5 +161,3 @@ done
 
 echo "🎯 Tous les fichiers de '$DB_NAME' ont été convertis et importés avec succès."
 
-echo "passage en int"
-mysql -uroot -proot -h127.0.0.1 -P5000 -DFC26 > sql/int.sql

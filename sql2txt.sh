@@ -54,6 +54,7 @@ for tbl in "${tables[@]}"; do
         echo "✅ $tbl exported successfully"
         
         # Convert with txt2utf16.sh
+        sed -i 's/\r//g' "$OUTFILE"
         iconv -f UTF-8 -t UTF-16LE "$OUTFILE" > "${OUTFILE%.*}_utf16.txt"
 
 # Move the converted file to DEST_DIR with the final name
