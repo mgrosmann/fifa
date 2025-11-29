@@ -220,10 +220,10 @@ echo "--- FIN TEAMPLAYERLINKS ---"
 # ---------------------------------------------------------
 # 4) PLAYERNAMES
 # ---------------------------------------------------------
-tail -n +2 "$CSV_NAMES" | while IFS=';' read -r playerid firstname lastname commonname jerseyname
+tail -n +2 "$CSV_NAMES" | while IFS=';' read -r playerid firstname lastname commonname
 do
     # Insert the names if they don't already exist in the database
-    for NAME in "$firstname" "$lastname" "$commonname" "$jerseyname"; do
+    for NAME in "$firstname" "$lastname" "$commonname" ; do
         [[ -z "$NAME" ]] && continue  # Skip if the name is empty
         exists=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$NAME';")
         if [[ -z "$exists" ]]; then
@@ -239,12 +239,6 @@ do
     firstid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$firstname';")
     lastid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$lastname';")
     commonid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$commonname';")
-    jerseyid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$jerseyname';")
-
-    # If lastname and jerseyname are the same, assign jerseyid to lastid
-    if [[ "$lastname" == "$jerseyname" ]]; then
-        jerseyid=$lastid
-    fi
 
     # Update player information with the nameids
     $MYSQL_CMD -e "
@@ -252,7 +246,7 @@ do
     SET firstnameid=$firstid,
         lastnameid=$lastid,
         commonnameid=$commonid,
-        playerjerseynameid=$jerseyid
+        playerjerseynameid=$lastid
     WHERE playerid=$playerid;
     "
 done
