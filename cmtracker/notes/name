@@ -40,3 +40,26 @@ WHERE nameid IN (
           AND p4.playerjerseynameid IS NULL
     ) AS t
 );
+SELECT 
+    pn.nameid,
+    pn.name,
+    p.playerid,
+    CASE 
+        WHEN p.firstnameid = pn.nameid THEN 'firstname'
+        WHEN p.lastnameid = pn.nameid THEN 'lastname'
+        WHEN p.commonnameid = pn.nameid THEN 'commonname'
+        WHEN p.playerjerseynameid = pn.nameid THEN 'jerseyname'
+    END AS used_as,
+    p.overallrating,
+    p.potential,
+    tpl.teamid,
+    CONCAT(pn1.name, ' ', pn2.name) AS fullname
+FROM playernames pn
+JOIN players p ON p.firstnameid = pn.nameid
+               OR p.lastnameid = pn.nameid
+               OR p.commonnameid = pn.nameid
+               OR p.playerjerseynameid = pn.nameid
+LEFT JOIN teamplayerlinks tpl ON p.playerid = tpl.playerid
+LEFT JOIN playernames pn1 ON p.firstnameid = pn1.nameid
+LEFT JOIN playernames pn2 ON p.lastnameid = pn2.nameid
+WHERE pn.name = 'Ronaldo';
