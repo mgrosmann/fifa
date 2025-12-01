@@ -18,19 +18,4 @@ name1.py analyse nouveau joueur et les envoie dans joueur existant si correspond
 name2.py se base sur le playerid indique les différences de nom pour 1 meme playerid (permet d'identifier quand 1 Playerid est occupé
 par un joueur qui ne devrait pas)
 
-recrée udogie (absent de 26)
-
-
-
-
-dans le pn.csv
-info.player.id;info.name.firstname;info.name.lastname;info.name.knownas;info.name.playerjerseyname
-241268;Endrick Felipe;Moreira de Souza;Endrick;Endrick
-241859;Riqui;Puig;Riqui Puig;Riqui Puig
-273025;Andrey N.;dos Santos;Andrey Santos;Andrey S.
-
-dans le csv cm tracker /mnt/c/github/csv/
-info.name.firstname	info.name.lastname	info.name.playerjerseyname	info.name.knownas
-Endrick Felipe,Moreira de Sousa,Endrick,Endrick
-Ricard,Puig Martí,Riqui Puig,Riqui Puig
-Andrey,N. dos Santos,Andrey Santos,Andrey Santos
+366
