@@ -1,0 +1,7 @@
+#uniquement firstname lastname new_csv
+Total noms uniques trouvés dans CSV : 634
+===== RÉSULTATS =====
+Noms déjà présents  : 311
+Noms manquants      : 323
+======================
+Slots nécessaires   : 323
