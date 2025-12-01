@@ -65,4 +65,4 @@ LEFT JOIN teamplayerlinks tpl ON p.playerid = tpl.playerid
 LEFT JOIN playernames pn1 ON p.firstnameid = pn1.nameid
 LEFT JOIN playernames pn2 ON p.lastnameid = pn2.nameid
 LEFT JOIN teams t ON tpl.teamid = t.teamid
-WHERE pn.name = 'Ronaldo';
+WHERE pn.name = 'Ronaldo' or pn.name = 'Cristiano';
