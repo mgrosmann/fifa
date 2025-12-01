@@ -16,23 +16,61 @@ if [[ "$default_exists" == "1" ]]; then
     $MYSQL_CMD -e "DELETE FROM players WHERE playerid=50075;"
 fi
 
-# Charger le template pour réutilisation
-$MYSQL_CMD -e "
-LOAD DATA LOCAL INFILE '$CSV_DEFAULT'
-INTO TABLE players
-FIELDS TERMINATED BY ';'
-LINES TERMINATED BY '\n'
-IGNORE 1 LINES;
-"
-
+# 2) PLAYERNAMES
 # ---------------------------------------------------------
-# 2) UPDATE / INSERT DES JOUEURS CMTRACKER
+tail -n +2 "$CSV_NAMES" | while IFS=';' read -r playerid firstname lastname
+do
+    # Vérifier si le joueur existe déjà dans players
+    player_exists=$($MYSQL_CMD --skip-column-names -e "SELECT 1 FROM players WHERE playerid=$playerid;")
+
+    # D’abord : insérer les noms dans playernames si nouveaux (logique inchangée)
+    for NAME in "$firstname" "$lastname" ; do
+        [[ -z "$NAME" ]] && continue
+        exists=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$NAME';")
+
+        if [[ -z "$exists" ]]; then
+            newid=$($MYSQL_CMD --skip-column-names -e "
+SELECT COALESCE(MIN(pn1.nameid + 1),1)
+FROM playernames pn1
+LEFT JOIN playernames pn2
+    ON pn1.nameid + 1 = pn2.nameid
+WHERE pn2.nameid IS NULL;
+" | tr -d '\n')
+
+            $MYSQL_CMD -e "
+INSERT INTO playernames (nameid,name,commentaryid)
+VALUES ($newid,'$NAME',900000);
+"
+        fi
+    done
+
+    # ❗ Si le joueur existe déjà dans players → on NE TOUCHE PAS à ses nameids
+    if [[ "$player_exists" == "1" ]]; then
+        echo "→ Joueur $playerid existe déjà : on ne modifie pas firstnameid/lastnameid"
+        continue
+    fi
+
+    # Sinon (nouveau joueur), on applique les nameids normalement
+    firstid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$firstname';")
+    lastid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$lastname';")
+
+    echo "→ Mise à jour des nameids pour le nouveau joueur $playerid"
+    $MYSQL_CMD -e "
+    UPDATE players
+    SET firstnameid=$firstid,
+        lastnameid=$lastid,
+        playerjerseynameid=$lastid
+    WHERE playerid=$playerid;
+    "
+done
+----------------------------------------
+# 3) UPDATE / INSERT DES JOUEURS CMTRACKER
 # ---------------------------------------------------------
 tail -n +2 "$CSV_CMTRACKER" | while IFS=';' read -r \
 playerid overallrating potential birthdate playerjointeamdate contractvaliduntil \
 _ _ _ _ _ height weight \
 preferredfoot skillmoves internationalrep _ isretiring nationality \
-preferredposition1 preferredposition2 preferredposition3 preferredposition4 \
+preferredposition1 preferredposition2 preferredposition3 preferredposition4 firstname lastname \
 acceleration sprintspeed agility balance jumping stamina strength reactions aggression interceptions positioning \
 vision ballcontrol crossing dribbling finishing freekickaccuracy headingaccuracy longpassing shortpassing marking \
 shotpower longshots standingtackle slidingtackle volleys curve penalties gkdiving gkhandling gkkicking gkreflexes gkpositioning
@@ -167,11 +205,26 @@ UPDATE players
 SET playerid=$playerid
 WHERE playerid=50075;
 "
+# 5) Mise à jour des nameids (maintenant que le joueur existe)
+firstid=$($MYSQL_CMD --skip-column-names \
+    -e "SELECT nameid FROM playernames WHERE name='$firstname';")
+
+lastid=$($MYSQL_CMD --skip-column-names \
+    -e "SELECT nameid FROM playernames WHERE name='$lastname';")
+
+$MYSQL_CMD -e "
+UPDATE players
+SET firstnameid=$firstid,
+    lastnameid=$lastid,
+    playerjerseynameid=$lastid
+WHERE playerid=$playerid;
+"
+
     fi
 done
 
 # ---------------------------------------------------------
-# 3) TEAMPLAYERLINKS
+# 4) TEAMPLAYERLINKS
 # ---------------------------------------------------------
 echo "--- TEAMPLAYERLINKS ---"
 
@@ -214,38 +267,4 @@ done
 echo "--- FIN TEAMPLAYERLINKS ---"
 
 # ---------------------------------------------------------
-# 4) PLAYERNAMES
-# ---------------------------------------------------------
-tail -n +2 "$CSV_NAMES" | while IFS=';' read -r playerid firstname lastname
-do
-    # Insert the names if they don't already exist in the database
-    for NAME in "$firstname" "$lastname" ; do
-        [[ -z "$NAME" ]] && continue  # Skip if the name is empty
-        exists=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$NAME';")
-        if [[ -z "$exists" ]]; then
-            # Get the max nameid and increment it
-                newid=$($MYSQL_CMD --skip-column-names -e "
-SELECT COALESCE(MIN(pn1.nameid + 1),1)
-FROM playernames pn1
-LEFT JOIN playernames pn2
-    ON pn1.nameid + 1 = pn2.nameid
-WHERE pn2.nameid IS NULL;
-" | tr -d '\n')
-            # Insert the new name into playernames table
-            $MYSQL_CMD -e "INSERT INTO playernames (nameid,name,commentaryid) VALUES ($newid,'$NAME',900000);"
-        fi
-    done
 
-    # Get nameid for each name
-    firstid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$firstname';")
-    lastid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$lastname';")
-
-    # Update player information with the nameids
-    $MYSQL_CMD -e "
-    UPDATE players
-    SET firstnameid=$firstid,
-        lastnameid=$lastid,
-        playerjerseynameid=$lastid
-    WHERE playerid=$playerid;
-    "
-done

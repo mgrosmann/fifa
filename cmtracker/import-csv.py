@@ -234,6 +234,10 @@ with open(CM_CSV, newline='', encoding='utf-8') as fh:
             "preferredposition2": p2,
             "preferredposition3": p3,
             "preferredposition4": p4,
+            "firstname": firstname,
+            "lastname": lastname,
+
+            
         }
         for src, dest in ATTRIBUTE_MAP.items():
             player[dest] = row.get(src, "")
