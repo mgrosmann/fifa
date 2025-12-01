@@ -8,6 +8,9 @@ tr '\t' ';' < players.txt > players.csv
 
 new.py genere 2 csv -> nouveau joueur et joueur existant
 name.py -> indique les slots nécéssaires dans playernames
-name1.py analyse nouveau joueur et les envoie dans joueur existant si correspondance (sauf andrey santos, a faire manuellement)
+name1.py analyse nouveau joueur et les envoie dans joueur existant si correspondance
+(sauf andrey santos, riui puig, endrick a faire manuellement -> les virer dans existant)
 name2.py se base sur le playerid indique les différences de nom pour 1 meme playerid (permet d'identifier quand 1 Playerid est occupé
 par un joueur qui ne devrait pas)
+
+recrée udogie (absent de 26)
