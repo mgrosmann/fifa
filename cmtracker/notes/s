@@ -1,0 +1,6 @@
+sql15 -e "SELECT players.playerid AS \`info.player.id\`,
+          pn1.name AS \`info.name.firstname\`,
+          pn2.name AS \`info.name.lastname\`
+FROM players
+INNER JOIN playernames pn1 ON players.firstnameid = pn1.nameid
+INNER JOIN playernames pn2 ON players.lastnameid = pn2.nameid;" > pn.txt

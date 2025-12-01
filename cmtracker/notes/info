@@ -1,7 +1,13 @@
-#uniquement firstname lastname new_csv
-Total noms uniques trouvés dans CSV : 634
-===== RÉSULTATS =====
-Noms déjà présents  : 311
-Noms manquants      : 323
-======================
-Slots nécessaires   : 323
+sql15 -e "SELECT players.playerid AS \`info.player.id\`,
+          pn1.name AS \`info.name.firstname\`,
+          pn2.name AS \`info.name.lastname\`
+FROM players
+INNER JOIN playernames pn1 ON players.firstnameid = pn1.nameid
+INNER JOIN playernames pn2 ON players.lastnameid = pn2.nameid;" > pn.txt
+tr '\t' ';' < players.txt > players.csv
+
+new.py genere 2 csv -> nouveau joueur et joueur existant
+name.py -> indique les slots nécéssaires dans playernames
+name1.py analyse nouveau joueur et les envoie dans joueur existant si correspondance (sauf andrey santos, a faire manuellement)
+name2.py se base sur le playerid indique les différences de nom pour 1 meme playerid (permet d'identifier quand 1 Playerid est occupé
+par un joueur qui ne devrait pas)
