@@ -30,3 +30,14 @@ update:
 
 238216
 mysql -uroot -proot -h127.0.0.1 -P5000 -DFIFA15 --skip-column-names -e "Select t.teamid from teams t inner join teamplayerlinks tpl on t.teamid = tpl.teamid where tpl.playerid = '251566' order by t.teamid asc limit 1;"
+
+
+UPDATE players
+    SET firstnameid=2100
+10035,
+        lastnameid=6607,
+        playerjerseynameid=6607
+    WHERE playerid=275029
+Ibrahim
+
+Ibrahimovic

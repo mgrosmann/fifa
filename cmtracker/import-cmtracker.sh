@@ -15,56 +15,7 @@ if [[ "$default_exists" == "1" ]]; then
     echo "→ Suppression du joueur par défaut 50075"
     $MYSQL_CMD -e "DELETE FROM players WHERE playerid=50075;"
 fi
-
-# 2) PLAYERNAMES
-# ---------------------------------------------------------
-tail -n +2 "$CSV_NAMES" | while IFS=';' read -r playerid firstname lastname
-do
-    # Vérifier si le joueur existe déjà dans players
-    player_exists=$($MYSQL_CMD --skip-column-names -e "SELECT 1 FROM players WHERE playerid=$playerid;")
-
-    # D’abord : insérer les noms dans playernames si nouveaux (logique inchangée)
-    for NAME in "$firstname" "$lastname" ; do
-        [[ -z "$NAME" ]] && continue
-        exists=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$NAME';")
-
-        if [[ -z "$exists" ]]; then
-            newid=$($MYSQL_CMD --skip-column-names -e "
-SELECT COALESCE(MIN(pn1.nameid + 1),1)
-FROM playernames pn1
-LEFT JOIN playernames pn2
-    ON pn1.nameid + 1 = pn2.nameid
-WHERE pn2.nameid IS NULL;
-" | tr -d '\n')
-
-            $MYSQL_CMD -e "
-INSERT INTO playernames (nameid,name,commentaryid)
-VALUES ($newid,'$NAME',900000);
-"
-        fi
-    done
-
-    # ❗ Si le joueur existe déjà dans players → on NE TOUCHE PAS à ses nameids
-    if [[ "$player_exists" == "1" ]]; then
-        echo "→ Joueur $playerid existe déjà : on ne modifie pas firstnameid/lastnameid"
-        continue
-    fi
-
-    # Sinon (nouveau joueur), on applique les nameids normalement
-    firstid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$firstname' limit 1;")
-    lastid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$lastname' limit 1;")
-
-    echo "→ Mise à jour des nameids pour le nouveau joueur $playerid"
-    $MYSQL_CMD -e "
-    UPDATE players
-    SET firstnameid=$firstid,
-        lastnameid=$lastid,
-        playerjerseynameid=$lastid
-    WHERE playerid=$playerid;
-    "
-done
-----------------------------------------
-# 3) UPDATE / INSERT DES JOUEURS CMTRACKER
+# 2) UPDATE / INSERT DES JOUEURS CMTRACKER
 # ---------------------------------------------------------
 tail -n +2 "$CSV_CMTRACKER" | while IFS=';' read -r \
 playerid overallrating potential birthdate playerjointeamdate contractvaliduntil \
