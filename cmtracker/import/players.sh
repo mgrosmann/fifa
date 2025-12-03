@@ -96,7 +96,7 @@ LINES TERMINATED BY '\n'
 IGNORE 1 LINES;
 "
 
-        # 3) Mise à jour des données
+        # 3) Mise à jour des données du template
         $MYSQL_CMD -e "
 UPDATE players
 SET
@@ -159,18 +159,19 @@ SET playerid=$playerid
 WHERE playerid=50075;
 "
 
-#5) Mise à jour des nameids (maintenant que le joueur existe)
-firstid=$($MYSQL_CMD --skip-column-names \
-    -e "SELECT nameid FROM playernames WHERE name='$firstname' LIMIT 1;")
+        # 5) Mise à jour des nameids
+        firstid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$firstname' LIMIT 1;")
+        lastid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$lastname' LIMIT 1;")
 
-lastid=$($MYSQL_CMD --skip-column-names \
-    -e "SELECT nameid FROM playernames WHERE name='$lastname' LIMIT 1;")
-
-$MYSQL_CMD -e "
+        $MYSQL_CMD -e "
 UPDATE players
 SET firstnameid=$firstid,
     lastnameid=$lastid,
     playerjerseynameid=$lastid
 WHERE playerid=$playerid;
+"
+    fi
+
+done
 
 echo "=== FIN IMPORT PLAYERS ==="
