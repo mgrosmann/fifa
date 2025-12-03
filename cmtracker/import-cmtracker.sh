@@ -207,10 +207,10 @@ WHERE playerid=50075;
 "
 # 5) Mise à jour des nameids (maintenant que le joueur existe)
 firstid=$($MYSQL_CMD --skip-column-names \
-    -e "SELECT nameid FROM playernames WHERE name='$firstname';")
+    -e "SELECT nameid FROM playernames WHERE name='$firstname' LIMIT 1;")
 
 lastid=$($MYSQL_CMD --skip-column-names \
-    -e "SELECT nameid FROM playernames WHERE name='$lastname';")
+    -e "SELECT nameid FROM playernames WHERE name='$lastname' LIMIT 1;")
 
 $MYSQL_CMD -e "
 UPDATE players
