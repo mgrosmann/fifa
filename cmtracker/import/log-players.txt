@@ -720,7 +720,7 @@ SET firstnameid=8134,
     playerjerseynameid=8154
 WHERE playerid=274447;
 
-SELECT p.playerid, p.overallrating, CONCAT(pn_first.name, ' ', pn_last.name) as fullname, pn_first.nameid, pn_last.nameid FROM players p JOIN playernames pn_first ON p.firstnameid = pn_first.nameid JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid WHERE p.playerid = 277427 ;
+SELECT p.playerid, p.overallrating, CONCAT(pn_first.name, ' ', pn_last.name) as fullname, pn_first.nameid, pn_last.nameid FROM players p JOIN playernames pn_first ON p.firstnameid = pn_first.nameid JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid WHERE p.playerid = 278773 ;
 
 faire une save sql 
 mysqldump -uroot -proot -h127.0.0.1 -P5000 FIFA15 > save1.sql
@@ -735,3 +735,29 @@ cat teamplayerlinks.csv | sed -E \
     -e 's/^131681;/47;/' \
     -e 's/^131682;/44;/' > tpl_fixed.csv
 grep "130017;" tpl_fixed.csv | head
+
+artificialkey 
+SET @k := -1;
+
+UPDATE teamplayerlinks t
+JOIN (
+    SELECT playerid, teamid, position,
+           (@k := @k + 1) AS new_key
+    FROM teamplayerlinks
+    ORDER BY teamid, position, playerid
+) x
+ON t.playerid = x.playerid AND t.teamid = x.teamid AND t.position = x.position
+SET t.artificialkey = x.new_key;
+
+
+suuprimer doublon (teamid x playerid)
+ALTER TABLE teamplayerlinks 
+ADD COLUMN tmp_id INT AUTO_INCREMENT PRIMARY KEY;
+DELETE t1
+FROM teamplayerlinks t1
+INNER JOIN teamplayerlinks t2
+    ON t1.teamid = t2.teamid
+    AND t1.playerid = t2.playerid
+    AND t1.position = t2.position
+    AND t1.artificialkey = t2.artificialkey
+    AND t1.tmp_id > t2.tmp_id;
