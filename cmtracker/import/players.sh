@@ -158,10 +158,8 @@ UPDATE players
 SET playerid=$playerid
 WHERE playerid=50075;
 "
-    fi
-done
 
- 5) Mise à jour des nameids (maintenant que le joueur existe)
+#5) Mise à jour des nameids (maintenant que le joueur existe)
 firstid=$($MYSQL_CMD --skip-column-names \
     -e "SELECT nameid FROM playernames WHERE name='$firstname' LIMIT 1;")
 
