@@ -2,8 +2,8 @@
 
 MYSQL_CMD="mysql -uroot -proot -h127.0.0.1 -P5000 -DFIFA15 -N -s"
 
-CSV_CMTRACKER="/mnt/c/github/fifa/cmtracker/players.csv"
-CSV_DEFAULT="/mnt/c/github/fifa/cmtracker/test.csv"
+CSV_CMTRACKER="/mnt/c/github/fifa/cmtracker/import/players.csv"
+CSV_DEFAULT="/mnt/c/github/fifa/cmtracker/import/test.csv"
 
 echo "=== IMPORT / UPDATE PLAYERS ==="
 

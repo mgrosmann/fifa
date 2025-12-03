@@ -6,8 +6,8 @@ import os
 base_dir = "/mnt/c/github/csv/"
 folders = ["wonderkid", "old wonderkid", "very old"]
 fifa_csv = "/mnt/c/github/txt/FIFA15/csv/players.csv"
-output_new_file = "/mnt/c/github/nouveaux_joueurs.csv"
-output_existing_file = "/mnt/c/github/joueurs_existants.csv"
+output_new_file = "/mnt/c/github/fifa/cmtracker/import/nouveaux_joueurs.csv"
+output_existing_file = "/mnt/c/github/fifa/cmtracker/import/joueurs_existants.csv"
 
 # --- Charger DB FIFA ---
 fifa_db = pd.read_csv(fifa_csv, sep=";")
