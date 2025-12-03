@@ -1,0 +1,737 @@
+=== IMPORT / UPDATE PLAYERS ===
+== Joueur : 70004 ==
+→ Nouveau joueur : création via template
+== Joueur : 71178 ==
+→ Nouveau joueur : création via template
+== Joueur : 71418 ==
+→ Nouveau joueur : création via template
+== Joueur : 72159 ==
+→ Nouveau joueur : création via template
+== Joueur : 74463 ==
+→ Nouveau joueur : création via template
+== Joueur : 76410 ==
+→ Nouveau joueur : création via template
+== Joueur : 78012 ==
+→ Nouveau joueur : création via template
+== Joueur : 81491 ==
+→ Nouveau joueur : création via template
+== Joueur : 262265 ==
+→ Nouveau joueur : création via template
+== Joueur : 268737 ==
+→ Nouveau joueur : création via template
+== Joueur : 270857 ==
+→ Nouveau joueur : création via template
+== Joueur : 275029 ==
+→ Nouveau joueur : création via template
+== Joueur : 275522 ==
+→ Nouveau joueur : création via template
+== Joueur : 276694 ==
+→ Nouveau joueur : création via template
+== Joueur : 277225 ==
+→ Nouveau joueur : création via template
+== Joueur : 277427 ==
+→ Nouveau joueur : création via template
+--------------
+SELECT nameid FROM playernames WHERE name='O'Reilly' LIMIT 1;
+--------------
+
+ERROR 1064 (42000) at line 1: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'Reilly' LIMIT 1' at line 1
+--------------
+UPDATE players
+SET firstnameid=664,
+    lastnameid=,
+    playerjerseynameid=
+WHERE playerid=277427
+--------------
+
+ERROR 1064 (42000) at line 2: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ',
+    playerjerseynameid=
+WHERE playerid=277427' at line 3
+== Joueur : 277909 ==
+→ Nouveau joueur : création via template
+== Joueur : 278061 ==
+→ Nouveau joueur : création via template
+== Joueur : 278499 ==
+→ Nouveau joueur : création via template
+== Joueur : 70497 ==
+→ Nouveau joueur : création via template
+== Joueur : 70888 ==
+→ Nouveau joueur : création via template
+== Joueur : 73884 ==
+→ Nouveau joueur : création via template
+== Joueur : 78063 ==
+→ Nouveau joueur : création via template
+== Joueur : 80384 ==
+→ Nouveau joueur : création via template
+== Joueur : 80915 ==
+→ Nouveau joueur : création via template
+== Joueur : 263640 ==
+→ Nouveau joueur : création via template
+== Joueur : 266237 ==
+→ Nouveau joueur : création via template
+== Joueur : 266895 ==
+→ Nouveau joueur : création via template
+== Joueur : 271057 ==
+→ Nouveau joueur : création via template
+== Joueur : 275411 ==
+→ Nouveau joueur : création via template
+== Joueur : 277022 ==
+→ Nouveau joueur : création via template
+== Joueur : 277689 ==
+→ Nouveau joueur : création via template
+== Joueur : 279497 ==
+→ Nouveau joueur : création via template
+== Joueur : 71651 ==
+→ Nouveau joueur : création via template
+== Joueur : 73885 ==
+→ Nouveau joueur : création via template
+== Joueur : 74209 ==
+→ Nouveau joueur : création via template
+== Joueur : 77126 ==
+→ Nouveau joueur : création via template
+== Joueur : 81319 ==
+→ Nouveau joueur : création via template
+== Joueur : 82106 ==
+→ Nouveau joueur : création via template
+== Joueur : 261108 ==
+→ Nouveau joueur : création via template
+== Joueur : 266245 ==
+→ Nouveau joueur : création via template
+== Joueur : 269230 ==
+→ Nouveau joueur : création via template
+== Joueur : 273459 ==
+→ Nouveau joueur : création via template
+== Joueur : 276346 ==
+→ Nouveau joueur : création via template
+== Joueur : 278003 ==
+→ Nouveau joueur : création via template
+== Joueur : 278391 ==
+→ Nouveau joueur : création via template
+== Joueur : 278659 ==
+→ Nouveau joueur : création via template
+== Joueur : 279128 ==
+→ Nouveau joueur : création via template
+== Joueur : 279758 ==
+→ Nouveau joueur : création via template
+== Joueur : 70679 ==
+→ Nouveau joueur : création via template
+== Joueur : 71350 ==
+→ Nouveau joueur : création via template
+== Joueur : 72093 ==
+→ Nouveau joueur : création via template
+== Joueur : 73921 ==
+→ Nouveau joueur : création via template
+== Joueur : 74142 ==
+→ Nouveau joueur : création via template
+== Joueur : 75055 ==
+→ Nouveau joueur : création via template
+== Joueur : 76416 ==
+→ Nouveau joueur : création via template
+== Joueur : 77033 ==
+→ Nouveau joueur : création via template
+== Joueur : 80570 ==
+→ Nouveau joueur : création via template
+== Joueur : 269823 ==
+→ Nouveau joueur : création via template
+== Joueur : 271114 ==
+→ Nouveau joueur : création via template
+== Joueur : 272958 ==
+→ Nouveau joueur : création via template
+== Joueur : 274934 ==
+→ Nouveau joueur : création via template
+== Joueur : 275291 ==
+→ Nouveau joueur : création via template
+== Joueur : 275592 ==
+→ Nouveau joueur : création via template
+== Joueur : 276048 ==
+→ Nouveau joueur : création via template
+== Joueur : 276216 ==
+→ Nouveau joueur : création via template
+== Joueur : 277327 ==
+→ Nouveau joueur : création via template
+== Joueur : 278228 ==
+→ Nouveau joueur : création via template
+== Joueur : 278813 ==
+→ Nouveau joueur : création via template
+== Joueur : 71998 ==
+→ Nouveau joueur : création via template
+== Joueur : 74413 ==
+→ Nouveau joueur : création via template
+== Joueur : 75736 ==
+→ Nouveau joueur : création via template
+== Joueur : 76944 ==
+→ Nouveau joueur : création via template
+== Joueur : 77354 ==
+→ Nouveau joueur : création via template
+== Joueur : 273599 ==
+→ Nouveau joueur : création via template
+== Joueur : 274915 ==
+→ Nouveau joueur : création via template
+== Joueur : 276372 ==
+→ Nouveau joueur : création via template
+== Joueur : 277283 ==
+→ Nouveau joueur : création via template
+== Joueur : 278600 ==
+→ Nouveau joueur : création via template
+== Joueur : 279622 ==
+→ Nouveau joueur : création via template
+== Joueur : 279841 ==
+→ Nouveau joueur : création via template
+== Joueur : 70786 ==
+→ Nouveau joueur : création via template
+== Joueur : 70903 ==
+→ Nouveau joueur : création via template
+== Joueur : 71106 ==
+→ Nouveau joueur : création via template
+== Joueur : 72419 ==
+→ Nouveau joueur : création via template
+== Joueur : 72754 ==
+→ Nouveau joueur : création via template
+== Joueur : 74094 ==
+→ Nouveau joueur : création via template
+== Joueur : 74449 ==
+→ Nouveau joueur : création via template
+== Joueur : 74544 ==
+→ Nouveau joueur : création via template
+== Joueur : 74626 ==
+→ Nouveau joueur : création via template
+== Joueur : 74970 ==
+→ Nouveau joueur : création via template
+== Joueur : 74980 ==
+→ Nouveau joueur : création via template
+== Joueur : 75087 ==
+→ Nouveau joueur : création via template
+== Joueur : 76624 ==
+→ Nouveau joueur : création via template
+== Joueur : 76784 ==
+→ Nouveau joueur : création via template
+== Joueur : 76879 ==
+→ Nouveau joueur : création via template
+== Joueur : 77415 ==
+→ Nouveau joueur : création via template
+== Joueur : 78014 ==
+→ Nouveau joueur : création via template
+== Joueur : 78049 ==
+→ Nouveau joueur : création via template
+== Joueur : 79587 ==
+→ Nouveau joueur : création via template
+== Joueur : 79771 ==
+→ Nouveau joueur : création via template
+== Joueur : 270039 ==
+→ Nouveau joueur : création via template
+== Joueur : 274913 ==
+→ Nouveau joueur : création via template
+== Joueur : 275137 ==
+→ Nouveau joueur : création via template
+== Joueur : 277465 ==
+→ Nouveau joueur : création via template
+== Joueur : 277484 ==
+→ Nouveau joueur : création via template
+== Joueur : 277969 ==
+→ Nouveau joueur : création via template
+== Joueur : 279934 ==
+→ Nouveau joueur : création via template
+== Joueur : 70862 ==
+→ Nouveau joueur : création via template
+== Joueur : 71174 ==
+→ Nouveau joueur : création via template
+== Joueur : 74344 ==
+→ Nouveau joueur : création via template
+== Joueur : 74473 ==
+→ Nouveau joueur : création via template
+== Joueur : 74749 ==
+→ Nouveau joueur : création via template
+== Joueur : 75156 ==
+→ Nouveau joueur : création via template
+== Joueur : 76125 ==
+→ Nouveau joueur : création via template
+== Joueur : 77638 ==
+→ Nouveau joueur : création via template
+== Joueur : 77934 ==
+→ Nouveau joueur : création via template
+== Joueur : 80597 ==
+→ Nouveau joueur : création via template
+== Joueur : 278318 ==
+→ Nouveau joueur : création via template
+== Joueur : 278578 ==
+→ Nouveau joueur : création via template
+== Joueur : 278923 ==
+→ Nouveau joueur : création via template
+== Joueur : 279252 ==
+→ Nouveau joueur : création via template
+== Joueur : 70037 ==
+→ Nouveau joueur : création via template
+== Joueur : 70496 ==
+→ Nouveau joueur : création via template
+== Joueur : 70994 ==
+→ Nouveau joueur : création via template
+== Joueur : 71330 ==
+→ Nouveau joueur : création via template
+== Joueur : 71997 ==
+→ Nouveau joueur : création via template
+== Joueur : 73049 ==
+→ Nouveau joueur : création via template
+== Joueur : 73098 ==
+→ Nouveau joueur : création via template
+== Joueur : 73286 ==
+→ Nouveau joueur : création via template
+== Joueur : 74207 ==
+→ Nouveau joueur : création via template
+== Joueur : 75074 ==
+→ Nouveau joueur : création via template
+== Joueur : 75148 ==
+→ Nouveau joueur : création via template
+== Joueur : 75452 ==
+→ Nouveau joueur : création via template
+== Joueur : 75533 ==
+→ Nouveau joueur : création via template
+== Joueur : 75598 ==
+→ Nouveau joueur : création via template
+== Joueur : 76116 ==
+→ Nouveau joueur : création via template
+== Joueur : 76411 ==
+→ Nouveau joueur : création via template
+== Joueur : 77152 ==
+→ Nouveau joueur : création via template
+== Joueur : 77760 ==
+→ Nouveau joueur : création via template
+== Joueur : 78549 ==
+→ Nouveau joueur : création via template
+== Joueur : 78859 ==
+→ Nouveau joueur : création via template
+== Joueur : 81406 ==
+→ Nouveau joueur : création via template
+== Joueur : 262657 ==
+→ Nouveau joueur : création via template
+== Joueur : 266681 ==
+→ Nouveau joueur : création via template
+== Joueur : 268414 ==
+→ Nouveau joueur : création via template
+== Joueur : 268916 ==
+→ Nouveau joueur : création via template
+== Joueur : 277194 ==
+→ Nouveau joueur : création via template
+== Joueur : 277448 ==
+→ Nouveau joueur : création via template
+== Joueur : 277871 ==
+→ Nouveau joueur : création via template
+== Joueur : 278035 ==
+→ Nouveau joueur : création via template
+== Joueur : 278350 ==
+→ Nouveau joueur : création via template
+== Joueur : 278372 ==
+→ Nouveau joueur : création via template
+== Joueur : 279572 ==
+→ Nouveau joueur : création via template
+== Joueur : 279731 ==
+→ Nouveau joueur : création via template
+== Joueur : 279777 ==
+→ Nouveau joueur : création via template
+== Joueur : 76740 ==
+→ Nouveau joueur : création via template
+== Joueur : 77644 ==
+→ Nouveau joueur : création via template
+== Joueur : 79800 ==
+→ Nouveau joueur : création via template
+== Joueur : 79821 ==
+→ Nouveau joueur : création via template
+== Joueur : 80665 ==
+→ Nouveau joueur : création via template
+== Joueur : 81427 ==
+→ Nouveau joueur : création via template
+== Joueur : 81845 ==
+→ Nouveau joueur : création via template
+== Joueur : 271265 ==
+→ Nouveau joueur : création via template
+== Joueur : 272445 ==
+→ Nouveau joueur : création via template
+== Joueur : 276377 ==
+→ Nouveau joueur : création via template
+== Joueur : 76396 ==
+→ Nouveau joueur : création via template
+== Joueur : 76501 ==
+→ Nouveau joueur : création via template
+== Joueur : 77170 ==
+→ Nouveau joueur : création via template
+== Joueur : 77174 ==
+→ Nouveau joueur : création via template
+== Joueur : 77325 ==
+→ Nouveau joueur : création via template
+== Joueur : 77349 ==
+→ Nouveau joueur : création via template
+== Joueur : 77527 ==
+→ Nouveau joueur : création via template
+== Joueur : 77814 ==
+→ Nouveau joueur : création via template
+== Joueur : 78261 ==
+→ Nouveau joueur : création via template
+== Joueur : 78926 ==
+→ Nouveau joueur : création via template
+== Joueur : 79110 ==
+→ Nouveau joueur : création via template
+== Joueur : 79300 ==
+→ Nouveau joueur : création via template
+== Joueur : 79432 ==
+→ Nouveau joueur : création via template
+== Joueur : 80018 ==
+→ Nouveau joueur : création via template
+== Joueur : 80816 ==
+→ Nouveau joueur : création via template
+== Joueur : 80882 ==
+→ Nouveau joueur : création via template
+== Joueur : 259522 ==
+→ Nouveau joueur : création via template
+== Joueur : 262109 ==
+→ Nouveau joueur : création via template
+== Joueur : 271248 ==
+→ Nouveau joueur : création via template
+== Joueur : 271918 ==
+→ Nouveau joueur : création via template
+== Joueur : 272718 ==
+→ Nouveau joueur : création via template
+== Joueur : 273537 ==
+→ Nouveau joueur : création via template
+== Joueur : 273546 ==
+→ Nouveau joueur : création via template
+== Joueur : 273628 ==
+→ Nouveau joueur : création via template
+== Joueur : 273884 ==
+→ Nouveau joueur : création via template
+== Joueur : 274226 ==
+→ Nouveau joueur : création via template
+== Joueur : 274447 ==
+→ Nouveau joueur : création via template
+--------------
+SELECT nameid FROM playernames WHERE name='Ngal'ayel' LIMIT 1;
+--------------
+
+ERROR 1064 (42000) at line 1: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'ayel' LIMIT 1' at line 1
+--------------
+UPDATE players
+SET firstnameid=,
+    lastnameid=8154,
+    playerjerseynameid=8154
+WHERE playerid=274447
+--------------
+
+ERROR 1064 (42000) at line 2: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ',
+    lastnameid=8154,
+    playerjerseynameid=8154
+WHERE playerid=274447' at line 2
+== Joueur : 275246 ==
+→ Nouveau joueur : création via template
+== Joueur : 275301 ==
+→ Nouveau joueur : création via template
+== Joueur : 275436 ==
+→ Nouveau joueur : création via template
+== Joueur : 277118 ==
+→ Nouveau joueur : création via template
+== Joueur : 76687 ==
+→ Nouveau joueur : création via template
+== Joueur : 76739 ==
+→ Nouveau joueur : création via template
+== Joueur : 79399 ==
+→ Nouveau joueur : création via template
+== Joueur : 271807 ==
+→ Nouveau joueur : création via template
+== Joueur : 276602 ==
+→ Nouveau joueur : création via template
+== Joueur : 277269 ==
+→ Nouveau joueur : création via template
+== Joueur : 278773 ==
+→ Nouveau joueur : création via template
+== Joueur : 279173 ==
+→ Nouveau joueur : création via template
+== Joueur : 71305 ==
+→ Nouveau joueur : création via template
+== Joueur : 71351 ==
+→ Nouveau joueur : création via template
+== Joueur : 71532 ==
+→ Nouveau joueur : création via template
+== Joueur : 72997 ==
+→ Nouveau joueur : création via template
+== Joueur : 80376 ==
+→ Nouveau joueur : création via template
+== Joueur : 269728 ==
+→ Nouveau joueur : création via template
+== Joueur : 270821 ==
+→ Nouveau joueur : création via template
+== Joueur : 271266 ==
+→ Nouveau joueur : création via template
+== Joueur : 272505 ==
+→ Le joueur existe déjà : mise à jour
+== Joueur : 275192 ==
+→ Nouveau joueur : création via template
+== Joueur : 275328 ==
+→ Nouveau joueur : création via template
+== Joueur : 278340 ==
+→ Nouveau joueur : création via template
+== Joueur : 278567 ==
+→ Nouveau joueur : création via template
+== Joueur : 278780 ==
+→ Nouveau joueur : création via template
+== Joueur : 279015 ==
+→ Nouveau joueur : création via template
+== Joueur : 279044 ==
+→ Nouveau joueur : création via template
+== Joueur : 279202 ==
+→ Nouveau joueur : création via template
+== Joueur : 269701 ==
+→ Nouveau joueur : création via template
+== Joueur : 275051 ==
+→ Nouveau joueur : création via template
+== Joueur : 275138 ==
+→ Nouveau joueur : création via template
+== Joueur : 275353 ==
+→ Nouveau joueur : création via template
+== Joueur : 279604 ==
+→ Nouveau joueur : création via template
+== Joueur : 254803 ==
+→ Nouveau joueur : création via template
+== Joueur : 272600 ==
+→ Nouveau joueur : création via template
+== Joueur : 273604 ==
+→ Nouveau joueur : création via template
+== Joueur : 273748 ==
+→ Nouveau joueur : création via template
+== Joueur : 273752 ==
+→ Nouveau joueur : création via template
+== Joueur : 74566 ==
+→ Nouveau joueur : création via template
+== Joueur : 254022 ==
+→ Nouveau joueur : création via template
+== Joueur : 259066 ==
+→ Nouveau joueur : création via template
+== Joueur : 263798 ==
+→ Nouveau joueur : création via template
+== Joueur : 267860 ==
+→ Nouveau joueur : création via template
+== Joueur : 270674 ==
+→ Nouveau joueur : création via template
+== Joueur : 272455 ==
+→ Nouveau joueur : création via template
+== Joueur : 273906 ==
+→ Nouveau joueur : création via template
+== Joueur : 276295 ==
+→ Nouveau joueur : création via template
+== Joueur : 276493 ==
+→ Nouveau joueur : création via template
+== Joueur : 80170 ==
+→ Nouveau joueur : création via template
+== Joueur : 256261 ==
+→ Le joueur existe déjà : mise à jour
+== Joueur : 260272 ==
+→ Nouveau joueur : création via template
+== Joueur : 260931 ==
+→ Nouveau joueur : création via template
+== Joueur : 264492 ==
+→ Nouveau joueur : création via template
+== Joueur : 277206 ==
+→ Nouveau joueur : création via template
+== Joueur : 73374 ==
+→ Nouveau joueur : création via template
+== Joueur : 75605 ==
+→ Nouveau joueur : création via template
+== Joueur : 80911 ==
+→ Nouveau joueur : création via template
+== Joueur : 265578 ==
+→ Le joueur existe déjà : mise à jour
+== Joueur : 265726 ==
+→ Nouveau joueur : création via template
+== Joueur : 272894 ==
+→ Nouveau joueur : création via template
+== Joueur : 71114 ==
+→ Nouveau joueur : création via template
+== Joueur : 246174 ==
+→ Le joueur existe déjà : mise à jour
+== Joueur : 256500 ==
+→ Nouveau joueur : création via template
+== Joueur : 267974 ==
+→ Nouveau joueur : création via template
+== Joueur : 268895 ==
+→ Nouveau joueur : création via template
+== Joueur : 269558 ==
+→ Nouveau joueur : création via template
+== Joueur : 273028 ==
+→ Nouveau joueur : création via template
+== Joueur : 274209 ==
+→ Nouveau joueur : création via template
+== Joueur : 275401 ==
+→ Nouveau joueur : création via template
+== Joueur : 276278 ==
+→ Nouveau joueur : création via template
+== Joueur : 276471 ==
+→ Nouveau joueur : création via template
+== Joueur : 277594 ==
+→ Nouveau joueur : création via template
+== Joueur : 76042 ==
+→ Nouveau joueur : création via template
+== Joueur : 81231 ==
+→ Nouveau joueur : création via template
+== Joueur : 259716 ==
+→ Nouveau joueur : création via template
+== Joueur : 264174 ==
+→ Nouveau joueur : création via template
+== Joueur : 264220 ==
+→ Nouveau joueur : création via template
+== Joueur : 74788 ==
+→ Nouveau joueur : création via template
+== Joueur : 74866 ==
+→ Nouveau joueur : création via template
+== Joueur : 74896 ==
+→ Nouveau joueur : création via template
+== Joueur : 258437 ==
+→ Nouveau joueur : création via template
+== Joueur : 258601 ==
+→ Nouveau joueur : création via template
+== Joueur : 258730 ==
+→ Nouveau joueur : création via template
+== Joueur : 264263 ==
+→ Nouveau joueur : création via template
+== Joueur : 72745 ==
+→ Nouveau joueur : création via template
+== Joueur : 266331 ==
+→ Nouveau joueur : création via template
+== Joueur : 270728 ==
+→ Nouveau joueur : création via template
+== Joueur : 271414 ==
+→ Nouveau joueur : création via template
+== Joueur : 272895 ==
+→ Nouveau joueur : création via template
+== Joueur : 277211 ==
+→ Nouveau joueur : création via template
+== Joueur : 277483 ==
+→ Nouveau joueur : création via template
+== Joueur : 278262 ==
+→ Nouveau joueur : création via template
+== Joueur : 278399 ==
+→ Nouveau joueur : création via template
+== Joueur : 279027 ==
+→ Nouveau joueur : création via template
+== Joueur : 279188 ==
+→ Nouveau joueur : création via template
+== Joueur : 70651 ==
+→ Nouveau joueur : création via template
+== Joueur : 70726 ==
+→ Nouveau joueur : création via template
+== Joueur : 70845 ==
+→ Nouveau joueur : création via template
+== Joueur : 73449 ==
+→ Nouveau joueur : création via template
+== Joueur : 266422 ==
+→ Nouveau joueur : création via template
+== Joueur : 268131 ==
+→ Nouveau joueur : création via template
+== Joueur : 271512 ==
+→ Nouveau joueur : création via template
+== Joueur : 271741 ==
+→ Nouveau joueur : création via template
+== Joueur : 273875 ==
+→ Nouveau joueur : création via template
+== Joueur : 275209 ==
+→ Nouveau joueur : création via template
+== Joueur : 276634 ==
+→ Nouveau joueur : création via template
+== Joueur : 277178 ==
+→ Nouveau joueur : création via template
+== Joueur : 277517 ==
+→ Nouveau joueur : création via template
+== Joueur : 277809 ==
+→ Nouveau joueur : création via template
+== Joueur : 277929 ==
+→ Nouveau joueur : création via template
+== Joueur : 278096 ==
+→ Nouveau joueur : création via template
+== Joueur : 279769 ==
+→ Nouveau joueur : création via template
+== Joueur : 254310 ==
+→ Nouveau joueur : création via template
+== Joueur : 255266 ==
+→ Nouveau joueur : création via template
+== Joueur : 260479 ==
+→ Nouveau joueur : création via template
+== Joueur : 263022 ==
+→ Nouveau joueur : création via template
+== Joueur : 253004 ==
+→ Le joueur existe déjà : mise à jour
+== Joueur : 255460 ==
+→ Nouveau joueur : création via template
+== Joueur : 255981 ==
+→ Nouveau joueur : création via template
+== Joueur : 256104 ==
+→ Nouveau joueur : création via template
+== Joueur : 256800 ==
+→ Nouveau joueur : création via template
+== Joueur : 258936 ==
+→ Nouveau joueur : création via template
+== Joueur : 261422 ==
+→ Nouveau joueur : création via template
+== Joueur : 262862 ==
+→ Nouveau joueur : création via template
+== Joueur : 263194 ==
+→ Nouveau joueur : création via template
+== Joueur : 263824 ==
+→ Nouveau joueur : création via template
+== Joueur : 265390 ==
+→ Nouveau joueur : création via template
+== Joueur : 265577 ==
+→ Nouveau joueur : création via template
+== Joueur : 73398 ==
+→ Nouveau joueur : création via template
+== Joueur : 70334 ==
+→ Nouveau joueur : création via template
+== Joueur : 70344 ==
+→ Nouveau joueur : création via template
+== Joueur : 74462 ==
+→ Nouveau joueur : création via template
+== Joueur : 75628 ==
+→ Nouveau joueur : création via template
+== Joueur : 238216 ==
+→ Le joueur existe déjà : mise à jour
+== Joueur : 77673 ==
+→ Nouveau joueur : création via template
+== Joueur : 73078 ==
+→ Nouveau joueur : création via template
+== Joueur : 242434 ==
+→ Le joueur existe déjà : mise à jour
+== Joueur : 255654 ==
+→ Le joueur existe déjà : mise à jour
+== Joueur : 73562 ==
+→ Le joueur existe déjà : mise à jour
+== Joueur : 239892 ==
+→ Le joueur existe déjà : mise à jour
+== Joueur : 242816 ==
+→ Le joueur existe déjà : mise à jour
+== Joueur : 243627 ==
+→ Le joueur existe déjà : mise à jour
+== Joueur : 258966 ==
+→ Le joueur existe déjà : mise à jour
+
+#correction pour '
+UPDATE players
+SET firstnameid=664,
+    lastnameid=6569,
+    playerjerseynameid=6569
+WHERE playerid=277427;
+
+UPDATE players
+SET firstnameid=8134,
+    lastnameid=8154,
+    playerjerseynameid=8154
+WHERE playerid=274447;
+
+SELECT p.playerid, p.overallrating, CONCAT(pn_first.name, ' ', pn_last.name) as fullname, pn_first.nameid, pn_last.nameid FROM players p JOIN playernames pn_first ON p.firstnameid = pn_first.nameid JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid WHERE p.playerid = 277427 ;
+
+faire une save sql 
+mysqldump -uroot -proot -h127.0.0.1 -P5000 FIFA15 > save1.sql
+
+tail -n +2 teamplayerlinks.csv | sed -E \
+    -e 's/^211;/130017;/' \
+    -e 's/^131798;/111592;/' \
+    -e 's/^110711;/111592;/' \
+    -e 's/^110908;/111592;/' \
+    -e 's/^112908;/111592;/' \
+    -e 's/^101047;/130015;/' \
+    -e 's/^131681;/47;/' \
+    -e 's/^131682;/44;/' > tpl_fixed.csv
+grep "130017;" tpl_fixed.csv | head
