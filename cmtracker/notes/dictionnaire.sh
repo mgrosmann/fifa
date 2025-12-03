@@ -9,9 +9,8 @@ CSV_NAMES="/mnt/c/github/fifa/cmtracker/playernames.csv"
 while IFS=';' read -r playerid firstname lastname
 do
     # Nettoyage des espaces et retours chariot
-firstname=$(echo "$firstname" | sed 's/\r$//' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-lastname=$(echo "$lastname"  | sed 's/\r$//' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-
+firstname=$(echo "$firstname" | sed "s/'//g" | sed 's/\r$//' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+lastname=$(echo "$lastname"  | sed "s/'//g" | sed 's/\r$//' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
 
 
     for NAME in "$firstname" "$lastname"; do
@@ -40,4 +39,5 @@ VALUES ($newid, '$NAME', 900000);
         fi
     done
 done < <(tail -n +2 "$CSV_NAMES")  # ignorer l'en-tête CSV
+
 
