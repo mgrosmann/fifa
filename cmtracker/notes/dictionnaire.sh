@@ -9,8 +9,9 @@ CSV_NAMES="/mnt/c/github/fifa/cmtracker/playernames.csv"
 while IFS=';' read -r playerid firstname lastname
 do
     # Nettoyage des espaces et retours chariot
-    firstname=$(echo "$firstname" | tr -d '\r' | xargs)
-    lastname=$(echo "$lastname" | tr -d '\r' | xargs)
+firstname=$(echo "$firstname" | tr -d '\r' | xargs | tr -cd '\11\12\15\40-\176')
+lastname=$(echo "$lastname"  | tr -d '\r' | xargs | tr -cd '\11\12\15\40-\176')
+
 
     for NAME in "$firstname" "$lastname"; do
         [[ -z "$NAME" ]] && continue  # Ignorer les champs vides
