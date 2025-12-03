@@ -51,8 +51,8 @@ VALUES ($newid,'$NAME',900000);
     fi
 
     # Sinon (nouveau joueur), on applique les nameids normalement
-    firstid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$firstname';")
-    lastid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$lastname';")
+    firstid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$firstname' limit 1;")
+    lastid=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$lastname' limit 1;")
 
     echo "→ Mise à jour des nameids pour le nouveau joueur $playerid"
     $MYSQL_CMD -e "
