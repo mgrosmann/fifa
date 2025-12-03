@@ -725,7 +725,7 @@ SELECT p.playerid, p.overallrating, CONCAT(pn_first.name, ' ', pn_last.name) as 
 faire une save sql 
 mysqldump -uroot -proot -h127.0.0.1 -P5000 FIFA15 > save1.sql
 
-tail -n +2 teamplayerlinks.csv | sed -E \
+cat teamplayerlinks.csv | sed -E \
     -e 's/^211;/130017;/' \
     -e 's/^131798;/111592;/' \
     -e 's/^110711;/111592;/' \
