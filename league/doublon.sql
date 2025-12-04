@@ -2,6 +2,7 @@
 --16 ligue 1, 17 : ligue 2, 19 : Bundesliga, 20 : 2. Bundesliga,
 --31 : Serie A, 32 : Serie B, 53 : Liga BBVA, 54 : Liga Adelante
 --countryid 14 : Angleterre, 18 : France, 21 : Allemagne, 27 : Italie, 45 : Espagne
+--place 20 et 20 france, 18 et 18 allemagne, italy 20 et 22, espagne 20 et 22, angleterre 20, 24 24 24
 ------------------------------------------------------------------
 -- Afficher le nombre d'équipes pour chaque championnat ciblé
 SELECT l.leagueid, l.level, COUNT(ltl.teamid) AS nb_equipes
@@ -34,11 +35,10 @@ JOIN (
 WHERE l.countryid IN (34,14,18,21,27,45,38)
 GROUP BY t.teamid, t.teamname
 HAVING COUNT(DISTINCT ltl.leagueid) > 1
-ORDER BY t.teamname;-
+ORDER BY t.teamname;
 ----------------------------------------------------------------
 --supprimer une équipe en trop
-delete from leagueteamlinks
-where teamid = <TEAM_ID> AND leagueid = <LEAGUEID>;
+delete from leagueteamlinks where teamid = 0  AND leagueid = 0;
 --remplacer l'équipe <OLD_TEAMID> par <NEW_TEAMID> dans la ligue <LEAGUEID>
 UPDATE leagueteamlinks
 SET teamid = <NEW_TEAMID> --equipe libre

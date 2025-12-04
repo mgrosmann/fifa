@@ -17,7 +17,8 @@ import os
 from datetime import datetime
 
 # --- Configuration ---
-CM_CSV = "nouveaux_joueurs.csv"                # input CM Tracker CSV
+CM_CSV = "nouveaux_joueurs.csv"
+#CM_CSV = "joueurs_existants.csv"                  # pour mettre a jour
 OUTPUT_PLAYERS = "players.csv"
 OUTPUT_PLAYERNAMES = "playernames.csv"
 OUTPUT_PLAYERLOANS = "playerloans.csv"

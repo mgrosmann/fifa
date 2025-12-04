@@ -6,6 +6,7 @@ import os
 base_dir = "/mnt/c/github/csv/"
 folders = ["wonderkid", "old wonderkid", "very old"]
 fifa_csv = "/mnt/c/github/txt/FIFA15/csv/players.csv"
+#fifa_csv = "/mnt/c/github/fifa/cmtracker/import/players.csv"
 output_new_file = "/mnt/c/github/fifa/cmtracker/import/nouveaux_joueurs.csv"
 output_existing_file = "/mnt/c/github/fifa/cmtracker/import/joueurs_existants.csv"
 

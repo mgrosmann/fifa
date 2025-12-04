@@ -761,3 +761,19 @@ INNER JOIN teamplayerlinks t2
     AND t1.position = t2.position
     AND t1.artificialkey = t2.artificialkey
     AND t1.tmp_id > t2.tmp_id;
+
+    doublon:
+
+
+SELECT *
+FROM teamplayerlinks
+WHERE artificialkey IN (
+    SELECT artificialkey
+    FROM teamplayerlinks
+    GROUP BY artificialkey
+    HAVING COUNT(*) > 1
+)
+ORDER BY artificialkey;
+
+256104
+278901
