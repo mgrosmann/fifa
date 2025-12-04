@@ -33,7 +33,7 @@ BASE_DATE = datetime(2014, 1, 1)
 ABBR_TO_CODE = {
     "GK": 0, "RWB": 2, "RWF": 2, "RB": 3, "CB": 5,
     "LB": 7, "LWB": 8, "LWF": 8, "CDM": 10, "CM": 14,
-    "LM": 12, "RM": 16, "CAM": 18, "CF": 21, "ST": 25,
+    "LM": 16, "RM": 12, "CAM": 18, "CF": 21, "ST": 25,
     "CF/SS": 21, "RW": 23, "LW": 27,
 }
 
