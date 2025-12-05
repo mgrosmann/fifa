@@ -720,7 +720,7 @@ SET firstnameid=8134,
     playerjerseynameid=8154
 WHERE playerid=274447;
 
-SELECT p.playerid, p.overallrating, CONCAT(pn_first.name, ' ', pn_last.name) as fullname, pn_first.nameid, pn_last.nameid FROM players p JOIN playernames pn_first ON p.firstnameid = pn_first.nameid JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid WHERE p.playerid = 278773 ;
+SELECT p.playerid, p.overallrating, CONCAT(pn_first.name, ' ', pn_last.name) as fullname, pn_first.nameid, pn_last.nameid FROM players p JOIN playernames pn_first ON p.firstnameid = pn_first.nameid JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid WHERE p.playerid = 247888 ;
 
 faire une save sql 
 mysqldump -uroot -proot -h127.0.0.1 -P5000 FIFA15 > save1.sql
@@ -737,6 +737,7 @@ cat teamplayerlinks.csv | sed -E \
 grep "130017;" tpl_fixed.csv | head
 
 artificialkey 
+
 SET @k := -1;
 
 UPDATE teamplayerlinks t
@@ -776,4 +777,3 @@ WHERE artificialkey IN (
 ORDER BY artificialkey;
 
 256104
-278901

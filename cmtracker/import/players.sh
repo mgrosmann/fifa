@@ -41,6 +41,7 @@ SET
     overallrating=$overallrating,
     potential=$potential,
     contractvaliduntil='$contractvaliduntil',
+    playerjointeamdate='$playerjointeamdate',
     internationalrep=$internationalrep,
     preferredposition1='$preferredposition1',
     preferredposition2='$preferredposition2',
