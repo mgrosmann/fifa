@@ -26,9 +26,9 @@ authorized_condition="(
 )
 AND NOT ($exclude_condition)"
 
-OUTPUT_FILE="players_export.csv"
+OUTPUT_FILE="players.csv"
 OUTPUT_NAMES="playernames.csv"
-OUTPUT_TPL="teamplayerlinks_export.csv"
+OUTPUT_TPL="teamplayerlinks.csv"
 
 
 echo "🔍 Export des joueurs filtrés…"
