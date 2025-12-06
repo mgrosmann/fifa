@@ -8,6 +8,16 @@ CSV_TPL="/mnt/c/github/fifa/player/import/teamplayerlinks.csv"
 AUTH_TEAMS="21,22,32,34,44,45,46,47,48,52,65,66,73,240,241,243,461,483,110374"
 FREE_AGENT=111592
 
+# Exclusion pour équipes spéciales
+exclude_condition="(
+    t.teamname LIKE '%All star%'
+ OR t.teamname LIKE '%Adidas%'
+ OR t.teamname LIKE '%Nike%'
+ OR t.teamname LIKE '% xi%'
+ OR t.teamname LIKE '%allstar%'
+ OR ltl.leagueid = 78
+)"
+
 echo "🚨 Libération des joueurs PL / clubs majeurs (mise à FREE_AGENT)..."
 $MYSQL_CMD -e "
 UPDATE teamplayerlinks tpl
@@ -27,7 +37,13 @@ do
 
     # Vérifier si le joueur existe dans n'importe quelle équipe
     existing_team=$($MYSQL_CMD --skip-column-names -e "
-        SELECT teamid FROM teamplayerlinks WHERE playerid=$tpl_playerid;
+SELECT tpl.teamid
+FROM teamplayerlinks tpl
+LEFT JOIN teams t ON tpl.teamid = t.teamid
+LEFT JOIN leagueteamlinks ltl ON tpl.teamid = ltl.teamid
+WHERE tpl.playerid=$tpl_playerid
+  AND NOT $exclude_condition
+LIMIT 1;
     ")
 
     if [[ -n "$existing_team" ]]; then
@@ -50,7 +66,7 @@ WHERE teamid=$tpl_teamid AND playerid=$tpl_playerid;
             "
             echo "✔ Player $tpl_playerid mis à jour dans team $tpl_teamid"
         else
-            # Joueur dans une autre équipe → déplacement
+            # Déplacement uniquement si pas équipe exclue
             echo "↳ Déplacement de $tpl_playerid de team $existing_team → $tpl_teamid"
             KEY=$($MYSQL_CMD --skip-column-names -e "SELECT IFNULL(MAX(artificialkey)+1,1) FROM teamplayerlinks WHERE teamid=$tpl_teamid;")
 
