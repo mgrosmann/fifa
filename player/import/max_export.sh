@@ -27,7 +27,7 @@ authorized_condition="(
 AND NOT ($exclude_condition)"
 
 OUTPUT_FILE="players_export.csv"
-OUTPUT_NAMES="players_names_teams.csv"
+OUTPUT_NAMES="playernames.csv"
 OUTPUT_TPL="teamplayerlinks_export.csv"
 
 
@@ -58,20 +58,16 @@ echo "📥 Export filtré enregistré dans : $OUTPUT_FILE"
 # ===================================================================
 
 $cmd -e "
-SELECT DISTINCT
+SELECT DISTINCT  p.playerid,
     pn_first.name AS firstname,
-    pn_last.name  AS lastname,
-    tpl.teamid,
-    p.playerid,
-    p.overallrating
+    pn_last.name  AS lastname
 FROM players p
 JOIN playernames pn_first ON p.firstnameid = pn_first.nameid
 JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid
-JOIN teamplayerlinks tpl  ON p.playerid    = tpl.playerid
+JOIN teamplayerlinks tpl  ON tpl.playerid  = p.playerid
 JOIN teams t              ON tpl.teamid    = t.teamid
 JOIN leagueteamlinks ltl  ON tpl.teamid    = ltl.teamid
-WHERE $authorized_condition
-ORDER BY CAST(p.playerid AS UNSIGNED) ASC;
+WHERE $authorized_condition;
 " | sed 's/\t/;/g' > "$OUTPUT_NAMES"
 
 echo "💾 CSV léger exporté dans : $OUTPUT_NAMES"

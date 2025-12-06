@@ -1,0 +1,68 @@
+--nombre de nom non utiliser
+SELECT COUNT(*) AS nb_a_supprimer
+FROM playernames pn
+LEFT JOIN players p1 ON p1.firstnameid = pn.nameid
+LEFT JOIN players p2 ON p2.lastnameid = pn.nameid
+LEFT JOIN players p3 ON p3.commonnameid = pn.nameid
+LEFT JOIN players p4 ON p4.playerjerseynameid = pn.nameid
+WHERE p1.firstnameid IS NULL
+  AND p2.lastnameid IS NULL
+  AND p3.commonnameid IS NULL
+  AND p4.playerjerseynameid IS NULL;
+--les noms inactif
+SELECT pn.nameid, pn.name
+FROM playernames pn
+LEFT JOIN players p1 ON p1.firstnameid = pn.nameid
+LEFT JOIN players p2 ON p2.lastnameid = pn.nameid
+LEFT JOIN players p3 ON p3.commonnameid = pn.nameid
+LEFT JOIN players p4 ON p4.playerjerseynameid = pn.nameid
+WHERE p1.firstnameid IS NULL
+  AND p2.lastnameid IS NULL
+  AND p3.commonnameid IS NULL
+  AND p4.playerjerseynameid IS NULL;
+--place libre
+SELECT 29000 - COUNT(*) AS nb_libres
+FROM playernames;
+--supprimer
+DELETE FROM playernames
+WHERE nameid IN (
+    SELECT nameid
+    FROM (
+        SELECT pn.nameid
+        FROM playernames pn
+        LEFT JOIN players p1 ON p1.firstnameid = pn.nameid
+        LEFT JOIN players p2 ON p2.lastnameid = pn.nameid
+        LEFT JOIN players p3 ON p3.commonnameid = pn.nameid
+        LEFT JOIN players p4 ON p4.playerjerseynameid = pn.nameid
+        WHERE p1.firstnameid IS NULL
+          AND p2.lastnameid IS NULL
+          AND p3.commonnameid IS NULL
+          AND p4.playerjerseynameid IS NULL
+    ) AS t
+);
+--utilisation d'un nom
+SELECT 
+    pn.nameid,
+    pn.name,
+    p.playerid,
+    CASE 
+        WHEN p.firstnameid = pn.nameid THEN 'firstname'
+        WHEN p.lastnameid = pn.nameid THEN 'lastname'
+        WHEN p.commonnameid = pn.nameid THEN 'commonname'
+        WHEN p.playerjerseynameid = pn.nameid THEN 'jerseyname'
+    END AS used_as,
+    p.overallrating,
+    p.potential,
+    tpl.teamid,
+    t.teamname,
+    CONCAT(pn1.name, ' ', pn2.name) AS fullname
+FROM playernames pn
+JOIN players p ON p.firstnameid = pn.nameid
+               OR p.lastnameid = pn.nameid
+               OR p.commonnameid = pn.nameid
+               OR p.playerjerseynameid = pn.nameid
+LEFT JOIN teamplayerlinks tpl ON p.playerid = tpl.playerid
+LEFT JOIN playernames pn1 ON p.firstnameid = pn1.nameid
+LEFT JOIN playernames pn2 ON p.lastnameid = pn2.nameid
+LEFT JOIN teams t ON tpl.teamid = t.teamid
+WHERE pn.name = 'Ronaldo' or pn.name = 'Cristiano';
