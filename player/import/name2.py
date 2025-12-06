@@ -11,7 +11,7 @@ conn = mysql.connector.connect(
     port=5000,
     user="root",
     password="root",
-    database="FIFA16"
+    database="FIFA15"
 )
 cursor = conn.cursor()
 
