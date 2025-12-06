@@ -1,12 +1,9 @@
 import pandas as pd
-import glob
 import os
 
 # --- CONFIG ---
-base_dir = "/mnt/c/github/csv/"
-folders = ["wonderkid", "old wonderkid", "very old"]
+csv_file = "/mnt/c/github/fifa/player/import/players.csv"  # chemin du CSV unique
 fifa_csv = "/mnt/c/github/txt/FIFA15/csv/players.csv"
-#fifa_csv = "/mnt/c/github/fifa/cmtracker/import/players.csv"
 output_new_file = "/mnt/c/github/fifa/cmtracker/import/nouveaux_joueurs.csv"
 output_existing_file = "/mnt/c/github/fifa/cmtracker/import/joueurs_existants.csv"
 
@@ -24,31 +21,26 @@ joueurs_nouveaux = 0
 nouveaux = []
 existants = []
 
-# --- Parcourir tous les CSV CM Tracker ---
-for folder in folders:
-    path = os.path.join(base_dir, folder, "*.csv")
-    for file in glob.glob(path):
-        # CSV CM Tracker utilise , et " comme quotechar
-        df = pd.read_csv(file, sep=",", quotechar='"')
+# --- Charger le CSV unique ---
+df = pd.read_csv(csv_file, sep=",", quotechar='"')
 
-        if "info.playerid" not in df.columns:
-            print(f"⚠️  Fichier {file} : colonne 'info.playerid' introuvable. Colonnes : {df.columns.tolist()}")
-            continue
+if "playerid" not in df.columns:
+    raise ValueError(f"La colonne 'playerid' est introuvable dans {csv_file}. Colonnes disponibles : {df.columns.tolist()}")
 
-        for _, row in df.iterrows():
-            pid = row.get("info.playerid")
-            if pid is None:
-                continue
-            pid = str(pid).strip()
-            total_joueurs += 1
+for _, row in df.iterrows():
+    pid = row.get("playerid")
+    if pid is None:
+        continue
+    pid = str(pid).strip()
+    total_joueurs += 1
 
-            row["source"] = folder
-            if pid in fifa_ids:
-                joueurs_deja += 1
-                existants.append(row)
-            else:
-                joueurs_nouveaux += 1
-                nouveaux.append(row)
+    row["source"] = os.path.basename(csv_file)  # on peut garder le nom du fichier comme source
+    if pid in fifa_ids:
+        joueurs_deja += 1
+        existants.append(row)
+    else:
+        joueurs_nouveaux += 1
+        nouveaux.append(row)
 
 # --- Export CSV ---
 pd.DataFrame(nouveaux).to_csv(output_new_file, index=False)
@@ -62,4 +54,3 @@ print(f"Nouveaux joueurs : {joueurs_nouveaux}")
 print("========================")
 print(f"CSV des nouveaux joueurs → {output_new_file}")
 print(f"CSV des joueurs existants → {output_existing_file}")
-

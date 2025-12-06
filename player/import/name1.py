@@ -8,10 +8,8 @@ pn_file = "/mnt/c/github/fifa/pn.csv"
 output_existants_file = "/mnt/c/github/joueurs_existants.csv"
 
 # Colonnes prénom/nom
-fn_col = 'info.name.firstname'
-ln_col = 'info.name.lastname'
-knownas_col = 'info.name.knownas'
-jersey_col = 'info.name.playerjerseyname'
+fn_col = 'firstname'
+ln_col = 'lastname'
 
 # Lecture CSV
 nouveaux_df = pd.read_csv(nouveaux_file)
@@ -30,24 +28,15 @@ def normalize_name(name):
 # Normaliser colonnes
 nouveaux_df['full_name'] = (nouveaux_df[fn_col].map(normalize_name) + ' ' +
                             nouveaux_df[ln_col].map(normalize_name))
-nouveaux_df['knownas_norm'] = nouveaux_df.get(knownas_col, '').map(normalize_name)
-
 pn_df['full_name'] = (pn_df[fn_col].map(normalize_name) + ' ' +
                       pn_df[ln_col].map(normalize_name))
-pn_df['knownas_norm'] = pn_df.get(knownas_col, '').map(normalize_name)
-pn_df['jersey_norm'] = pn_df.get(jersey_col, '').map(normalize_name)
 
 # Créer sets pour recherche rapide
-pn_knownas_set = set(pn_df[pn_df['knownas_norm'] != '']['knownas_norm'])
 pn_firstlast_set = set(pn_df['full_name'])
-pn_jersey_set = set(pn_df['jersey_norm'])
 
 # Détecter les joueurs existants
 existants_mask = (
-    nouveaux_df['full_name'].isin(pn_firstlast_set) |
-    nouveaux_df['full_name'].isin(pn_jersey_set) |
-    nouveaux_df['knownas_norm'].isin(pn_knownas_set) |
-    nouveaux_df['knownas_norm'].isin(pn_jersey_set)
+    nouveaux_df['full_name'].isin(pn_firstlast_set)
 )
 
 existants_df = nouveaux_df[existants_mask].copy()

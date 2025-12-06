@@ -11,7 +11,7 @@ conn = mysql.connector.connect(
     port=5000,
     user="root",
     password="root",
-    database="FIFA15"
+    database="FIFA16"
 )
 cursor = conn.cursor()
 
@@ -20,11 +20,11 @@ joueurs_csv = []
 with open(CSV_FILE, newline="", encoding="utf-8") as f:
     reader = csv.DictReader(f)
     for row in reader:
-        if "info.playerid" in row and row["info.playerid"].strip():
+        if "playerid" in row and row["playerid"].strip():
             joueurs_csv.append({
-                "playerid": int(row["info.playerid"].strip()),
-                "csv_firstname": row.get("info.name.firstname", "").strip(),
-                "csv_lastname": row.get("info.name.lastname", "").strip()
+                "playerid": int(row["playerid"].strip()),
+                "csv_firstname": row.get("firstname", "").strip(),
+                "csv_lastname": row.get("lastname", "").strip()
             })
 
 print(f"Total joueurs uniques dans CSV : {len(joueurs_csv)}")

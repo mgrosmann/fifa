@@ -18,14 +18,14 @@ noms = set()
 with open(CSV_FILE, newline="", encoding="utf-8") as f:
     reader = csv.DictReader(f)
     for row in reader:
-        if "info.name.firstname" in row and row["info.name.firstname"].strip():
-            noms.add(row["info.name.firstname"].strip())
-        if "info.name.lastname" in row and row["info.name.lastname"].strip():
-            noms.add(row["info.name.lastname"].strip())
-        #if "info.name.playerjerseyname" in row and row["info.name.playerjerseyname"].strip():
-        #    noms.add(row["info.name.playerjerseyname"].strip())
-        #if "info.name.knownas" in row and row["info.name.knownas"].strip():
-        #    noms.add(row["info.name.knownas"].strip())
+        if "firstname" in row and row["firstname"].strip():
+            noms.add(row["firstname"].strip())
+        if "lastname" in row and row["lastname"].strip():
+            noms.add(row["lastname"].strip())
+        #if "playerjerseyname" in row and row["playerjerseyname"].strip():
+        #    noms.add(row["playerjerseyname"].strip())
+        #if "knownas" in row and row["knownas"].strip():
+        #    noms.add(row["knownas"].strip())
 
 print(f"Total noms uniques trouvés dans CSV : {len(noms)}")
 
