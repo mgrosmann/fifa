@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-MYSQL_CMD="mysql -uroot -proot -h127.0.0.1 -P5000 -DFIFA15 -N -s"
+MYSQL_CMD="mysql -uroot -proot -h127.0.0.1 -P5000 -DFC15 -N -s"
 
 CSV_NAMES="/mnt/c/github/fifa/player/import/playernames.csv"
 CSV_PLAYERS="/mnt/c/github/fifa/cmtracker/import/players.csv"

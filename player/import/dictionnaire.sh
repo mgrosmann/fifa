@@ -1,7 +1,10 @@
 #!/bin/bash
 
-MYSQL_CMD="mysql -uroot -proot -h127.0.0.1 -P5000 -DFIFA15 -N -s"
-CSV_NAMES="/mnt/c/github/fifa/cmtracker/import/playernames.csv"
+MYSQL_CMD="mysql -uroot -proot -h127.0.0.1 -P5000 -DFC15 -N -s"
+CSV_NAMES="/mnt/c/github/fifa/player/import/playernames.csv"
+sed -i "s/'//g" playernames.csv
+sed -i "s/'//g" players.csv
+sed -i "s/'//g" teamplayerlinks.csv
 
 # ---------------------------------------------------------
 # 1) INSERT DES NOMS DANS playernames SI ABSENTS
