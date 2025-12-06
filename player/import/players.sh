@@ -2,6 +2,7 @@
 set -e
 
 MYSQL_CMD="mysql -uroot -proot -h127.0.0.1 -P5000 -DFIFA15 -N -s"
+
 CSV_NAMES="/mnt/c/github/fifa/player/import/playernames.csv"
 CSV_PLAYERS="/mnt/c/github/fifa/cmtracker/import/players.csv"
 
@@ -29,10 +30,10 @@ tail -n +2 "$CSV_NAMES" | while IFS=';' read -r playerid firstname lastname comm
 
     for FIELD in "firstname" "lastname" "commonname" "playerjerseyname"; do
         NAME=${!FIELD}
-        [[ -z "$NAME" || "$NAME" == "NULL" ]] && continue
+        [[ -z "$NAME" || "$NAME" == "NULL" ]] && continue  # Ignorer vide ou 'NULL'
 
-        # Récupérer le nameid existant dans playernames
-        ids[$FIELD]=$($MYSQL_CMD -e "SELECT nameid FROM playernames WHERE name='$NAME' LIMIT 1;")
+        # Récupérer le nameid dans playernames
+        ids[$FIELD]=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$NAME' LIMIT 1;")
     done
 
     # Construire la clause SET

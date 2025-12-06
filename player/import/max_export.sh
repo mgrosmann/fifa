@@ -58,16 +58,22 @@ echo "📥 Export filtré enregistré dans : $OUTPUT_FILE"
 # ===================================================================
 
 $cmd -e "
-SELECT DISTINCT  p.playerid,
+SELECT DISTINCT
+    p.playerid,
     pn_first.name AS firstname,
-    pn_last.name  AS lastname
+    pn_last.name  AS lastname,
+    pn_common.name AS commonname,
+    pn_jersey.name AS playerjerseyname
 FROM players p
-JOIN playernames pn_first ON p.firstnameid = pn_first.nameid
-JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid
-JOIN teamplayerlinks tpl  ON tpl.playerid  = p.playerid
-JOIN teams t              ON tpl.teamid    = t.teamid
-JOIN leagueteamlinks ltl  ON tpl.teamid    = ltl.teamid
-WHERE $authorized_condition;
+JOIN playernames pn_first   ON p.firstnameid = pn_first.nameid
+JOIN playernames pn_last    ON p.lastnameid  = pn_last.nameid
+LEFT JOIN playernames pn_common  ON p.commonnameid        = pn_common.nameid
+LEFT JOIN playernames pn_jersey  ON p.playerjerseynameid  = pn_jersey.nameid
+JOIN teamplayerlinks tpl     ON tpl.playerid = p.playerid
+JOIN teams t                 ON tpl.teamid   = t.teamid
+JOIN leagueteamlinks ltl     ON tpl.teamid   = ltl.teamid
+WHERE $authorized_condition
+ORDER BY CAST(p.playerid AS UNSIGNED) ASC;
 " | sed 's/\t/;/g' > "$OUTPUT_NAMES"
 
 echo "💾 CSV léger exporté dans : $OUTPUT_NAMES"

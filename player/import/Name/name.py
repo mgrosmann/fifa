@@ -1,8 +1,8 @@
 import csv
 import mysql.connector
 
-#CSV_FILE = "/mnt/c/github/joueurs_existants.csv"
-CSV_FILE = "/mnt/c/github/nouveaux_joueurs.csv"
+CSV_FILE = "/mnt/c/github/fifa/player/import/playernames.csv"
+
 # --- Connexion MySQL ---
 conn = mysql.connector.connect(
     host="127.0.0.1",
@@ -16,16 +16,16 @@ cursor = conn.cursor()
 # --- Lecture CSV ---
 noms = set()
 with open(CSV_FILE, newline="", encoding="utf-8") as f:
-    reader = csv.DictReader(f)
+    reader = csv.DictReader(f, delimiter=";")  # <-- IMPORTANT
     for row in reader:
-        if "firstname" in row and row["firstname"].strip():
-            noms.add(row["firstname"].strip())
-        if "lastname" in row and row["lastname"].strip():
-            noms.add(row["lastname"].strip())
-        #if "playerjerseyname" in row and row["playerjerseyname"].strip():
-        #    noms.add(row["playerjerseyname"].strip())
-        #if "knownas" in row and row["knownas"].strip():
-        #    noms.add(row["knownas"].strip())
+
+        firstname = row.get("firstname", "").strip()
+        lastname = row.get("lastname", "").strip()
+
+        if firstname:
+            noms.add(firstname)
+        if lastname:
+            noms.add(lastname)
 
 print(f"Total noms uniques trouvés dans CSV : {len(noms)}")
 
@@ -34,7 +34,10 @@ deja = 0
 nouveaux = 0
 
 for nom in noms:
-    cursor.execute("SELECT nameid FROM playernames WHERE LOWER(name) = LOWER(%s);", (nom,))
+    cursor.execute(
+        "SELECT nameid FROM playernames WHERE LOWER(name) = LOWER(%s);",
+        (nom,)
+    )
     result = cursor.fetchall()
     if result:
         deja += 1
@@ -49,4 +52,3 @@ print(f"Slots nécessaires   : {nouveaux}")
 
 cursor.close()
 conn.close()
-
