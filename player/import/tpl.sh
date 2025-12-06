@@ -25,14 +25,15 @@ do
     tpl_playerid=$(echo "$playerid" | tr -d '" ' | xargs)
     [[ -z "$tpl_teamid" || -z "$tpl_playerid" ]] && continue
 
-    # Vérifier si le joueur existe déjà dans cette équipe
-    exists_tpl=$($MYSQL_CMD --skip-column-names -e "
-        SELECT 1 FROM teamplayerlinks WHERE teamid=$tpl_teamid AND playerid=$tpl_playerid;
+    # Vérifier si le joueur existe dans n'importe quelle équipe
+    existing_team=$($MYSQL_CMD --skip-column-names -e "
+        SELECT teamid FROM teamplayerlinks WHERE playerid=$tpl_playerid;
     ")
 
-    if [[ "$exists_tpl" == "1" ]]; then
-        # Mise à jour des stats
-        $MYSQL_CMD -e "
+    if [[ -n "$existing_team" ]]; then
+        if [[ "$existing_team" == "$tpl_teamid" ]]; then
+            # Même équipe → update
+            $MYSQL_CMD -e "
 UPDATE teamplayerlinks
 SET leaguegoals=$leaguegoals,
     isamongtopscorers=$isamongtopscorers,
@@ -46,54 +47,66 @@ SET leaguegoals=$leaguegoals,
     form=$form,
     reds=$reds
 WHERE teamid=$tpl_teamid AND playerid=$tpl_playerid;
-        "
-        echo "✔ Player $tpl_playerid mis à jour pour team $tpl_teamid"
+            "
+            echo "✔ Player $tpl_playerid mis à jour dans team $tpl_teamid"
+        else
+            # Joueur dans une autre équipe → déplacement
+            echo "↳ Déplacement de $tpl_playerid de team $existing_team → $tpl_teamid"
+            KEY=$($MYSQL_CMD --skip-column-names -e "SELECT IFNULL(MAX(artificialkey)+1,1) FROM teamplayerlinks WHERE teamid=$tpl_teamid;")
 
-        # Recalcul du jersey si équipe non autorisée
-        if ! [[ ",$AUTH_TEAMS," =~ ",$tpl_teamid," ]]; then
+            # Calcul du jersey number si nécessaire
+            if [[ ",$AUTH_TEAMS," =~ ",$tpl_teamid," ]]; then
+                number=$jerseynumber
+            else
+                number=$($MYSQL_CMD --skip-column-names -e "
+SELECT COALESCE(MIN(tpl1.jerseynumber + 1),1)
+FROM teamplayerlinks tpl1
+LEFT JOIN teamplayerlinks tpl2
+  ON tpl1.jerseynumber + 1 = tpl2.jerseynumber
+ AND tpl1.teamid = $tpl_teamid
+WHERE tpl1.teamid = $tpl_teamid AND tpl2.jerseynumber IS NULL;
+                ")
+                [[ -z "$number" ]] && number=1
+            fi
+
+            $MYSQL_CMD -e "
+UPDATE teamplayerlinks
+SET teamid=$tpl_teamid,
+    artificialkey=$KEY,
+    leaguegoals=$leaguegoals,
+    isamongtopscorers=$isamongtopscorers,
+    yellows=$yellows,
+    isamongtopscorersinteam=$isamongtopscorersinteam,
+    position=$position,
+    injury=$injury,
+    leagueappearances=$leagueappearances,
+    prevform=$prevform,
+    istopscorer=$istopscorer,
+    form=$form,
+    reds=$reds,
+    jerseynumber=$number
+WHERE playerid=$tpl_playerid;
+            "
+            echo "✔ Player $tpl_playerid déplacé vers team $tpl_teamid (key $KEY, jersey $number)"
+        fi
+    else
+        # Joueur inexistant → insert
+        KEY=$($MYSQL_CMD --skip-column-names -e "SELECT IFNULL(MAX(artificialkey)+1,1) FROM teamplayerlinks WHERE teamid=$tpl_teamid;")
+        if [[ ",$AUTH_TEAMS," =~ ",$tpl_teamid," ]]; then
+            number=$jerseynumber
+        else
             number=$($MYSQL_CMD --skip-column-names -e "
 SELECT COALESCE(MIN(tpl1.jerseynumber + 1),1)
 FROM teamplayerlinks tpl1
 LEFT JOIN teamplayerlinks tpl2
-    ON tpl1.jerseynumber + 1 = tpl2.jerseynumber
-   AND tpl1.teamid = $tpl_teamid
-WHERE tpl1.teamid = $tpl_teamid
-  AND tpl2.jerseynumber IS NULL;
+  ON tpl1.jerseynumber + 1 = tpl2.jerseynumber
+ AND tpl1.teamid = $tpl_teamid
+WHERE tpl1.teamid = $tpl_teamid AND tpl2.jerseynumber IS NULL;
             ")
             [[ -z "$number" ]] && number=1
-            $MYSQL_CMD -e "
-UPDATE teamplayerlinks
-SET jerseynumber=$number
-WHERE teamid=$tpl_teamid AND playerid=$tpl_playerid;
-            "
-            echo "↳ Jerseynumber recalculé : $number"
         fi
 
-        continue
-    fi
-
-    # Ajouter un nouveau joueur
-    KEY=$($MYSQL_CMD --skip-column-names -e "
-SELECT IFNULL(MAX(artificialkey)+1,1) FROM teamplayerlinks WHERE teamid=$tpl_teamid;
-    ")
-
-    # Calcul du jerseynumber
-    if [[ ",$AUTH_TEAMS," =~ ",$tpl_teamid," ]]; then
-        number=$jerseynumber
-    else
-        number=$($MYSQL_CMD --skip-column-names -e "
-SELECT COALESCE(MIN(tpl1.jerseynumber + 1),1)
-FROM teamplayerlinks tpl1
-LEFT JOIN teamplayerlinks tpl2
-    ON tpl1.jerseynumber + 1 = tpl2.jerseynumber
-   AND tpl1.teamid = $tpl_teamid
-WHERE tpl1.teamid = $tpl_teamid
-  AND tpl2.jerseynumber IS NULL;
-        ")
-        [[ -z "$number" ]] && number=1
-    fi
-
-    $MYSQL_CMD -e "
+        $MYSQL_CMD -e "
 INSERT INTO teamplayerlinks
 (teamid, playerid, artificialkey, leaguegoals, isamongtopscorers, yellows,
  isamongtopscorersinteam, injury, leagueappearances, prevform, form,
@@ -102,8 +115,10 @@ VALUES
 ($tpl_teamid, $tpl_playerid, $KEY, $leaguegoals, $isamongtopscorers, $yellows,
  $isamongtopscorersinteam, $injury, $leagueappearances, $prevform, $form,
  $istopscorer, $reds, $position, $number);
-    "
-    echo "✔ Player $tpl_playerid ajouté pour team $tpl_teamid (key $KEY, jersey $number)"
+        "
+        echo "✔ Player $tpl_playerid ajouté dans team $tpl_teamid (key $KEY, jersey $number)"
+    fi
+
 done
 
 echo "--- FIN TEAMPLAYERLINKS ---"

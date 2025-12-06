@@ -2,22 +2,21 @@
 
 MYSQL_CMD="mysql -uroot -proot -h127.0.0.1 -P5000 -DFIFA15 -N -s"
 CSV_NAMES="/mnt/c/github/fifa/cmtracker/import/playernames.csv"
-
+sed -i "s/'//g" playernames.csv
+sed -i "s/'//g" players.csv
+sed -i "s/'//g" teamplayerlinks.csv
 # ---------------------------------------------------------
 # 1) INSERT DES NOMS DANS playernames SI ABSENTS
 # ---------------------------------------------------------
-tail -n +2 "$CSV_NAMES" | while IFS=';' read -r playerid firstname lastname commonname playerjerseyname
+while IFS=';' read -r playerid firstname lastname
 do
-    # Nettoyage des quotes, espaces et retours chariot
-    firstname=$(echo "$firstname" | sed "s/'//g" | tr -d '\r' | xargs)
-    lastname=$(echo "$lastname" | sed "s/'//g" | tr -d '\r' | xargs)
-    commonname=$(echo "$commonname" | sed "s/'//g" | tr -d '\r' | xargs)
-    playerjerseyname=$(echo "$playerjerseyname" | sed "s/'//g" | tr -d '\r' | xargs)
+    # Nettoyage des espaces et retours chariot
+firstname=$(echo "$firstname" | sed "s/'//g" | sed 's/\r$//' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+lastname=$(echo "$lastname"  | sed "s/'//g" | sed 's/\r$//' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
 
-    # Boucle sur tous les noms à traiter
-    for NAME in "$firstname" "$lastname" "$commonname" "$playerjerseyname"; do
-        # Ignorer vide ou 'NULL'
-        [[ -z "$NAME" || "$NAME" == "NULL" ]] && continue
+
+    for NAME in "$firstname" "$lastname"; do
+        [[ -z "$NAME" ]] && continue  # Ignorer les champs vides
 
         # Vérifier si le nom existe déjà
         exists=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$NAME';")
@@ -41,4 +40,6 @@ VALUES ($newid, '$NAME', 900000);
             echo "→ Nom '$NAME' existe déjà (nameid $exists), pas d'insertion"
         fi
     done
-done
+done < <(tail -n +2 "$CSV_NAMES")  # ignorer l'en-tête CSV
+
+
