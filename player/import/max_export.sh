@@ -98,3 +98,4 @@ for f in "$OUTPUT_FILE" "$OUTPUT_NAMES" "$OUTPUT_TPL"; do
     echo -n "$f : "
     wc -l < "$f"
 done
+
