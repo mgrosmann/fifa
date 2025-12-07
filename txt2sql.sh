@@ -159,5 +159,58 @@ IGNORE 1 LINES;"
   echo "✅ Import terminé pour \`${tablename}\`."
 done
 
+
 echo "🎯 Tous les fichiers de '$DB_NAME' ont été convertis et importés avec succès."
 
+########################################
+# PHASE 3 : ALTER TABLE + logs détaillés
+########################################
+
+echo "----------------------------------------"
+echo "🔧 Correction des types MySQL (INT UNSIGNED)..."
+echo "----------------------------------------"
+
+run_alter() {
+    local sql="$1"
+    local message="$2"
+
+    echo "➡️  $message"
+    $MYSQL_CMD -D "$DB_NAME" -e "$sql"
+}
+
+# players
+run_alter "ALTER TABLE players MODIFY COLUMN playerid INT UNSIGNED;" "players.playerid → INT UNSIGNED"
+run_alter "ALTER TABLE players MODIFY COLUMN overallrating INT UNSIGNED;" "players.overallrating → INT UNSIGNED"
+run_alter "ALTER TABLE players MODIFY COLUMN potential INT UNSIGNED;" "players.potential → INT UNSIGNED"
+run_alter "ALTER TABLE players MODIFY COLUMN nationality INT UNSIGNED;" "players.nationality → INT UNSIGNED"
+run_alter "ALTER TABLE players MODIFY COLUMN firstnameid INT UNSIGNED;" "players.firstnameid → INT UNSIGNED"
+run_alter "ALTER TABLE players MODIFY COLUMN lastnameid INT UNSIGNED;" "players.lastnameid → INT UNSIGNED"
+run_alter "ALTER TABLE players MODIFY COLUMN commonameid INT UNSIGNED;" "players.commonameid → INT UNSIGNED"
+
+# playernames
+run_alter "ALTER TABLE playernames MODIFY COLUMN nameid INT UNSIGNED;" "playernames.nameid → INT UNSIGNED"
+run_alter "ALTER TABLE playernames MODIFY COLUMN commentaryid INT UNSIGNED;" "playernames.commentaryid → INT UNSIGNED"
+
+# teams
+run_alter "ALTER TABLE teams MODIFY COLUMN teamid INT UNSIGNED;" "teams.teamid → INT UNSIGNED"
+
+# teamplayerlinks
+run_alter "ALTER TABLE teamplayerlinks MODIFY COLUMN playerid INT UNSIGNED;" "teamplayerlinks.playerid → INT UNSIGNED"
+run_alter "ALTER TABLE teamplayerlinks MODIFY COLUMN teamid INT UNSIGNED;" "teamplayerlinks.teamid → INT UNSIGNED"
+run_alter "ALTER TABLE teamplayerlinks MODIFY COLUMN artificialkey INT UNSIGNED;" "teamplayerlinks.artificialkey → INT UNSIGNED"
+run_alter "ALTER TABLE teamplayerlinks MODIFY COLUMN jerseynumber INT UNSIGNED;" "teamplayerlinks.jerseynumber → INT UNSIGNED"
+run_alter "ALTER TABLE teamplayerlinks MODIFY COLUMN position INT UNSIGNED;" "teamplayerlinks.position → INT UNSIGNED"
+
+# leagueteamlinks
+run_alter "ALTER TABLE leagueteamlinks MODIFY COLUMN teamid INT UNSIGNED;" "leagueteamlinks.teamid → INT UNSIGNED"
+run_alter "ALTER TABLE leagueteamlinks MODIFY COLUMN leagueid INT UNSIGNED;" "leagueteamlinks.leagueid → INT UNSIGNED"
+
+# leagues
+run_alter "ALTER TABLE leagues MODIFY COLUMN leagueid INT UNSIGNED;" "leagues.leagueid → INT UNSIGNED"
+
+# playerloans
+run_alter "ALTER TABLE playerloans MODIFY COLUMN playerid INT UNSIGNED;" "playerloans.playerid → INT UNSIGNED"
+
+echo "----------------------------------------"
+echo "✅ Tous les ALTER TABLE ont été exécutés avec succès."
+echo "----------------------------------------"
