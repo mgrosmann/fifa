@@ -36,3 +36,14 @@ AUTH_TEAMS="21,22,32,34,44,45,46,47,48,52,65,66,73,240,241,243,461,483,110374, 1
 
 
 
+SET @k := -1;
+
+UPDATE teamplayerlinks t
+JOIN (
+    SELECT playerid, teamid, position,
+           (@k := @k + 1) AS new_key
+    FROM teamplayerlinks
+    ORDER BY teamid, position, playerid
+) x
+ON t.playerid = x.playerid AND t.teamid = x.teamid AND t.position = x.position
+SET t.artificialkey = x.new_key;
