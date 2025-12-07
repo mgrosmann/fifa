@@ -185,7 +185,7 @@ run_alter "ALTER TABLE players MODIFY COLUMN potential INT UNSIGNED;" "players.p
 run_alter "ALTER TABLE players MODIFY COLUMN nationality INT UNSIGNED;" "players.nationality → INT UNSIGNED"
 run_alter "ALTER TABLE players MODIFY COLUMN firstnameid INT UNSIGNED;" "players.firstnameid → INT UNSIGNED"
 run_alter "ALTER TABLE players MODIFY COLUMN lastnameid INT UNSIGNED;" "players.lastnameid → INT UNSIGNED"
-run_alter "ALTER TABLE players MODIFY COLUMN commonameid INT UNSIGNED;" "players.commonameid → INT UNSIGNED"
+run_alter "ALTER TABLE players MODIFY COLUMN commonnameid INT UNSIGNED;" "players.commonnameid → INT UNSIGNED"
 
 # playernames
 run_alter "ALTER TABLE playernames MODIFY COLUMN nameid INT UNSIGNED;" "playernames.nameid → INT UNSIGNED"
