@@ -66,6 +66,16 @@ FROM teamplayerlinks tpl
 JOIN teams t ON tpl.teamid = t.teamid
 GROUP BY t.teamid, t.teamname
 ORDER BY nb_joueurs DESC;
+--filtrer
+SELECT
+    t.teamid,
+    t.teamname,
+    COUNT(DISTINCT tpl.playerid) AS nb_joueurs
+FROM teamplayerlinks tpl
+JOIN teams t ON tpl.teamid = t.teamid
+GROUP BY t.teamid, t.teamname
+HAVING COUNT(DISTINCT tpl.playerid) > 37
+ORDER BY nb_joueurs DESC;
 --7 classé les joueurs par player id
 SELECT tpl.playerid, CONCAT(pn_first.name, ' ', pn_last.name) as fullname, p.overallrating, t.teamname
 from FIFA14.teamplayerlinks tpl

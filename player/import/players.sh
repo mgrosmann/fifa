@@ -4,7 +4,7 @@ set -e
 MYSQL_CMD="mysql -uroot -proot -h127.0.0.1 -P5000 -DFC15 -N -s"
 
 CSV_NAMES="/mnt/c/github/fifa/player/import/playernames.csv"
-CSV_PLAYERS="/mnt/c/github/fifa/cmtracker/import/players.csv"
+CSV_PLAYERS="/mnt/c/github/fifa/player/import/players.csv"
 
 echo "=== SUPPRESSION DES JOUEURS EXISTANTS DANS LE CSV NAMES ==="
 tail -n +2 "$CSV_NAMES" | while IFS=';' read -r playerid firstname lastname commonname playerjerseyname; do

@@ -5,7 +5,7 @@ MYSQL_CMD="mysql -uroot -proot -h127.0.0.1 -P5000 -DFC15 -N -s"
 CSV_TPL="/mnt/c/github/fifa/player/import/teamplayerlinks.csv"
 
 # Liste des équipes autorisées (jerseynumber fixe)
-AUTH_TEAMS="21,22,32,34,44,45,46,47,48,52,65,66,73,240,241,243,461,483,110374"
+AUTH_TEAMS="21,22,32,34,44,45,46,47,48,52,65,66,73,240,241,243,461,483,110374, 1, 2, 5, 7, 8, 9, 10, 11, 13, 14, 18, 19, 106, 110, 144, 1796, 1799, 1808, 1925, 1943"
 FREE_AGENT=111592
 
 # Exclusion pour équipes spéciales
@@ -23,7 +23,7 @@ $MYSQL_CMD -e "
 UPDATE teamplayerlinks tpl
 LEFT JOIN leagueteamlinks ltl ON tpl.teamid = ltl.teamid
 SET tpl.teamid=$FREE_AGENT
-WHERE ltl.leagueid=13 OR tpl.teamid IN ($AUTH_TEAMS);
+WHERE tpl.teamid IN ($AUTH_TEAMS);
 "
 
 echo "--- IMPORT TEAMPLAYERLINKS ---"

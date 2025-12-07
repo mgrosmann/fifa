@@ -5,3 +5,30 @@ players 16:37 20 sec -> 16 43 fin suppression -> 16:58 (total 21 minutes)
 tpl 16:58 ->
 SELECT p.playerid, p.overallrating, CONCAT(pn_first.name, ' ', pn_last.name) as fullname, pn_first.nameid, pn_last.nameid FROM players p JOIN playernames pn_first ON p.firstnameid = pn_first.nameid JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid WHERE p.playerid = 247888 ;
 SELECT p.playerid, p.overallrating, CONCAT(pn_first.name, ' ', pn_last.name) as fullname, pn_first.nameid, pn_last.nameid FROM players p JOIN playernames pn_first ON p.firstnameid = pn_first.nameid JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid WHERE CONCAT(pn_first.name, ' ', pn_last.name) like '%zidane%';
+
+
+
+| teamid |
++--------+
+|      1 |
+|      2 |
+|      5 |
+|      7 |
+|      8 |
+|      9 |
+|     10 |
+|     11 |
+|     13 |
+|     14 |
+|     18 |
+|     19 |
+|    106 |
+|    110 |
+|    144 |
+|   1796 |
+|   1799 |
+|   1808 |
+|   1925 |
+|   1943 |
+
+AUTH_TEAMS="21,22,32,34,44,45,46,47,48,52,65,66,73,240,241,243,461,483,110374, 1, 2, 5, 7, 8, 9, 10, 11, 13, 14, 18, 19, 106, 110, 144, 1796, 1799, 1808, 1925, 1943"
