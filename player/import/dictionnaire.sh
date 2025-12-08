@@ -1,29 +1,29 @@
 #!/bin/bash
 
-MYSQL_CMD="mysql -uroot -proot -h127.0.0.1 -P5000 -DFC15 -N -s"
+MYSQL_CMD="mysql -uroot -proot -h127.0.0.1 -P5000 -DFIFA1518 -N -s"
 CSV_NAMES="/mnt/c/github/fifa/player/import/playernames.csv"
-sed -i "s/'//g" playernames.csv
-sed -i "s/'//g" players.csv
-sed -i "s/'//g" teamplayerlinks.csv
 
 # ---------------------------------------------------------
 # 1) INSERT DES NOMS DANS playernames SI ABSENTS
 # ---------------------------------------------------------
 tail -n +2 "$CSV_NAMES" | while IFS=';' read -r playerid firstname lastname commonname playerjerseyname
 do
-    # Nettoyage des quotes, espaces et retours chariot
-    firstname=$(echo "$firstname" | sed "s/'//g" | tr -d '\r' | xargs)
-    lastname=$(echo "$lastname" | sed "s/'//g" | tr -d '\r' | xargs)
-    commonname=$(echo "$commonname" | sed "s/'//g" | tr -d '\r' | xargs)
-    playerjerseyname=$(echo "$playerjerseyname" | sed "s/'//g" | tr -d '\r' | xargs)
+    # Nettoyage des espaces et retours chariot sans xargs
+    firstname=$(echo "$firstname" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | tr -d '\r')
+    lastname=$(echo "$lastname" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | tr -d '\r')
+    commonname=$(echo "$commonname" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | tr -d '\r')
+    playerjerseyname=$(echo "$playerjerseyname" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | tr -d '\r')
 
     # Boucle sur tous les noms à traiter
     for NAME in "$firstname" "$lastname" "$commonname" "$playerjerseyname"; do
         # Ignorer vide ou 'NULL'
         [[ -z "$NAME" || "$NAME" == "NULL" ]] && continue
 
+        # Ajouter un backslash avant chaque apostrophe pour MySQL
+        NAME_ESCAPED=$(echo "$NAME" | sed "s/'/\\\\'/g")
+
         # Vérifier si le nom existe déjà
-        exists=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$NAME';")
+        exists=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$NAME_ESCAPED';")
 
         if [[ -z "$exists" ]]; then
             # Trouver le prochain nameid disponible
@@ -38,7 +38,7 @@ WHERE pn2.nameid IS NULL;
             echo "→ Insertion du nom '$NAME' avec nameid $newid"
             $MYSQL_CMD -e "
 INSERT INTO playernames (nameid, name, commentaryid)
-VALUES ($newid, '$NAME', 900000);
+VALUES ($newid, '$NAME_ESCAPED', 900000);
 "
         else
             echo "→ Nom '$NAME' existe déjà (nameid $exists), pas d'insertion"

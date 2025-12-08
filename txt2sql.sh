@@ -187,9 +187,7 @@ run_alter "ALTER TABLE players MODIFY COLUMN firstnameid INT UNSIGNED;" "players
 run_alter "ALTER TABLE players MODIFY COLUMN lastnameid INT UNSIGNED;" "players.lastnameid → INT UNSIGNED"
 run_alter "ALTER TABLE players MODIFY COLUMN commonnameid INT UNSIGNED;" "players.commonnameid → INT UNSIGNED"
 
-# playernames
-run_alter "ALTER TABLE playernames MODIFY COLUMN nameid INT UNSIGNED;" "playernames.nameid → INT UNSIGNED"
-run_alter "ALTER TABLE playernames MODIFY COLUMN commentaryid INT UNSIGNED;" "playernames.commentaryid → INT UNSIGNED"
+
 
 # teams
 run_alter "ALTER TABLE teams MODIFY COLUMN teamid INT UNSIGNED;" "teams.teamid → INT UNSIGNED"
@@ -210,6 +208,10 @@ run_alter "ALTER TABLE leagues MODIFY COLUMN leagueid INT UNSIGNED;" "leagues.le
 
 # playerloans
 run_alter "ALTER TABLE playerloans MODIFY COLUMN playerid INT UNSIGNED;" "playerloans.playerid → INT UNSIGNED"
+
+# playernames
+run_alter "ALTER TABLE playernames MODIFY COLUMN nameid INT UNSIGNED;" "playernames.nameid → INT UNSIGNED"
+run_alter "ALTER TABLE playernames MODIFY COLUMN commentaryid INT UNSIGNED;" "playernames.commentaryid → INT UNSIGNED"
 
 echo "----------------------------------------"
 echo "✅ Tous les ALTER TABLE ont été exécutés avec succès."

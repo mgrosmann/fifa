@@ -47,3 +47,31 @@ JOIN (
 ) x
 ON t.playerid = x.playerid AND t.teamid = x.teamid AND t.position = x.position
 SET t.artificialkey = x.new_key;
+7929
+
+POUR fix 1518 playernames                                   name,commentaryid,nameid
+select * from playernames where commentaryid = '� el';  gabriel,9000000,7929
+select * from playernames where commentaryid = '� aj'; niraj,9000000,9892
+ select * from playernames where commentaryid = '� ' kuba,9000000, 14555
+
+
+-- Fix Gabriel
+UPDATE playernames
+SET name = 'Gabriel',
+    commentaryid = '9000000',
+    nameid = 7929
+WHERE commentaryid = '� el';
+
+-- Fix Niraj
+UPDATE playernames
+SET name = 'Niraj',
+    commentaryid = '9000000',
+    nameid = 9892
+WHERE commentaryid = '� aj';
+
+-- Fix Kuba
+UPDATE playernames
+SET name = 'Kuba',
+    commentaryid = '9000000',
+    nameid = 14555
+WHERE commentaryid = '� ';
