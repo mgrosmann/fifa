@@ -3,8 +3,9 @@ pour 1686
 playernames 8 minutes
 players 16:37 20 sec -> 16 43 fin suppression -> 16:58 (total 21 minutes)
 tpl 16:58 ->
-SELECT p.playerid, p.overallrating, CONCAT(pn_first.name, ' ', pn_last.name) as fullname, pn_first.nameid, pn_last.nameid FROM players p JOIN playernames pn_first ON p.firstnameid = pn_first.nameid JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid WHERE p.playerid = 247888 ;
-SELECT p.playerid, p.overallrating, CONCAT(pn_first.name, ' ', pn_last.name) as fullname, pn_first.nameid, pn_last.nameid FROM players p JOIN playernames pn_first ON p.firstnameid = pn_first.nameid JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid WHERE CONCAT(pn_first.name, ' ', pn_last.name) like '%zidane%';
+SELECT p.playerid, p.overallrating, CONCAT(pn_first.name, ' ', pn_last.name) as fullname, pn_first.nameid, pn_last.nameid FROM players p JOIN playernames pn_first ON p.firstnameid = pn_first.nameid JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid JOIN teamplayerlinks tpl on p.playerid WHERE p.playerid = 247888 ;
+
+SELECT p.playerid, p.overallrating, tpl.teamid, t.teamname, CONCAT(pn_first.name, ' ', pn_last.name) as fullname, pn_first.nameid, pn_last.nameid FROM players p JOIN playernames pn_first ON p.firstnameid = pn_first.nameid JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid JOIN teamplayerlinks tpl on p.playerid = tpl.playerid JOIN teams t on tpl.teamid = t.teamid WHERE CONCAT(pn_first.name, ' ', pn_last.name) like '%zidane%';
 
 
 
@@ -75,3 +76,8 @@ SET name = 'Kuba',
     commentaryid = '9000000',
     nameid = 14555
 WHERE commentaryid = '� ';
+ALTER TABLE playernames MODIFY COLUMN commentaryid INT UNSIGNED;
+
+
+
+9227 log.txt
