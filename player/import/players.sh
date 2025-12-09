@@ -1,108 +1,127 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
-# ---------------------------------------------------------
-# CONFIGURATION
-# ---------------------------------------------------------
-MYSQL_CMD="mysql -uroot -proot -h127.0.0.1 -P5000 -DFC15 -N -s"
+# -----------------------
+# CONFIG
+# -----------------------
+MYSQL_CMD="mysql -uroot -proot -h127.0.0.1 -P5000 -DFIFA1518 -N -s"
 CSV_NAMES="/mnt/c/github/fifa/player/import/playernames.csv"
 CSV_PLAYERS="/mnt/c/github/fifa/player/import/players.csv"
+CSV_TPL="/mnt/c/github/fifa/player/import/teamplayerlinks.csv"
 
-# ---------------------------------------------------------
-# 1) INSERT DES NOMS DANS playernames SI ABSENTS
-# ---------------------------------------------------------
-echo "=== INSERTION DES NOMS DANS playernames ==="
-tail -n +2 "$CSV_NAMES" | while IFS=';' read -r playerid firstname lastname commonname playerjerseyname
-do
-    for NAME in "$firstname" "$lastname" "$commonname" "$playerjerseyname"; do
-        [[ -z "$NAME" || "$NAME" == "NULL" ]] && continue
+AUTH_TEAMS="21,22,32,34,44,45,46,47,48,52,65,66,73,240,241,243,461,483,110374,1,2,5,7,8,9,10,11,13,14,18,19,106,110,144,1796,1799,1808,1925,1943"
+FREE_AGENT=111592
+EXCLUDE_TEAM_COND="(
+       t.teamname LIKE '%All star%'
+    OR t.teamname LIKE '%Adidas%'
+    OR t.teamname LIKE '%Nike%'
+    OR t.teamname LIKE '% xi%'
+    OR t.teamname LIKE '%allstar%'
+    OR ltl.leagueid = 78
+)"
 
-        # Nettoyage des espaces et retours chariot
-        NAME=$(echo "$NAME" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | tr -d '\r')
+# -----------------------
+# UTILITAIRES
+# -----------------------
+sql_escape() { printf '%s' "$1" | sed "s/'/\\\\'/g"; }
+trim() { printf '%s' "$1" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | tr -d '\r'; }
 
-        # Échapper les apostrophes pour MySQL
-        NAME_ESCAPED=$(echo "$NAME" | sed "s/'/\\\\'/g")
-
-        # Vérifier si le nom existe déjà
-        exists=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$NAME_ESCAPED';")
-
-        if [[ -z "$exists" ]]; then
-            # Trouver le prochain nameid disponible
-            newid=$($MYSQL_CMD --skip-column-names -e "
+get_next_nameid() {
+    $MYSQL_CMD --skip-column-names -e "
 SELECT COALESCE(MIN(pn1.nameid + 1), 1)
 FROM playernames pn1
 LEFT JOIN playernames pn2 ON pn1.nameid + 1 = pn2.nameid
-WHERE pn2.nameid IS NULL;
-" | tr -d '\n')
+WHERE pn2.nameid IS NULL;" | tr -d '\n'
+}
 
-            # Insérer le nom
-            echo "→ Insertion du nom '$NAME' avec nameid $newid"
-            $MYSQL_CMD -e "
-INSERT INTO playernames (nameid, name, commentaryid)
-VALUES ($newid, '$NAME_ESCAPED', 900000);
-"
-        else
-            echo "→ Nom '$NAME' existe déjà (nameid $exists), pas d'insertion"
+get_position_for_team() {
+    local teamid=$1
+    local preferred=$2
+
+    # Comptage titulaires et remplacents
+    local titulaires remp
+    titulaires=$($MYSQL_CMD -e "SELECT COUNT(*) FROM teamplayerlinks WHERE teamid=$teamid AND position BETWEEN 0 AND 27;" | tr -d '\n')
+    remp=$($MYSQL_CMD -e "SELECT COUNT(*) FROM teamplayerlinks WHERE teamid=$teamid AND position = 28;" | tr -d '\n')
+    titulaires=${titulaires:-0}; remp=${remp:-0}
+
+    # Déterminer position titulaire max par poste
+    local pos
+    case $preferred in
+        0) # gardien
+            pos=$(( titulaires < 1 ? 0 : 29 )) ;;
+        1|2|3|4) # défenseurs
+            pos=$(( titulaires < 5 ? titulaires : 29 )) ;;
+        5|6|7) # milieux
+            pos=$(( titulaires < 8 ? titulaires : 29 )) ;;
+        8|9|10) # attaquants
+            pos=$(( titulaires < 11 ? titulaires : 29 )) ;;
+        *)
+            pos=29 ;;
+    esac
+
+    # Titulaire dispo ?
+    if (( pos <= 27 )); then
+        echo "$pos"
+    elif (( remp < 7 )); then
+        echo 28
+    else
+        echo 29
+    fi
+}
+
+# -----------------------
+# 1) INSERT PLAYERNAMES
+# -----------------------
+echo "[LOG] === INSERTION DES NOMS DANS playernames ==="
+while IFS=';' read -r playerid firstname lastname commonname playerjerseyname; do
+    for raw in "$firstname" "$lastname" "$commonname" "$playerjerseyname"; do
+        NAME=$(trim "$raw")
+        [[ -z "$NAME" || "$NAME" == "NULL" ]] && continue
+        NAME_ESCAPED=$(sql_escape "$NAME")
+        exists=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$NAME_ESCAPED' LIMIT 1;")
+        if [[ -z "$exists" ]]; then
+            newid=$(get_next_nameid)
+            echo "→ Insertion '$NAME' (nameid=$newid)"
+            $MYSQL_CMD -e "INSERT INTO playernames (nameid,name,commentaryid) VALUES ($newid,'$NAME_ESCAPED',900000);"
         fi
     done
-done
+done < <(tail -n +2 "$CSV_NAMES")
 
-# ---------------------------------------------------------
-# 2) SUPPRESSION DES JOUEURS EXISTANTS
-# ---------------------------------------------------------
-echo "=== SUPPRESSION DES JOUEURS EXISTANTS ==="
-tail -n +2 "$CSV_NAMES" | while IFS=';' read -r playerid firstname lastname commonname playerjerseyname; do
+# -----------------------
+# 2) SUPPRESSION JOUEURS EXISTANTS
+# -----------------------
+echo "[LOG] === SUPPRESSION DES JOUEURS ==="
+while IFS=';' read -r playerid _; do
+    playerid=$(trim "$playerid")
     [[ -z "$playerid" ]] && continue
+    echo "→ Suppression playerid=$playerid"
     $MYSQL_CMD -e "DELETE FROM players WHERE playerid=$playerid;"
-    echo "✔ Player $playerid supprimé (s'il existait)"
-done
+done < <(tail -n +2 "$CSV_NAMES")
 
-# ---------------------------------------------------------
-# 3) INSERTION DES JOUEURS
-# ---------------------------------------------------------
-echo "=== INSERTION DES JOUEURS DEPUIS players.csv ==="
+# -----------------------
+# 3) LOAD PLAYERS
+# -----------------------
+echo "[LOG] === CHARGEMENT PLAYERS.CSV ==="
 $MYSQL_CMD -e "
 LOAD DATA LOCAL INFILE '$CSV_PLAYERS'
 INTO TABLE players
 FIELDS TERMINATED BY ';'
 LINES TERMINATED BY '\n'
-IGNORE 1 LINES;
-"
+IGNORE 1 LINES;"
 
-# ---------------------------------------------------------
-# 4) MISE À JOUR DES nameid
-# ---------------------------------------------------------
-echo "=== MISE À JOUR DES nameid DES JOUEURS ==="
-tail -n +2 "$CSV_NAMES" | while IFS=';' read -r playerid firstname lastname commonname playerjerseyname; do
-    [[ -z "$playerid" ]] && continue
+# -----------------------
+# 4) UPDATE NAMEID
+# -----------------------
+echo "[LOG] === MISE À JOUR NAMEID ==="
+while IFS=';' read -r playerid firstname lastname commonname playerjerseyname; do
+    playerid=$(trim "$playerid"); [[ -z "$playerid" ]] && continue
+    firstnameid=0; lastnameid=0; commonnameid=0; playerjerseynameid=0
 
-    declare -A ids
+    [[ "$firstname" != "NULL" ]] && firstnameid=$($MYSQL_CMD --skip-column-names -e "SELECT COALESCE((SELECT nameid FROM playernames WHERE name='$(sql_escape "$firstname")' LIMIT 1),0);")
+    [[ "$lastname" != "NULL" ]] && lastnameid=$($MYSQL_CMD --skip-column-names -e "SELECT COALESCE((SELECT nameid FROM playernames WHERE name='$(sql_escape "$lastname")' LIMIT 1),0);")
+    [[ "$commonname" != "NULL" && -n "$commonname" ]] && commonnameid=$($MYSQL_CMD --skip-column-names -e "SELECT COALESCE((SELECT nameid FROM playernames WHERE name='$(sql_escape "$commonname")' LIMIT 1),0);")
+    [[ "$playerjerseyname" != "NULL" && -n "$playerjerseyname" ]] && playerjerseynameid=$($MYSQL_CMD --skip-column-names -e "SELECT COALESCE((SELECT nameid FROM playernames WHERE name='$(sql_escape "$playerjerseyname")' LIMIT 1),0);")
 
-    for FIELD in "firstname" "lastname" "commonname" "playerjerseyname"; do
-        NAME=${!FIELD}
-        [[ -z "$NAME" || "$NAME" == "NULL" ]] && continue
-
-        # Nettoyage et échappement des apostrophes
-        NAME=$(echo "$NAME" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | tr -d '\r')
-        NAME_ESCAPED=$(echo "$NAME" | sed "s/'/\\\\'/g")
-
-        # Récupérer le nameid
-        ids[$FIELD]=$($MYSQL_CMD --skip-column-names -e "SELECT nameid FROM playernames WHERE name='$NAME_ESCAPED' LIMIT 1;")
-    done
-
-    # Construire la clause SET
-    set_clause=""
-    [[ -n "${ids[firstname]}" ]] && set_clause+="firstnameid=${ids[firstname]},"
-    [[ -n "${ids[lastname]}" ]] && set_clause+="lastnameid=${ids[lastname]},"
-    [[ -n "${ids[commonname]}" ]] && set_clause+="commonnameid=${ids[commonname]},"
-    [[ -n "${ids[playerjerseyname]}" ]] && set_clause+="playerjerseynameid=${ids[playerjerseyname]},"
-    set_clause=${set_clause%,}  # retirer la dernière virgule
-
-    if [[ -n "$set_clause" ]]; then
-        $MYSQL_CMD -e "UPDATE players SET $set_clause WHERE playerid=$playerid;"
-        echo "✔ Player $playerid mis à jour avec les nameid"
-    fi
-done
-
-echo "=== FIN ==="
-
+    echo "→ UPDATE playerid=$playerid firstnameid=$firstnameid lastnameid=$lastnameid commonnameid=$commonnameid playerjerseynameid=$playerjerseynameid"
+    $MYSQL_CMD -e "UPDATE players SET firstnameid=$firstnameid,lastnameid=$lastnameid,commonnameid=$commonnameid,playerjerseynameid=$playerjerseynameid WHERE playerid=$playerid;"
+done < <(tail -n +2 "$CSV_NAMES")

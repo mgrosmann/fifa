@@ -1,218 +1,77 @@
 #!/bin/bash
-set -e
 
-MYSQL_CMD="mysql -uroot -proot -h127.0.0.1 -P5000 -DFC15 -N -s"
+# --------------------------
+# Script d'import TPL complet (suppression playerid un par un)
+# --------------------------
+
+MYSQL_CMD="mysql -uroot -proot -h127.0.0.1 -P5000 -DFIFA1518 -N -s"
 CSV_TPL="/mnt/c/github/fifa/player/import/teamplayerlinks.csv"
-
-# Équipes autorisées (jerseynumber fixe)
+CSV_V2="/tmp/tpl.csv"
 AUTH_TEAMS="21,22,32,34,44,45,46,47,48,52,65,66,73,240,241,243,461,483,110374,1,2,5,7,8,9,10,11,13,14,18,19,106,110,144,1796,1799,1808,1925,1943"
-
 FREE_AGENT=111592
 
-exclude_condition="(
-    t.teamname LIKE '%All star%'
- OR t.teamname LIKE '%Adidas%'
- OR t.teamname LIKE '%Nike%'
- OR t.teamname LIKE '% xi%'
- OR t.teamname LIKE '%allstar%'
- OR ltl.leagueid = 78
-)"
+# Conditions pour ignorer les équipes spéciales
+EXCLUDE_CONDITION="t.teamname LIKE '%All star%' OR t.teamname LIKE '%Adidas%' OR t.teamname LIKE '%Nike%' OR t.teamname LIKE '% xi%' OR t.teamname LIKE '%allstar%' OR ltl.leagueid = 78"
 
-##########################################################
-# 📌 Fonction : choisir automatiquement la bonne position
-##########################################################
-get_position_for_team() {
-    local teamid=$1
-    local desired=$2
+echo "🚀 Suppression des joueurs des clubs normaux (pas spéciaux ni sélections)..."
 
-    local titulaires=$($MYSQL_CMD -e "
-        SELECT COUNT(*) FROM teamplayerlinks
-        WHERE teamid=$teamid AND position BETWEEN 0 AND 27;
-    ")
-
-    local remp=$($MYSQL_CMD -e "
-        SELECT COUNT(*) FROM teamplayerlinks
-        WHERE teamid=$teamid AND position = 28;
-    ")
-
-    # Cas 1 : position entre 0 et 27
-    if (( desired >= 0 && desired <= 27 )); then
-        if (( titulaires < 11 )); then
-            echo "$desired"
-        elif (( remp < 7 )); then
-            echo 28
-        else
-            echo 29
-        fi
-
-    # Cas 2 : remplaçant demandé
-    elif (( desired == 28 )); then
-        if (( remp < 7 )); then
-            echo 28
-        elif (( titulaires < 11 )); then
-            echo 0
-        else
-            echo 29
-        fi
-
-    # Cas 3 : autre valeur → placement intelligent
-    else
-        if (( titulaires < 11 )); then
-            echo 0
-        elif (( remp < 7 )); then
-            echo 28
-        else
-            echo 29
-        fi
-    fi
-}
-
-##########################################################
-# 🚨 Libération players des équipes autorisées
-##########################################################
-
-echo "🚨 Libération des joueurs des équipes AUTH_TEAMS → FREE_AGENT…"
+# 1️⃣ Import CSV complet dans tmp_tpl pour avoir la liste des playerid
 $MYSQL_CMD -e "
-UPDATE teamplayerlinks tpl
-LEFT JOIN leagueteamlinks ltl ON tpl.teamid = ltl.teamid
-SET tpl.teamid=$FREE_AGENT
-WHERE tpl.teamid IN ($AUTH_TEAMS);
+DROP TABLE IF EXISTS tmp_tpl;
+CREATE TABLE tmp_tpl LIKE teamplayerlinks;
+
+LOAD DATA LOCAL INFILE '$CSV_TPL'
+INTO TABLE tmp_tpl
+FIELDS TERMINATED BY ';' 
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;
 "
 
-echo "--- IMPORT TEAMPLAYERLINKS ---"
-
-##########################################################
-# 🔄 Import CSV
-##########################################################
-
-tail -n +2 "$CSV_TPL" | while IFS=';' read -r leaguegoals isamongtopscorers yellows isamongtopscorersinteam jerseynumber \
-    position artificialkey teamid injury leagueappearances prevform istopscorer playerid form reds
-do
-    tpl_teamid=$(echo "$teamid" | tr -d '" ' | xargs)
-    tpl_playerid=$(echo "$playerid" | tr -d '" ' | xargs)
-    [[ -z "$tpl_teamid" || -z "$tpl_playerid" ]] && continue
-
-    # 🔍 Vérifier si joueur déjà présent
-    existing_team=$($MYSQL_CMD --skip-column-names -e "
-SELECT tpl.teamid
-FROM teamplayerlinks tpl
-LEFT JOIN teams t ON tpl.teamid = t.teamid
-LEFT JOIN leagueteamlinks ltl ON tpl.teamid = ltl.teamid
-WHERE tpl.playerid=$tpl_playerid
-  AND NOT $exclude_condition
-LIMIT 1;
-")
-
-    ##########################################################
-    # 🟦 CAS 1 : Le joueur existe déjà
-    ##########################################################
-    if [[ -n "$existing_team" ]]; then
-
-        # 🟩 Même équipe → simple update
-        if [[ "$existing_team" == "$tpl_teamid" ]]; then
-
-            final_position=$(get_position_for_team "$tpl_teamid" "$position")
-
-            $MYSQL_CMD -e "
-UPDATE teamplayerlinks
-SET leaguegoals=$leaguegoals,
-    isamongtopscorers=$isamongtopscorers,
-    yellows=$yellows,
-    isamongtopscorersinteam=$isamongtopscorersinteam,
-    position=$final_position,
-    injury=$injury,
-    leagueappearances=$leagueappearances,
-    prevform=$prevform,
-    istopscorer=$istopscorer,
-    form=$form,
-    reds=$reds
-WHERE teamid=$tpl_teamid AND playerid=$tpl_playerid;
-            "
-
-            echo "✔ UPDATE : Player $tpl_playerid dans team $tpl_teamid"
-        
-        # 🟥 Joueur doit être déplacé
-        else
-            echo "↳ Déplacement $tpl_playerid : $existing_team → $tpl_teamid"
-
-            KEY=$($MYSQL_CMD -e "SELECT IFNULL(MAX(artificialkey)+1,1) FROM teamplayerlinks WHERE teamid=$tpl_teamid;")
-
-            # Jersey
-            if [[ ",$AUTH_TEAMS," =~ ",$tpl_teamid," ]]; then
-                number=$jerseynumber
-            else
-                number=$($MYSQL_CMD -e "
-SELECT COALESCE(MIN(t1.jerseynumber + 1),1)
-FROM teamplayerlinks t1
-LEFT JOIN teamplayerlinks t2
-  ON t1.jerseynumber + 1 = t2.jerseynumber
- AND t1.teamid = $tpl_teamid
-WHERE t1.teamid = $tpl_teamid AND t2.jerseynumber IS NULL;
-                ")
-                [[ -z "$number" ]] && number=1
-            fi
-
-            final_position=$(get_position_for_team "$tpl_teamid" "$position")
-
-            $MYSQL_CMD -e "
-UPDATE teamplayerlinks
-SET teamid=$tpl_teamid,
-    artificialkey=$KEY,
-    leaguegoals=$leaguegoals,
-    isamongtopscorers=$isamongtopscorers,
-    yellows=$yellows,
-    isamongtopscorersinteam=$isamongtopscorersinteam,
-    position=$final_position,
-    injury=$injury,
-    leagueappearances=$leagueappearances,
-    prevform=$prevform,
-    istopscorer=$istopscorer,
-    form=$form,
-    reds=$reds,
-    jerseynumber=$number
-WHERE playerid=$tpl_playerid;
-            "
-
-            echo "✔ MOVE : $tpl_playerid → team $tpl_teamid (key=$KEY, pos=$final_position, jersey=$number)"
-        fi
-
-    ##########################################################
-    # 🟩 CAS 2 : Joueur inexistant → INSERT
-    ##########################################################
-    else
-        
-        KEY=$($MYSQL_CMD -e "SELECT IFNULL(MAX(artificialkey)+1,1) FROM teamplayerlinks WHERE teamid=$tpl_teamid;")
-
-        if [[ ",$AUTH_TEAMS," =~ ",$tpl_teamid," ]]; then
-            number=$jerseynumber
-        else
-            number=$($MYSQL_CMD -e "
-SELECT COALESCE(MIN(t1.jerseynumber + 1),1)
-FROM teamplayerlinks t1
-LEFT JOIN teamplayerlinks t2
-  ON t1.jerseynumber + 1 = t2.jerseynumber
- AND t1.teamid = $tpl_teamid
-WHERE t1.teamid = $tpl_teamid AND t2.jerseynumber IS NULL;
-            ")
-            [[ -z "$number" ]] && number=1
-        fi
-
-        final_position=$(get_position_for_team "$tpl_teamid" "$position")
-
-        $MYSQL_CMD -e "
-INSERT INTO teamplayerlinks
-(teamid, playerid, artificialkey, leaguegoals, isamongtopscorers, yellows,
- isamongtopscorersinteam, injury, leagueappearances, prevform, form,
- istopscorer, reds, position, jerseynumber)
-VALUES
-($tpl_teamid, $tpl_playerid, $KEY, $leaguegoals, $isamongtopscorers, $yellows,
- $isamongtopscorersinteam, $injury, $leagueappearances, $prevform, $form,
- $istopscorer, $reds, $final_position, $number);
-        "
-
-        echo "✔ INSERT : Player $tpl_playerid → team $tpl_teamid (key=$KEY, pos=$final_position, jersey=$number)"
-    fi
-
+# 2️⃣ Supprimer chaque playerid un par un dans teamplayerlinks, en protégeant les équipes spéciales
+$MYSQL_CMD -e "SELECT playerid FROM tmp_tpl;" | while read -r playerid; do
+    [[ -z "$playerid" ]] && continue
+    echo "→ Suppression playerid=$playerid présent dans le csv"
+    $MYSQL_CMD -e "
+    DELETE tpl
+    FROM teamplayerlinks tpl
+    JOIN teams t ON tpl.teamid = t.teamid
+    LEFT JOIN league_team_links ltl ON tpl.teamid = ltl.teamid
+    WHERE tpl.playerid=$playerid
+      AND NOT ($EXCLUDE_CONDITION);
+    "
 done
 
-echo "--- FIN TEAMPLAYERLINKS ---"
+echo "✅ Joueurs supprimés des présent dans le csv"
+
+# 3️⃣ Mise à jour des AUTH_TEAMS → position = 29 (agent libre)
+$MYSQL_CMD -e "
+UPDATE teamplayerlinks
+SET position = 29,
+    teamid = $FREE_AGENT
+WHERE teamid IN ($AUTH_TEAMS);
+"
+
+echo "✅ Joueurs des AUTH_TEAMS mis à jour."
+
+# 4️⃣ Mise à jour : position = 29 pour les joueurs de tmp_tpl dont teamid n'est pas dans AUTH_TEAMS
+$MYSQL_CMD -e "
+UPDATE tmp_tpl
+SET position = 29
+WHERE teamid NOT IN ($AUTH_TEAMS);
+"
+
+echo "✅ Positions mises à jour dans tmp_tpl."
+
+# 5️⃣ Export temporaire en CSV pour vérification ou backup
+TMP_CSV="/tmp/tmp_tpl_export.csv"
+$MYSQL_CMD -e "select * from tmp_tpl" | tr '\t' ';' > $TMP_CSV
+
+# 6️⃣ Chargement final dans teamplayerlinks
+$MYSQL_CMD -e "
+LOAD DATA LOCAL INFILE '$TMP_CSV'
+INTO TABLE teamplayerlinks
+FIELDS TERMINATED BY ';' 
+LINES TERMINATED BY '\n';
+"
+
+echo "✅ Import final terminé."

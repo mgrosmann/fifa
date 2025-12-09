@@ -1,9 +1,10 @@
 mysqldump -uroot -proot -h127.0.0.1 -P5000 FC15 > save0.sql
 pour 1686
+
 playernames 8 minutes
 players 16:37 20 sec -> 16 43 fin suppression -> 16:58 (total 21 minutes)
 tpl 16:58 ->
-SELECT p.playerid, p.overallrating, CONCAT(pn_first.name, ' ', pn_last.name) as fullname, pn_first.nameid, pn_last.nameid FROM players p JOIN playernames pn_first ON p.firstnameid = pn_first.nameid JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid JOIN teamplayerlinks tpl on p.playerid WHERE p.playerid = 247888 ;
+SELECT p.playerid, p.overallrating, tpl.teamid, t.teamname, CONCAT(pn_first.name, ' ', pn_last.name) as fullname, pn_first.nameid, pn_last.nameid FROM players p JOIN playernames pn_first ON p.firstnameid = pn_first.nameid JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid JOIN teamplayerlinks tpl on p.playerid = tpl.playerid JOIN teams t on tpl.teamid = t.teamid WHERE p.playerid = 1397;
 
 SELECT p.playerid, p.overallrating, tpl.teamid, t.teamname, CONCAT(pn_first.name, ' ', pn_last.name) as fullname, pn_first.nameid, pn_last.nameid FROM players p JOIN playernames pn_first ON p.firstnameid = pn_first.nameid JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid JOIN teamplayerlinks tpl on p.playerid = tpl.playerid JOIN teams t on tpl.teamid = t.teamid WHERE CONCAT(pn_first.name, ' ', pn_last.name) like '%zidane%';
 
@@ -51,7 +52,7 @@ SET t.artificialkey = x.new_key;
 7929
 
 POUR fix 1518 playernames                                   name,commentaryid,nameid
-select * from playernames where commentaryid = '� el';  gabriel,9000000,7929
+select * from playernames where commentaryid = '� el';  gabriel,9000000,7928
 select * from playernames where commentaryid = '� aj'; niraj,9000000,9892
  select * from playernames where commentaryid = '� ' kuba,9000000, 14555
 
@@ -60,7 +61,7 @@ select * from playernames where commentaryid = '� aj'; niraj,9000000,9892
 UPDATE playernames
 SET name = 'Gabriel',
     commentaryid = '9000000',
-    nameid = 7929
+    nameid = 7928
 WHERE commentaryid = '� el';
 
 -- Fix Niraj
@@ -80,4 +81,7 @@ ALTER TABLE playernames MODIFY COLUMN commentaryid INT UNSIGNED;
 
 
 
-9227 log.txt
+9227 log.txt players.sh (name+player)
+18:03 10 -> 18:22 40
+2332 log1.txt
+18:25:00 -> 18:38:00
