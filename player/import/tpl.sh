@@ -82,8 +82,7 @@ $MYSQL_CMD -e "
 LOAD DATA LOCAL INFILE '$TMP_CSV'
 INTO TABLE teamplayerlinks
 FIELDS TERMINATED BY ';'
-LINES TERMINATED BY '\n'
-IGNORE 1 LINES;
+LINES TERMINATED BY '\n';
 "
 
 echo "✅ Import final terminé avec succès — version optimisée"
