@@ -68,10 +68,12 @@ select * from playernames where commentaryid = '� aj'; niraj,9000000,9892
 UPDATE playernames SET name = 'Gabriel', commentaryid = '9000000', nameid = 7928 WHERE commentaryid = '� el';
 UPDATE playernames SET name = 'Niraj', commentaryid = '9000000', nameid = 9892 WHERE commentaryid = '� aj';
 UPDATE playernames SET name = 'Kuba',  commentaryid = '9000000', nameid = 14555 WHERE commentaryid = '� ';
+UPDATE playernames SET nameid = '35000' WHERE name = '';
 ALTER TABLE playernames MODIFY COLUMN commentaryid INT UNSIGNED;
 
 
 
-9227 log.txt players.sh (name+player)
-
-08:32:06
+944 log.txt
+16:38:26 16:55:??
+11 log1.txt
+1 minute a peine

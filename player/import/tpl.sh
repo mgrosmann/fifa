@@ -116,3 +116,4 @@ LINES TERMINATED BY '\n';
 "
 
 echo "✅ Import final terminé avec succès — version optimisée avec vérification des index"
+
