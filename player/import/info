@@ -4,10 +4,18 @@ pour 1686
 playernames 8 minutes
 players 16:37 20 sec -> 16 43 fin suppression -> 16:58 (total 21 minutes)
 tpl 16:58 ->
-SELECT p.playerid, p.overallrating, tpl.teamid, t.teamname, CONCAT(pn_first.name, ' ', pn_last.name) as fullname, pn_first.nameid, pn_last.nameid FROM players p JOIN playernames pn_first ON p.firstnameid = pn_first.nameid JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid JOIN teamplayerlinks tpl on p.playerid = tpl.playerid JOIN teams t on tpl.teamid = t.teamid WHERE p.playerid = 1397;
+SELECT p.commonnameid, p.playerid, p.overallrating, tpl.teamid, t.teamname, CONCAT(pn_first.name, ' ', pn_last.name) as fullname, pn_first.nameid, pn_last.nameid FROM players p JOIN playernames pn_first ON p.firstnameid = pn_first.nameid JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid JOIN teamplayerlinks tpl on p.playerid = tpl.playerid JOIN teams t on tpl.teamid = t.teamid WHERE CONCAT(pn_first.name, ' ', pn_last.name) like '%zidane%';
 
-SELECT p.playerid, p.overallrating, tpl.teamid, t.teamname, CONCAT(pn_first.name, ' ', pn_last.name) as fullname, pn_first.nameid, pn_last.nameid FROM players p JOIN playernames pn_first ON p.firstnameid = pn_first.nameid JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid JOIN teamplayerlinks tpl on p.playerid = tpl.playerid JOIN teams t on tpl.teamid = t.teamid WHERE CONCAT(pn_first.name, ' ', pn_last.name) like '%zidane%';
+--version sans teams
+SELECT p.commonnameid, p.playerid, p.overallrating, CONCAT(pn_first.name, ' ', pn_last.name) as fullname, pn_first.nameid, pn_last.nameid FROM players p JOIN playernames pn_first ON p.firstnameid = pn_first.nameid JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid WHERE CONCAT(pn_first.name, ' ', pn_last.name) like '%zidane%';
 
+SELECT tpl.artificialkey, tpl.jerseynumber,p.playerid, tpl.position, p.overallrating, p.potential, t.teamname, CONCAT(pn_first.name, ' ', pn_last.name) as fullname, pn_first.nameid, pn_last.nameid
+FROM teamplayerlinks tpl
+JOIN teams t ON tpl.teamid = t.teamid
+join players p on tpl.playerid = p.playerid
+JOIN playernames pn_first ON p.firstnameid = pn_first.nameid
+JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid
+WHERE t.teamname LIKE '%real madrid%' order by tpl.jerseynumber;
 
 
 | teamid |
@@ -57,31 +65,13 @@ select * from playernames where commentaryid = '� aj'; niraj,9000000,9892
  select * from playernames where commentaryid = '� ' kuba,9000000, 14555
 
 
--- Fix Gabriel
-UPDATE playernames
-SET name = 'Gabriel',
-    commentaryid = '9000000',
-    nameid = 7928
-WHERE commentaryid = '� el';
-
--- Fix Niraj
-UPDATE playernames
-SET name = 'Niraj',
-    commentaryid = '9000000',
-    nameid = 9892
-WHERE commentaryid = '� aj';
-
--- Fix Kuba
-UPDATE playernames
-SET name = 'Kuba',
-    commentaryid = '9000000',
-    nameid = 14555
-WHERE commentaryid = '� ';
+UPDATE playernames SET name = 'Gabriel', commentaryid = '9000000', nameid = 7928 WHERE commentaryid = '� el';
+UPDATE playernames SET name = 'Niraj', commentaryid = '9000000', nameid = 9892 WHERE commentaryid = '� aj';
+UPDATE playernames SET name = 'Kuba',  commentaryid = '9000000', nameid = 14555 WHERE commentaryid = '� ';
 ALTER TABLE playernames MODIFY COLUMN commentaryid INT UNSIGNED;
 
 
 
 9227 log.txt players.sh (name+player)
-18:03 10 -> 18:22 40
-2332 log1.txt
-18:25:00 -> 18:38:00
+
+08:32:06

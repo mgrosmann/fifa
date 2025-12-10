@@ -1,49 +1,58 @@
 #!/bin/bash
 
-# --------------------------
-# Script d'import TPL complet (suppression playerid un par un)
-# --------------------------
+# ---------------------------------------------------------
+# Script d'import TPL complet — Version optimisée sans boucle
+# ---------------------------------------------------------
 
 MYSQL_CMD="mysql -uroot -proot -h127.0.0.1 -P5000 -DFIFA1518 -N -s"
 CSV_TPL="/mnt/c/github/fifa/player/import/teamplayerlinks.csv"
-CSV_V2="/tmp/tpl.csv"
-AUTH_TEAMS="21,22,32,34,44,45,46,47,48,52,65,66,73,240,241,243,461,483,110374,1,2,5,7,8,9,10,11,13,14,18,19,106,110,144,1796,1799,1808,1925,1943"
+AUTH_TEAMS="21,22,32,34,44,45,46,47,48,52,65,66,73,240,241,243,461,483,110374,1,2,3,4,5,7,9,10,11,12,13,18,19,88,89,106,109,144,1799,1917"
 FREE_AGENT=111592
 
 # Conditions pour ignorer les équipes spéciales
-EXCLUDE_CONDITION="t.teamname LIKE '%All star%' OR t.teamname LIKE '%Adidas%' OR t.teamname LIKE '%Nike%' OR t.teamname LIKE '% xi%' OR t.teamname LIKE '%allstar%' OR ltl.leagueid = 78"
+EXCLUDE_CONDITION="t.teamname LIKE '%All star%' OR \
+t.teamname LIKE '%Adidas%' OR t.teamname LIKE '%Nike%' OR \
+t.teamname LIKE '% xi%' OR t.teamname LIKE '%allstar%' OR \
+ltl.leagueid = 78"
 
-echo "🚀 Suppression des joueurs des clubs normaux (pas spéciaux ni sélections)..."
+echo "🚀 Import TPL optimisé — suppression massive instantanée"
 
-# 1️⃣ Import CSV complet dans tmp_tpl pour avoir la liste des playerid
+# 1️⃣ Import CSV complet dans tmp_tpl
 $MYSQL_CMD -e "
 DROP TABLE IF EXISTS tmp_tpl;
 CREATE TABLE tmp_tpl LIKE teamplayerlinks;
 
 LOAD DATA LOCAL INFILE '$CSV_TPL'
 INTO TABLE tmp_tpl
-FIELDS TERMINATED BY ';' 
+FIELDS TERMINATED BY ';'
 LINES TERMINATED BY '\n'
 IGNORE 1 LINES;
 "
 
-# 2️⃣ Supprimer chaque playerid un par un dans teamplayerlinks, en protégeant les équipes spéciales
-$MYSQL_CMD -e "SELECT playerid FROM tmp_tpl;" | while read -r playerid; do
-    [[ -z "$playerid" ]] && continue
-    echo "→ Suppression playerid=$playerid présent dans le csv"
-    $MYSQL_CMD -e "
-    DELETE tpl
-    FROM teamplayerlinks tpl
-    JOIN teams t ON tpl.teamid = t.teamid
-    LEFT JOIN league_team_links ltl ON tpl.teamid = ltl.teamid
-    WHERE tpl.playerid=$playerid
-      AND NOT ($EXCLUDE_CONDITION);
-    "
-done
+echo "📥 tmp_tpl chargé depuis le CSV"
 
-echo "✅ Joueurs supprimés des présent dans le csv"
+# 2️⃣ Ajout d'index temporaires pour accélérer les DELETE & JOIN
+$MYSQL_CMD -e "
+ALTER TABLE tmp_tpl ADD INDEX idx_playerid (playerid);
+ALTER TABLE teamplayerlinks ADD INDEX idx_playerid2 (playerid);
+ALTER TABLE teamplayerlinks ADD INDEX idx_teamid2 (teamid);
+"
 
-# 3️⃣ Mise à jour des AUTH_TEAMS → position = 29 (agent libre)
+echo "⚡ Index temporaires créés"
+
+# 3️⃣ Suppression MASSIVE en une seule requête (plus de boucle lente)
+$MYSQL_CMD -e "
+DELETE tpl
+FROM teamplayerlinks tpl
+JOIN tmp_tpl csv ON csv.playerid = tpl.playerid
+JOIN teams t ON tpl.teamid = t.teamid
+LEFT JOIN leagueteamlinks ltl ON tpl.teamid = ltl.teamid
+WHERE NOT ($EXCLUDE_CONDITION);
+"
+
+echo "🗑️ Joueurs présents dans le CSV supprimés des clubs normaux"
+
+# 4️⃣ Mise à jour des AUTH_TEAMS → agent libre (free agent)
 $MYSQL_CMD -e "
 UPDATE teamplayerlinks
 SET position = 29,
@@ -51,27 +60,30 @@ SET position = 29,
 WHERE teamid IN ($AUTH_TEAMS);
 "
 
-echo "✅ Joueurs des AUTH_TEAMS mis à jour."
+echo "🔄 Joueurs AUTH_TEAMS déplacés vers agent libre"
 
-# 4️⃣ Mise à jour : position = 29 pour les joueurs de tmp_tpl dont teamid n'est pas dans AUTH_TEAMS
+# 5️⃣ Mise à jour des positions dans tmp_tpl
 $MYSQL_CMD -e "
 UPDATE tmp_tpl
 SET position = 29
 WHERE teamid NOT IN ($AUTH_TEAMS);
 "
 
-echo "✅ Positions mises à jour dans tmp_tpl."
+echo "🔧 Positions mises à jour dans tmp_tpl"
 
-# 5️⃣ Export temporaire en CSV pour vérification ou backup
+# 6️⃣ Export tmp_tpl en CSV pour réimport final
 TMP_CSV="/tmp/tmp_tpl_export.csv"
-$MYSQL_CMD -e "select * from tmp_tpl" | tr '\t' ';' > $TMP_CSV
+$MYSQL_CMD -e "SELECT * FROM tmp_tpl" | tr '\t' ';' > "$TMP_CSV"
 
-# 6️⃣ Chargement final dans teamplayerlinks
+echo "📤 Export tmp_tpl vers $TMP_CSV"
+
+# 7️⃣ Chargement final dans teamplayerlinks
 $MYSQL_CMD -e "
 LOAD DATA LOCAL INFILE '$TMP_CSV'
 INTO TABLE teamplayerlinks
-FIELDS TERMINATED BY ';' 
-LINES TERMINATED BY '\n';
+FIELDS TERMINATED BY ';'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES;
 "
 
-echo "✅ Import final terminé."
+echo "✅ Import final terminé avec succès — version optimisée"

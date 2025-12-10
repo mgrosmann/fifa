@@ -7,20 +7,6 @@ set -euo pipefail
 MYSQL_CMD="mysql -uroot -proot -h127.0.0.1 -P5000 -DFIFA1518 -N -s"
 CSV_NAMES="/mnt/c/github/fifa/player/import/playernames.csv"
 CSV_PLAYERS="/mnt/c/github/fifa/player/import/players.csv"
-CSV_TPL="/mnt/c/github/fifa/player/import/teamplayerlinks.csv"
-
-AUTH_TEAMS="21,22,32,34,44,45,46,47,48,52,65,66,73,240,241,243,461,483,110374,1,2,5,7,8,9,10,11,13,14,18,19,106,110,144,1796,1799,1808,1925,1943"
-FREE_AGENT=111592
-EXCLUDE_TEAM_COND="(
-       t.teamname LIKE '%All star%'
-    OR t.teamname LIKE '%Adidas%'
-    OR t.teamname LIKE '%Nike%'
-    OR t.teamname LIKE '% xi%'
-    OR t.teamname LIKE '%allstar%'
-    OR ltl.leagueid = 78
-)"
-
-# -----------------------
 # UTILITAIRES
 # -----------------------
 sql_escape() { printf '%s' "$1" | sed "s/'/\\\\'/g"; }
@@ -34,42 +20,6 @@ LEFT JOIN playernames pn2 ON pn1.nameid + 1 = pn2.nameid
 WHERE pn2.nameid IS NULL;" | tr -d '\n'
 }
 
-get_position_for_team() {
-    local teamid=$1
-    local preferred=$2
-
-    # Comptage titulaires et remplacents
-    local titulaires remp
-    titulaires=$($MYSQL_CMD -e "SELECT COUNT(*) FROM teamplayerlinks WHERE teamid=$teamid AND position BETWEEN 0 AND 27;" | tr -d '\n')
-    remp=$($MYSQL_CMD -e "SELECT COUNT(*) FROM teamplayerlinks WHERE teamid=$teamid AND position = 28;" | tr -d '\n')
-    titulaires=${titulaires:-0}; remp=${remp:-0}
-
-    # Déterminer position titulaire max par poste
-    local pos
-    case $preferred in
-        0) # gardien
-            pos=$(( titulaires < 1 ? 0 : 29 )) ;;
-        1|2|3|4) # défenseurs
-            pos=$(( titulaires < 5 ? titulaires : 29 )) ;;
-        5|6|7) # milieux
-            pos=$(( titulaires < 8 ? titulaires : 29 )) ;;
-        8|9|10) # attaquants
-            pos=$(( titulaires < 11 ? titulaires : 29 )) ;;
-        *)
-            pos=29 ;;
-    esac
-
-    # Titulaire dispo ?
-    if (( pos <= 27 )); then
-        echo "$pos"
-    elif (( remp < 7 )); then
-        echo 28
-    else
-        echo 29
-    fi
-}
-
-# -----------------------
 # 1) INSERT PLAYERNAMES
 # -----------------------
 echo "[LOG] === INSERTION DES NOMS DANS playernames ==="
