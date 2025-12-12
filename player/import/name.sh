@@ -4,7 +4,7 @@ set -euo pipefail
 # -----------------------
 # CONFIG
 # -----------------------
-MYSQL_CMD="mysql -uroot -proot -h127.0.0.1 -P5000 -DFIFA1518 -N -s"
+MYSQL_CMD="mysql -uroot -proot -h127.0.0.1 -P5000 -DFC16 -N -s"
 CSV_NAMES="/mnt/c/github/fifa/player/import/playernames.csv"
 CSV_PLAYERS="/mnt/c/github/fifa/player/import/players.csv"
 
@@ -21,7 +21,7 @@ FROM playernames pn1
 LEFT JOIN playernames pn2 ON pn1.nameid + 1 = pn2.nameid
 WHERE pn2.nameid IS NULL;" | tr -d '\n'
 }
-
+start=$(date +%s)
 # -----------------------
 # 0) Création table temporaire pour playerid CSV
 # -----------------------
@@ -102,4 +102,7 @@ WHERE playerid=$playerid;
 done < <(tail -n +2 "$CSV_NAMES")
 
 echo "🎉 IMPORT TERMINÉ: players insérés et nameid affectés"
-
+end=$(date +%s)
+elapsed=$(( end - start ))
+printf "Durée : %02d:%02d:%02d\n" \
+    $((elapsed/3600)) $(((elapsed%3600)/60)) $((elapsed%60))
