@@ -18,7 +18,7 @@ t.teamname LIKE '%Nike%' OR
 t.teamname LIKE '% xi%' OR 
 t.teamname LIKE '%allstar%' OR 
 ltl.leagueid = 78"
-
+start=$(date +%s)
 echo "🚀 Import TPL Ultra Optimisé — MODE DEBUG"
 
 # ---------------------------------------
@@ -141,4 +141,7 @@ LINES TERMINATED BY '\n';
 "
 
 echo "🎉 Import TPL Ultra Optimisé — MODE DEBUG — Terminé"
-
+end=$(date +%s)
+elapsed=$(( end - start ))
+printf "Durée : %02d:%02d:%02d\n" \
+    $((elapsed/3600)) $(((elapsed%3600)/60)) $((elapsed%60))
