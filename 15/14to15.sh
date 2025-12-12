@@ -8,14 +8,14 @@ TABLE2="players"
 OUTFILE2="players.txt"
 
 # 📝 Création du fichier SQL
-cat <<EOF > 14.sql
-ALTER TABLE FIFA14.teams
+cat <<EOF > $DB.sql
+ALTER TABLE $DB.teams
 ADD COLUMN leftfreekicktakerid INT DEFAULT 0,
 ADD COLUMN rightfreekicktakerid INT DEFAULT 0;
 EOF
 
 # 🛠️ Exécution du script SQL
-$cmd "$DB" < 14.sql
+$cmd "$DB" < $DB.sql
 
 # ✅ Export des deux tables fixes
 $cmd -D "$DB" --batch --column-names -e "SELECT * FROM \`$TABLE1\`;" > "$OUTFILE1"
