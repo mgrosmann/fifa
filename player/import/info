@@ -80,4 +80,41 @@ ALTER TABLE playernames MODIFY COLUMN commentaryid INT UNSIGNED;
 1 minute a peine
 
 rajouter 138654;1607,
+
 (gabriel milito et barthez)
+
+
+CREATE TABLE tmp_loan (
+    teamidloanedfrom  INT,
+    playerid INT ,
+    loandateend INT
+);
+LOAD DATA LOCAL INFILE '/mnt/c/github/txt/FIFA16/csv/playerloans.csv'
+INTO TABLE tmp_loan
+FIELDS TERMINATED BY ';'
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
+
+
+DELETE tl
+FROM tmp_loan tl
+LEFT JOIN FC16.players p
+    ON tl.playerid = p.playerid
+WHERE p.playerid IS NULL;
+
+
+
+
+
+start=$(date +%s)
+
+end=$(date +%s)
+elapsed=$(( end - start ))
+printf "Durée : %02d:%02d:%02d\n" \
+    $((elapsed/3600)) $(((elapsed%3600)/60)) $((elapsed%60))
+
+
+Durée : 00:19:46
+946 log.txt
+Durée : 00:00:06
+16 1log.txt
