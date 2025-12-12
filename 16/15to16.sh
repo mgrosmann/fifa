@@ -10,18 +10,18 @@ TABLE3="leagueteamlinks"
 OUTFILE3="leagueteamlinks.txt"
 
 # 📝 Création du fichier SQL
-cat <<EOF > 15.sql
-ALTER TABLE FIFA15.players
+cat <<EOF > ${DB}.sql
+ALTER TABLE ${DB}.players
 ADD COLUMN gender INT DEFAULT 0,
 ADD COLUMN emotion INT DEFAULT 1;
 
-ALTER TABLE FIFA15.teamplayerlinks
+ALTER TABLE ${DB}.teamplayerlinks
 ADD COLUMN leaguegoalsprevmatch INT DEFAULT 0,
 ADD COLUMN leaguegoalsprevthreematches INT DEFAULT 0;
 EOF
 
 # 🛠️ Exécution du script SQL
-$cmd "$DB" < 15.sql
+$cmd "$DB" < ${DB}.sql
 
 # ✅ Export des deux tables fixes
 $cmd -D "$DB" --batch --column-names -e "SELECT * FROM \`$TABLE1\`;" > "$OUTFILE1"
