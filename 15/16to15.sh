@@ -41,14 +41,14 @@ else
 fi
 
 # 📦 Conversion vers format DB Master
-bash /mnt/c/github/fifa/txt2utf16.sh  "./$OUTFILE1"
-bash /mnt/c/github/fifa/txt2utf16.sh  "./$OUTFILE2"
+iconv -f UTF-8 -t UTF-16LE players.txt > 1players.txt
+iconv -f UTF-8 -t UTF-16LE teamplayerlinks.txt > 1teamplayerlinks.txt
 bash /mnt/c/github/fifa/15/ltl15.sh
-bash /mnt/c/github/fifa/txt2utf16.sh  leagueteamlinks_fifa15_format.txt
+iconv -f UTF-8 -t UTF-16LE leagueteamlinks_fifa15_format.txt > leagueteamlinks.txt
 mkdir -p /mnt/c/github/fifa/15/imported_files_16/
 cp /mnt/c/github/txt/FIFA16/leagues.txt /mnt/c/github/fifa/15/imported_files_16/
 cp /mnt/c/github/txt/FIFA16/playernames.txt /mnt/c/github/fifa/15/imported_files_16/
 cp /mnt/c/github/txt/FIFA16/teams.txt /mnt/c/github/fifa/15/imported_files_16/
-mv players_dbmaster.txt /mnt/c/github/fifa/15/imported_files_16/players.txt
-mv teamplayerlinks_dbmaster.txt /mnt/c/github/fifa/15/imported_files_16/teamplayerlinks.txt
-mv leagueteamlinks_fifa15_format_utf16.txt /mnt/c/github/fifa/15/imported_files_16/leagueteamlinks.txt
+mv 1players.txt /mnt/c/github/fifa/15/imported_files_16/players.txt
+mv 1teamplayerlinks.txt /mnt/c/github/fifa/15/imported_files_16/teamplayerlinks.txt
+mv leagueteamlinks.txt /mnt/c/github/fifa/15/imported_files_16/leagueteamlinks.txt
