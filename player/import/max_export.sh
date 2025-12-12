@@ -2,7 +2,8 @@
 # --- max_export.sh ---
 # Export ciblé : clubs majeurs + PL + joueurs 85+ ou potentiel élevé + réserve + exclusions AllStar/Nike/etc
 # --- Variables pour équipes ---
-AUTHORISED_TEAMS="21,22,32,34,44,45,46,47,48,52,65,66,73,240,241,243,461,483,110374"
+#de 44 a 52 (avec 110374) serie a, de 59 a 219 ligue 1|  de 240 a 483 liga, de 245 a 247 eredivisie, de 1 a 1917 premier league, de 21 a 1825 bundesliga
+AUTHORISED_TEAMS="44,45,46,47,48,52,110374,59,65,66,69,73,219,240,241,243,449,461,483,245,247,1,2,3,4,5,7,9,10,11,12,13,18,19,88,89,106,109,144,1790,1917,21,22,23,28,29,31,32,34,36,38,159,166,169,171,175,485,1824,1825"
 DB="FIFA16"
 cmd="mysql -uroot -proot -P5000 -h127.0.0.1 -D $DB"
 
@@ -19,10 +20,10 @@ exclude_condition="(
 # 🔥 Condition d’autorisation globale
 authorized_condition="(
        tpl.teamid IN ($AUTHORISED_TEAMS)
-    OR ltl.leagueid = 13
     OR p.overallrating >= 85
     OR p.potential >= 85
     OR (p.potential - p.overallrating) >= 15
+    OR p.playerid in (138654, 1607)
 )
 AND NOT ($exclude_condition)"
 

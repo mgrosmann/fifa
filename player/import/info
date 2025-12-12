@@ -12,11 +12,11 @@ SELECT p.commonnameid, p.playerid, p.overallrating, CONCAT(pn_first.name, ' ', p
 
 
 --lister joueur teams
-SELECT tpl.artificialkey, tpl.jerseynumber,p.playerid, tpl.position, p.overallrating, p.potential, t.teamname, CONCAT(pn_first.name, ' ', pn_last.name) as fullname, pn_first.nameid as fid, pn_last.nameid as lid, pn_common.nameid as cid FROM teamplayerlinks tpl JOIN teams t ON tpl.teamid = t.teamid join players p on tpl.playerid = p.playerid JOIN playernames pn_common on p.commonnameid = pn_common.nameid JOIN playernames pn_first ON p.firstnameid = pn_first.nameid JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid WHERE t.teamname LIKE '%real madrid%' order by tpl.artificialkey;
+SELECT tpl.artificialkey as akey, tpl.jerseynumber as jnb,p.playerid, tpl.position, p.overallrating as gen, p.potential as pot, t.teamname, CONCAT(pn_first.name, ' ', pn_last.name) as fullname, pn_first.nameid as fid, pn_last.nameid as lid, pn_common.nameid as cid FROM teamplayerlinks tpl JOIN teams t ON tpl.teamid = t.teamid join players p on tpl.playerid = p.playerid JOIN playernames pn_common on p.commonnameid = pn_common.nameid JOIN playernames pn_first ON p.firstnameid = pn_first.nameid JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid WHERE t.teamname LIKE '%real madrid%' order by tpl.artificialkey;
 
 | teamid |
 +--------+
-|      1 |
+|      1 |168542
 |      2 |
 |      5 |
 |      7 |
@@ -78,3 +78,6 @@ ALTER TABLE playernames MODIFY COLUMN commentaryid INT UNSIGNED;
 16:38:26 16:55:??
 11 log1.txt
 1 minute a peine
+
+rajouter 138654;1607,
+(gabriel milito et barthez)
