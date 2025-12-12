@@ -14,34 +14,6 @@ SELECT p.commonnameid, p.playerid, p.overallrating, CONCAT(pn_first.name, ' ', p
 --lister joueur teams
 SELECT tpl.artificialkey as akey, tpl.jerseynumber as jnb,p.playerid, tpl.position, p.overallrating as gen, p.potential as pot, t.teamname, CONCAT(pn_first.name, ' ', pn_last.name) as fullname, pn_first.nameid as fid, pn_last.nameid as lid, pn_common.nameid as cid FROM teamplayerlinks tpl JOIN teams t ON tpl.teamid = t.teamid join players p on tpl.playerid = p.playerid JOIN playernames pn_common on p.commonnameid = pn_common.nameid JOIN playernames pn_first ON p.firstnameid = pn_first.nameid JOIN playernames pn_last  ON p.lastnameid  = pn_last.nameid WHERE t.teamname LIKE '%real madrid%' order by tpl.artificialkey;
 
-| teamid |
-+--------+
-|      1 |168542
-|      2 |
-|      5 |
-|      7 |
-|      8 |
-|      9 |
-|     10 |
-|     11 |
-|     13 |
-|     14 |
-|     18 |
-|     19 |
-|    106 |
-|    110 |
-|    144 |
-|   1796 |
-|   1799 |
-|   1808 |
-|   1925 |
-|   1943 |
-
-AUTH_TEAMS="21,22,32,34,44,45,46,47,48,52,65,66,73,240,241,243,461,483,110374, 1, 2, 5, 7, 8, 9, 10, 11, 13, 14, 18, 19, 106, 110, 144, 1796, 1799, 1808, 1925, 1943"
-
-
-
-
 SET @k := -1;
 
 UPDATE teamplayerlinks t
@@ -54,34 +26,15 @@ JOIN (
 ON t.playerid = x.playerid AND t.teamid = x.teamid AND t.position = x.position
 SET t.artificialkey = x.new_key;
 
-
-POUR fix 1518 playernames                                   name,commentaryid,nameid
-select * from playernames where commentaryid = '� el';  gabriel,9000000,7928
-select * from playernames where commentaryid = '� aj'; niraj,9000000,9892
- select * from playernames where commentaryid = '� ' kuba,9000000, 14555
-
-
 UPDATE playernames SET name = 'Gabriel', commentaryid = '9000000', nameid = 7928 WHERE commentaryid = '� el';
 UPDATE playernames SET name = 'Niraj', commentaryid = '9000000', nameid = 9892 WHERE commentaryid = '� aj';
 UPDATE playernames SET name = 'Kuba',  commentaryid = '9000000', nameid = 14555 WHERE commentaryid = '� ';
 ALTER TABLE playernames MODIFY COLUMN commentaryid INT UNSIGNED;
 
-
-
 UPDATE playernames SET name = 'Niraj', commentaryid = '9000000', nameid = 16443 WHERE commentaryid = '� aj';
 UPDATE playernames SET name = 'staro',  commentaryid = '9000000', nameid = 21224 WHERE commentaryid = '� o';
 ALTER TABLE playernames MODIFY COLUMN commentaryid INT UNSIGNED;
 
-
-944 log.txt (1518)
-754 log.txt (FC16)
-16:38:26 16:55:??
-11 log1.txt
-1 minute a peine
-
-rajouter 138654;1607,
-
-(gabriel milito et barthez)
 
 
 CREATE TABLE tmp_loan (
@@ -103,9 +56,6 @@ LEFT JOIN FC16.players p
 WHERE p.playerid IS NULL;
 
 
-
-
-
 start=$(date +%s)
 
 end=$(date +%s)
@@ -113,8 +63,5 @@ elapsed=$(( end - start ))
 printf "Durée : %02d:%02d:%02d\n" \
     $((elapsed/3600)) $(((elapsed%3600)/60)) $((elapsed%60))
 
-
-Durée : 00:19:46
-946 log.txt
-Durée : 00:00:06
-16 1log.txt
+Durée : 00:19:46 946 log.txt
+Durée : 00:00:06 16 1log.txt
