@@ -11,21 +11,21 @@ OUTFILE3="leagueteamlinks.txt"
 
 
 # 📝 Création du fichier SQL
-cat <<EOF > 16.sql
-DELETE FROM FIFA16.players
+cat <<EOF > ${DB}.sql
+DELETE FROM ${DB}.players
 WHERE gender = 1;
 
-ALTER TABLE FIFA16.players
+ALTER TABLE ${DB}.players
 DROP COLUMN gender,
 DROP COLUMN emotion;
 
-ALTER TABLE FIFA16.teamplayerlinks
+ALTER TABLE ${DB}.teamplayerlinks
 DROP COLUMN leaguegoalsprevmatch,
 DROP COLUMN leaguegoalsprevthreematches;
 EOF
 
 # 🛠️ Exécution du script SQL
-$cmd "$DB" < 16.sql
+$cmd "$DB" < ${DB}.sql
 
 # ✅ Export des deux tables fixes
 $cmd -D "$DB" --batch --column-names -e "SELECT * FROM \`$TABLE1\`;" > "$OUTFILE1"
