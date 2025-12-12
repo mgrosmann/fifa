@@ -29,5 +29,7 @@ echo "alias vide='>'" >> ~/.bashrc
 echo "alias fifa='cd /mnt/c/github/fifa'" >> ~/.bashrc
 echo "alias home='cd /mnt/c/Users/PC'" >> ~/.bashrc
 echo "alias regen='source ~/.bashrc'" >> ~/.bashrc
+echo "alias dump='mysqldump -uroot -proot -h127.0.0.1 -P5000'" >> ~/.bashrc
 
 echo "penser à faire 'source ~/.bashrc'"
+
