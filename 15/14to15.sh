@@ -30,13 +30,13 @@ fi
 
 # 📦 Conversion vers format DB Master
 bash /mnt/c/github/fifa/15/player15.sh
-bash /mnt/c/github/fifa/txt2utf16.sh  players_fifa15_format.txt
+iconv -f UTF-8 -t UTF-16LE players_fifa15_format.txt > players.txt
 bash /mnt/c/github/fifa/15/team15.sh
-bash /mnt/c/github/fifa/txt2utf16.sh  teams_fifa15_format.txt
+iconv -f UTF-8 -t UTF-16LE teams_fifa15_format.txt > teams.txt
 mkdir -p /mnt/c/github/fifa/15/imported_files_14/
 cp /mnt/c/github/txt/FIFA15/leagueteamlinks.txt /mnt/c/github/fifa/15/imported_files_14/
 cp /mnt/c/github/txt/FIFA15/leagues.txt /mnt/c/github/fifa/15/imported_files_14/
 cp /mnt/c/github/txt/FIFA15/playernames.txt /mnt/c/github/fifa/15/imported_files_14/
 cp /mnt/c/github/txt/FIFA15/teamplayerlinks.txt /mnt/c/github/fifa/15/imported_files_14/
-mv players_fifa15_format_utf16.txt /mnt/c/github/fifa/15/imported_files_14/players.txt
-mv teams_fifa15_format_utf16.txt /mnt/c/github/fifa/15/imported_files_14/teams.txt
+mv players.txt /mnt/c/github/fifa/15/imported_files_14/players.txt
+mv teams.txt /mnt/c/github/fifa/15/imported_files_14/teams.txt
