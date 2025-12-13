@@ -15,11 +15,11 @@ ADD COLUMN rightfreekicktakerid INT DEFAULT 0;
 EOF
 
 # 🛠️ Exécution du script SQL
-$cmd "$DB" < ${DB}.sql
+$cmd < ${DB}.sql
 
 # ✅ Export des deux tables fixes
-$cmd -D "$DB" --batch --column-names -e "SELECT * FROM \`$TABLE1\`;" > "$OUTFILE1"
-$cmd -D "$DB" --batch --column-names -e "SELECT * FROM \`$TABLE2\`;" > "$OUTFILE2"
+$cmd --batch --column-names -e "SELECT * FROM \`$TABLE1\`;" > "$OUTFILE1"
+$cmd --batch --column-names -e "SELECT * FROM \`$TABLE2\`;" > "$OUTFILE2"
 
 if [ $? -eq 0 ]; then
     echo "✅ Export terminé : $OUTFILE1 et $OUTFILE2"
