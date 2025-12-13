@@ -21,12 +21,12 @@ ADD COLUMN leaguegoalsprevthreematches INT DEFAULT 0;
 EOF
 
 # 🛠️ Exécution du script SQL
-$cmd "$DB" < ${DB}.sql
+$cmd < ${DB}.sql
 
 # ✅ Export des deux tables fixes
-$cmd -D "$DB" --batch --column-names -e "SELECT * FROM \`$TABLE1\`;" > "$OUTFILE1"
-$cmd -D "$DB" --batch --column-names -e "SELECT * FROM \`$TABLE2\`;" > "$OUTFILE2"
-$cmd -D "$DB" --batch --column-names -e "SELECT * FROM \`$TABLE3\`;" > "$OUTFILE3"
+$cmd --batch --column-names -e "SELECT * FROM \`$TABLE1\`;" > "$OUTFILE1"
+$cmd --batch --column-names -e "SELECT * FROM \`$TABLE2\`;" > "$OUTFILE2"
+$cmd --batch --column-names -e "SELECT * FROM \`$TABLE3\`;" > "$OUTFILE3"
 
 
 if [ $? -eq 0 ]; then
@@ -37,16 +37,16 @@ else
 fi
 
 # 📦 Conversion vers format DB Master
-bash/mnt/c/github/fifa/16/player16.sh
-bash/mnt/c/github/fifa/txt2utf16.sh  players_fifa16_format.txt
-bash/mnt/c/github/fifa/16/tpl16.sh
-bash/mnt/c/github/fifa/txt2utf16.sh  teamplayerlinks_fifa16_format.txt
-bash/mnt/c/github/fifa/16/ltl16.sh
-bash/mnt/c/github/fifa/txt2utf16.sh  leagueteamlinks_fifa15_format.txt
+bash /mnt/c/github/fifa/16/tpl16.sh
+iconv -f UTF-8 -t UTF-16LE teamplayerlinks_fifa16_format.txt > teamplayerlinks.txt
+bash /mnt/c/github/fifa/16/ltl16.sh
+iconv -f UTF-8 -t UTF-16LE leagueteamlinks_fifa16_format.txt > leagueteamlinks.txt
+bash /mnt/c/github/fifa/16/player16.sh
+iconv -f UTF-8 -t UTF-16LE players_fifa16_format.txt > players.txt
 mkdir -p /mnt/c/github/fifa/16/imported_files_15/
 cp /mnt/c/github/txt/FIFA16/leagues.txt /mnt/c/github/fifa/16/imported_files_15/
 cp /mnt/c/github/txt/FIFA16/playernames.txt /mnt/c/github/fifa/16/imported_files_15/
 cp /mnt/c/github/txt/FIFA16/teams.txt /mnt/c/github/fifa/16/imported_files_15/
-mv players_fifa16_format_utf16.txt /mnt/c/github/fifa/16/imported_files_15/players.txt
-mv teamplayerlinks_fifa16_format_utf16.txt /mnt/c/github/fifa/16/imported_files_15/teamplayerlinks.txt
-mv leagueteamlinks_fifa15_format_utf16.txt /mnt/c/github/fifa/16/imported_files_15/leagueteamlinks.txt
+mv players.txt /mnt/c/github/fifa/16/imported_files_15/players.txt
+mv teamplayerlinks.txt /mnt/c/github/fifa/16/imported_files_15/teamplayerlinks.txt
+mv leagueteamlinks.txt /mnt/c/github/fifa/16/imported_files_15/leagueteamlinks.txt
