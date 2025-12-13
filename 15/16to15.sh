@@ -9,20 +9,31 @@ OUTFILE2="teamplayerlinks.txt"
 TABLE3="leagueteamlinks"
 OUTFILE3="leagueteamlinks.txt"
 
+drop_column_if_exists() {
+    local db="$1"
+    local table="$2"
+    local column="$3"
 
-# 📝 Création du fichier SQL
-cat <<EOF > ${DB}.sql
-DELETE FROM ${DB}.players
-WHERE gender = 1;
+    exists=$($cmd -N -s -e "
+        SELECT 1
+        FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA='${db}'
+          AND TABLE_NAME='${table}'
+          AND COLUMN_NAME='${column}';
+    ")
 
-ALTER TABLE ${DB}.players
-DROP COLUMN gender,
-DROP COLUMN emotion;
-
-ALTER TABLE ${DB}.teamplayerlinks
-DROP COLUMN leaguegoalsprevmatch,
-DROP COLUMN leaguegoalsprevthreematches;
-EOF
+    if [ -n "$exists" ]; then
+        echo "→ DROP COLUMN ${column} dans ${table}"
+        $cmd -e "ALTER TABLE ${db}.${table} DROP COLUMN ${column};"
+    else
+        echo "→ ${column} n'existe pas dans ${table}"
+    fi
+}
+$cmd -e "delete from ${DB}.players where gender=1"
+drop_column_if_exists FC16 players gender
+drop_column_if_exists FC16 players emotion
+drop_column_if_exists FC16 teamplayerlinks leaguegoalsprevmatch
+drop_column_if_exists FC16 teamplayerlinks leaguegoalsprevthreematches
 
 # 🛠️ Exécution du script SQL
 $cmd < ${DB}.sql

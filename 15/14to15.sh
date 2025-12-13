@@ -6,16 +6,29 @@ TABLE1="teams"
 OUTFILE1="teams.txt"
 TABLE2="players"
 OUTFILE2="players.txt"
+add_column_if_missing() {
+    local db="$1"
+    local table="$2"
+    local column="$3"
+    local definition="$4"
 
-# 📝 Création du fichier SQL
-cat <<EOF > ${DB}.sql
-ALTER TABLE ${DB}.teams
-ADD COLUMN leftfreekicktakerid INT DEFAULT 0,
-ADD COLUMN rightfreekicktakerid INT DEFAULT 0;
-EOF
+    exists=$($cmd -N -e "
+        SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA='${db}'
+          AND TABLE_NAME='${table}'
+          AND COLUMN_NAME='${column}';
+    ")
 
-# 🛠️ Exécution du script SQL
-$cmd < ${DB}.sql
+    if [ -z "$exists" ]; then
+        echo "→ Ajout de ${column} dans ${table}"
+        $cmd -e "ALTER TABLE ${db}.${table} ADD COLUMN ${column} ${definition};"
+    else
+        echo "→ ${column} existe déjà"
+    fi
+}
+
+add_column_if_missing $DB teams leftfreekicktakerid "INT DEFAULT 0"
+add_column_if_missing $DB teams rightfreekicktakerid "INT DEFAULT 0"
 
 # ✅ Export des deux tables fixes
 $cmd --batch --column-names -e "SELECT * FROM \`$TABLE1\`;" > "$OUTFILE1"

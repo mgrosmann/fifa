@@ -8,17 +8,30 @@ OUTFILE1="players.txt"
 OUTFILE2="teamplayerlinks.txt"
 TABLE3="leagueteamlinks"
 OUTFILE3="leagueteamlinks.txt"
+add_column_if_missing() {
+    local db="$1"
+    local table="$2"
+    local column="$3"
+    local definition="$4"
 
-# 📝 Création du fichier SQL
-cat <<EOF > ${DB}.sql
-ALTER TABLE ${DB}.players
-ADD COLUMN gender INT DEFAULT 0,
-ADD COLUMN emotion INT DEFAULT 1;
+    exists=$($cmd -N -e "
+        SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA='${db}'
+          AND TABLE_NAME='${table}'
+          AND COLUMN_NAME='${column}';
+    ")
 
-ALTER TABLE ${DB}.teamplayerlinks
-ADD COLUMN leaguegoalsprevmatch INT DEFAULT 0,
-ADD COLUMN leaguegoalsprevthreematches INT DEFAULT 0;
-EOF
+    if [ -z "$exists" ]; then
+        echo "→ Ajout de ${column} dans ${table}"
+        $cmd -e "ALTER TABLE ${db}.${table} ADD COLUMN ${column} ${definition};"
+    else
+        echo "→ ${column} existe déjà"
+    fi
+}
+add_column_if_missing $DB players gender "INT DEFAULT 0"
+add_column_if_missing $DB players emotion "INT DEFAULT 1"
+add_column_if_missing $DB teamplayerlinks leaguegoalsprevmatch "INT DEFAULT 0"
+add_column_if_missing $DB teamplayerlinks leaguegoalsprevthreematches "INT DEFAULT 0"
 
 # 🛠️ Exécution du script SQL
 $cmd < ${DB}.sql
