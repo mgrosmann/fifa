@@ -25,12 +25,12 @@ DROP COLUMN leaguegoalsprevthreematches;
 EOF
 
 # 🛠️ Exécution du script SQL
-$cmd "$DB" < ${DB}.sql
+$cmd < ${DB}.sql
 
 # ✅ Export des deux tables fixes
-$cmd -D "$DB" --batch --column-names -e "SELECT * FROM \`$TABLE1\`;" > "$OUTFILE1"
-$cmd -D "$DB" --batch --column-names -e "SELECT * FROM \`$TABLE2\`;" > "$OUTFILE2"
-$cmd -D "$DB" --batch --column-names -e "SELECT * FROM \`$TABLE3\`;" > "$OUTFILE3"
+$cmd --batch --column-names -e "SELECT * FROM \`$TABLE1\`;" > "$OUTFILE1"
+$cmd --batch --column-names -e "SELECT * FROM \`$TABLE2\`;" > "$OUTFILE2"
+$cmd --batch --column-names -e "SELECT * FROM \`$TABLE3\`;" > "$OUTFILE3"
 
 
 if [ $? -eq 0 ]; then
