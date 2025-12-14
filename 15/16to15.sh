@@ -30,10 +30,10 @@ drop_column_if_exists() {
     fi
 }
 $cmd -e "delete from ${DB}.players where gender=1"
-drop_column_if_exists FC16 players gender
-drop_column_if_exists FC16 players emotion
-drop_column_if_exists FC16 teamplayerlinks leaguegoalsprevmatch
-drop_column_if_exists FC16 teamplayerlinks leaguegoalsprevthreematches
+drop_column_if_exists $DB players gender
+drop_column_if_exists $DB players emotion
+drop_column_if_exists $DB teamplayerlinks leaguegoalsprevmatch
+drop_column_if_exists $DB teamplayerlinks leaguegoalsprevthreematches
 
 # 🛠️ Exécution du script SQL
 $cmd < ${DB}.sql
