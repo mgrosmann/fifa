@@ -36,6 +36,5 @@ apt install python3-full -y
 python3 -m venv venv
 source venv/bin/activate
 apt install pip -y
-pip install pandas
-pip install datetime 
-pip install mysql.connector
+pip install pandas datetime mysql.connector
+
